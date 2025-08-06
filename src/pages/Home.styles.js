@@ -1,156 +1,229 @@
 import styled from "styled-components";
 
-// Home 페이지 1440x1024 해상도 최적화 스타일드 컴포넌트
+// 대기화면 1440x1024 해상도 전용 스타일드 컴포넌트
 
-export const HomeContainer = styled.div`
-  /* App 전체 컨테이너 스타일 (기존 App.css에서 이동) */
-  min-height: 100vh;
-  width: 100vw;
-  background-color: #f8f9fa;
-
-  /* 메인 컨텐츠 영역 스타일 */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 3rem 4rem;
-  max-width: 1200px;
+// 메인 컨테이너 (대기화면)
+export const WaitingScreenContainer = styled.div`
+  position: relative;
+  width: 1440px;
+  height: 1024px;
+  background: #f2f6fb;
   margin: 0 auto;
-  box-sizing: border-box;
+  overflow: hidden;
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
 
-  /* 1440x1024 해상도 전용 스타일 */
-  @media (width: 1440px) and (height: 1024px) {
-    padding: 4rem 5rem;
-    max-width: 1200px;
-  }
-
-  /* 1440x1024 이상의 해상도에서 */
-  @media (min-width: 1440px) and (min-height: 1024px) {
-    padding: 4rem 6rem;
-    max-width: 1300px;
+  /* 전체화면 중앙 정렬 */
+  @media (min-width: 1441px) {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   }
 
   /* 작은 화면에서의 대응 */
-  @media (max-width: 1439px) or (max-height: 1023px) {
-    padding: 2rem 3rem;
-    max-width: 1000px;
+  @media (max-width: 1439px) {
+    width: 100vw;
+    height: 100vh;
+    min-height: 600px;
   }
 `;
 
-export const HomeTitle = styled.h1`
-  font-size: 4rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 2rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+// 로고 영역
+export const LogoContainer = styled.div`
+  position: absolute;
+  top: 3.5rem;
+  left: 4rem;
+  width: 11.875rem;
+  height: 2.5007rem;
 
-  /* 1440x1024 해상도 전용 스타일 */
-  @media (width: 1440px) and (height: 1024px) {
-    font-size: 5rem;
-    margin-bottom: 2.5rem;
+  /* 반응형 대응 */
+  @media (max-width: 1439px) {
+    top: 2rem;
+    left: 2rem;
+    width: 9rem;
+    height: 1.9rem;
   }
 
-  /* 1440x1024보다 큰 해상도 */
-  @media (min-width: 1440px) and (min-height: 1024px) {
-    font-size: 6rem;
-  }
-
-  /* 작은 화면 대응 */
   @media (max-width: 768px) {
-    font-size: 2.5rem;
+    top: 1.5rem;
+    left: 1.5rem;
+    width: 7rem;
+    height: 1.5rem;
   }
 `;
 
-export const HomeDescription = styled.p`
-  font-size: 1.5rem;
-  color: #666;
-  line-height: 1.8;
-  max-width: 800px;
-  margin: 0 auto 3rem auto;
-
-  /* 1440x1024 해상도 전용 스타일 */
-  @media (width: 1440px) and (height: 1024px) {
-    font-size: 1.75rem;
-    max-width: 900px;
-  }
-
-  /* 1440x1024보다 큰 해상도 */
-  @media (min-width: 1440px) and (min-height: 1024px) {
-    font-size: 2rem;
-    max-width: 1000px;
-  }
-
-  /* 작은 화면 대응 */
-  @media (max-width: 768px) {
-    font-size: 1.25rem;
-  }
-`;
-
-export const HomeFeatures = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+export const LogoImage = styled.img`
   width: 100%;
-  max-width: 1000px;
-  margin-top: 3rem;
+  height: 100%;
+  object-fit: contain;
+`;
 
-  /* 1440x1024 해상도 전용 스타일 */
-  @media (width: 1440px) and (height: 1024px) {
-    max-width: 1200px;
-    gap: 2.5rem;
-  }
+// 부제목 텍스트
+export const SubtitleText = styled.div`
+  position: absolute;
+  width: 43.6875rem;
+  height: 5.8125rem;
+  top: 20.75rem;
+  left: calc(50% - 46.6875rem / 2);
 
-  /* 1440x1024보다 큰 해상도 */
-  @media (min-width: 1440px) and (min-height: 1024px) {
-    max-width: 1300px;
-    gap: 3rem;
-  }
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 4rem;
+  line-height: 145%;
+  display: flex;
+  align-items: center;
+  letter-spacing: -1.5%;
+  white-space: nowrap;
+
+  color: #272727;
 
   /* 작은 화면 대응 */
-  @media (max-width: 1439px) or (max-height: 1023px) {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 800px;
+  @media (max-width: 1439px) {
+    font-size: 3rem;
+    width: 80%;
+    left: 10%;
+    top: 15rem;
   }
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    max-width: 500px;
+    font-size: 2rem;
+    width: 90%;
+    left: 5%;
+    top: 12rem;
   }
 `;
 
-export const FeatureCard = styled.div`
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+// 제목 그룹
+export const TitleGroup = styled.div`
+  position: absolute;
+  width: 52rem;
+  top: 26.375rem;
+  left: calc(50% - 52rem / 2);
+
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  white-space: nowrap;
+
+  /* 작은 화면 대응 */
+  @media (max-width: 1439px) {
+    flex-direction: column;
+    gap: 0.625rem;
+    left: 10%;
+    top: 20rem;
+  }
+
+  @media (max-width: 768px) {
+    top: 16rem;
+    left: 5%;
+  }
+`;
+
+// 제목 파란색 부분
+export const TitleBlue = styled.div`
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 6.25rem;
+  line-height: 145%;
+  display: flex;
+  align-items: center;
+  letter-spacing: -2%;
+  white-space: nowrap;
+
+  color: #224094;
+
+  /* 작은 화면 대응 */
+  @media (max-width: 1439px) {
+    font-size: 4.5rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 3rem;
+  }
+`;
+
+// 제목 검은색 부분
+export const TitleBlack = styled.div`
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 6.25rem;
+  line-height: 145%;
+  display: flex;
+  align-items: center;
+  letter-spacing: -1.5%;
+  white-space: nowrap;
+
+  color: #272727;
+
+  /* 작은 화면 대응 */
+  @media (max-width: 1439px) {
+    font-size: 4.5rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 3rem;
+  }
+`;
+
+// 주문하기 버튼 컨테이너
+export const OrderButton = styled.div`
+  position: absolute;
+  width: 55rem;
+  height: 9.375rem;
+  left: calc(50% - 53.5rem / 2);
+  top: 41.625rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #223770;
+  border-radius: 30px;
+
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(34, 55, 112, 0.3);
   }
 
-  /* 1440x1024 해상도 전용 스타일 */
-  @media (width: 1440px) and (height: 1024px) {
-    padding: 2.5rem;
+  &:active {
+    transform: translateY(0);
+  }
+
+  /* 작은 화면 대응 */
+  @media (max-width: 1439px) {
+    width: 80%;
+    left: 10%;
+    height: 120px;
+  }
+
+  @media (max-width: 768px) {
+    width: 90%;
+    left: 5%;
+    height: 100px;
   }
 `;
 
-export const FeatureIcon = styled.div`
-  font-size: 3rem;
-  margin-bottom: 1rem;
-`;
-
-export const FeatureTitle = styled.h3`
-  font-size: 1.5rem;
+// 주문하기 버튼 텍스트
+export const OrderButtonText = styled.div`
+  font-family: "Pretendard";
+  font-style: normal;
   font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 1rem;
-`;
+  font-size: 3rem;
+  line-height: 100%;
+  letter-spacing: 0%;
 
-export const FeatureText = styled.p`
-  font-size: 1rem;
-  color: #666;
-  line-height: 1.6;
+  color: #ffffff;
+
+  /* 작은 화면 대응 */
+  @media (max-width: 1439px) {
+    font-size: 2.25rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.75rem;
+  }
 `;

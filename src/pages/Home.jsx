@@ -1,51 +1,42 @@
 import React from "react";
 import {
-  HomeContainer,
-  HomeTitle,
-  HomeDescription,
-  HomeFeatures,
-  FeatureCard,
-  FeatureIcon,
-  FeatureTitle,
-  FeatureText,
+  WaitingScreenContainer,
+  LogoContainer,
+  LogoImage,
+  SubtitleText,
+  TitleGroup,
+  TitleBlue,
+  TitleBlack,
+  OrderButton,
+  OrderButtonText,
 } from "./Home.styles";
+import logoImage from "../assets/images/logo.png";
 
 function Home() {
+  const handleOrderClick = () => {
+    // 주문하기 버튼 클릭 이벤트 처리
+    console.log("주문하기 버튼 클릭");
+  };
+
   return (
-    <HomeContainer>
-      <HomeTitle>KiTalk</HomeTitle>
-      <HomeDescription>
-        차세대 커뮤니케이션 플랫폼으로 더 나은 소통의 경험을 제공합니다.
-        <br />
-        1440 x 1024 해상도에 최적화된 사용자 친화적인 인터페이스를 만나보세요.
-      </HomeDescription>
+    <WaitingScreenContainer>
+      {/* 로고 영역 */}
+      <LogoContainer>
+        <LogoImage src={logoImage} alt="KiTalk 로고" />
+      </LogoContainer>
 
-      <HomeFeatures>
-        <FeatureCard>
-          <FeatureIcon>💬</FeatureIcon>
-          <FeatureTitle>실시간 채팅</FeatureTitle>
-          <FeatureText>
-            빠르고 안정적인 실시간 메시징으로 언제 어디서나 소통하세요.
-          </FeatureText>
-        </FeatureCard>
+      {/* 메인 콘텐츠 */}
+      <SubtitleText>키오스크 이젠 어렵지 않아요</SubtitleText>
+      <TitleGroup>
+        <TitleBlue>간편하게</TitleBlue>
+        <TitleBlack>주문하세요</TitleBlack>
+      </TitleGroup>
 
-        <FeatureCard>
-          <FeatureIcon>🎨</FeatureIcon>
-          <FeatureTitle>모던 UI/UX</FeatureTitle>
-          <FeatureText>
-            1440x1024 해상도에 최적화된 직관적이고 아름다운 사용자 인터페이스.
-          </FeatureText>
-        </FeatureCard>
-
-        <FeatureCard>
-          <FeatureIcon>⚡</FeatureIcon>
-          <FeatureTitle>고성능</FeatureTitle>
-          <FeatureText>
-            React와 최신 웹 기술을 활용한 빠르고 반응성 있는 애플리케이션.
-          </FeatureText>
-        </FeatureCard>
-      </HomeFeatures>
-    </HomeContainer>
+      {/* 주문하기 버튼 */}
+      <OrderButton onClick={handleOrderClick}>
+        <OrderButtonText>주문하기</OrderButtonText>
+      </OrderButton>
+    </WaitingScreenContainer>
   );
 }
 
