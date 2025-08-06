@@ -10,7 +10,7 @@ import {
   FeatureText,
 } from "./Home.styles";
 
-const Home = () => {
+function Home() {
   return (
     <HomeContainer>
       <HomeTitle>KiTalk</HomeTitle>
@@ -47,6 +47,6 @@ const Home = () => {
       </HomeFeatures>
     </HomeContainer>
   );
-};
+}
 
 export default Home;
