@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   WaitingScreenContainer,
   LogoContainer,
@@ -13,10 +14,10 @@ import {
 import logoImage from "../assets/images/logo.png";
 
 function Home() {
-  const handleOrderClick = () => {
-    // 주문하기 버튼 클릭 이벤트 처리
+  const navigate = useNavigate();
+  function handleOrderClick() {
     console.log("주문하기 버튼 클릭");
-  };
+  }
 
   return (
     <WaitingScreenContainer>

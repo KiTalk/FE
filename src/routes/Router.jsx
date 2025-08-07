@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
+import OrderMethod from "../pages/OrderMethod";
 // 추후 추가될 페이지들을 위한 임포트 (현재는 주석 처리)
 // import Chat from "./pages/Chat";
 // import About from "./pages/About";
@@ -16,7 +17,7 @@ export default function AppRouter() {
       <Routes>
         {/* 메인 홈페이지 */}
         <Route path="/" element={<Home />} />
-
+        <Route path="/order-method" element={<OrderMethod />}/>
         {/* 추후 추가될 라우트들 */}
         {/* <Route path="/chat" element={<Chat />} /> */}
         {/* <Route path="/about" element={<About />} /> */}
