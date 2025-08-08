@@ -1,0 +1,99 @@
+/* src/pages/OrderMethod.styled.css */
+.container {
+  text-align: center;
+  padding: 5rem;
+  background-color: #f2f6fc;
+  min-height: 100vh;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.6rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.large-button {
+  text-align: left;
+  color: black;
+  font-size: 40px;
+  width: 1074px;
+  height: 200px;
+  flex-shrink: 0;
+  border-radius: 19px;
+  background: #D9D9D9;
+
+  align-items: center;     /* 세로 정렬 중앙으로 */
+  padding-left: 40px;      /* 아이콘과 글자 간 공간 확보 */
+}
+
+
+.large-button:hover {
+  background-color: #f0f4ff;
+}
+
+.icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.desc {
+  font-size: 0.9rem;
+  color: #333;
+  margin-top: 0.3rem;
+}
+
+.small-buttons {
+  display: flex;
+  gap: 3rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.small-button {
+  text-align: left;
+  color: black;
+  font-size: 40px;
+  width: 510px;
+  height: 200px;
+  flex-shrink: 0;
+  border-radius: 19px;
+  background: #D9D9D9;
+  align-items: center;
+  padding-left: 40px;
+}
+
+.small-button:hover {
+  background-color: #f0f4ff;
+}
+
+.large-button .icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 40px;      /* 글자와 아이콘 사이 간격을 더 넓힘 */
+  object-fit: contain;
+  position: relative;
+  top: 5px;                /* 아이콘 위치를 아래로 조금 내림 */
+}
+
+.small-button .icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 40px;
+  object-fit: contain;
+  position: relative;
+  top: 5px;
+}

@@ -1,7 +1,9 @@
 // src/pages/OrderMethod.jsx
 import React from "react";
 import "./OrderMethod.styled.css";
-import { FaMicrophone, FaHandPointer, FaPhone } from "react-icons/fa";
+import voiceImg from "../assets/images/voice.png";
+import fingerImg from "../assets/images/finger.png";
+import phoneImg from "../assets/images/phone.png";
 
 function OrderMethod() {
   return (
@@ -11,21 +13,21 @@ function OrderMethod() {
 
       <div className="buttons">
         <button className="large-button">
-          <FaMicrophone className="icon" />
           <strong>음성주문</strong>
+          <img src={voiceImg} alt="음성주문 아이콘" className="icon" />
           <div className="desc">간편하게 말로 주문</div>
         </button>
 
         <div className="small-buttons">
           <button className="small-button">
-            <FaHandPointer className="icon" />
             <strong>손가락 주문</strong>
+            <img src={fingerImg} alt="손가락 주문 아이콘" className="icon" />
             <div className="desc">화면을 눌러 간편하게 주문</div>
           </button>
 
           <button className="small-button">
-            <FaPhone className="icon" />
             <strong>전화번호 간편주문</strong>
+            <img src={phoneImg} alt="전화번호 간편주문 아이콘" className="icon" />
             <div className="desc">간편하게 말로 주문</div>
           </button>
         </div>
