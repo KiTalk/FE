@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import {
   WaitingScreenContainer,
   LogoContainer,
@@ -15,12 +15,9 @@ import logoImage from "../assets/images/logo.png";
 
 function Home() {
   const navigate = useNavigate();
-  //아래 주문하기 버튼 클릭 이벤트 처리랑 비교해서 필요한 거 수정해주세요.
   function handleOrderClick() {
     console.log("주문하기 버튼 클릭");
-
-    const orderPath = process.env.REACT_APP_ORDER_PATH || "/order-method";
-    navigate(orderPath);  
+    navigate('/order-method');
   }
 
   return (
