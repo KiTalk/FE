@@ -1,37 +1,65 @@
-// src/pages/OrderMethod.jsx
 import React from "react";
 import "./OrderMethod.styled.css";
+import { useNavigate } from "react-router-dom";
 import voiceImg from "../assets/images/voice.png";
 import fingerImg from "../assets/images/finger.png";
 import phoneImg from "../assets/images/phone.png";
 
+/** 컴포넌트 함수 선언식 */
 function OrderMethod() {
-  return (
-    <div className="container">
-      <h2 className="title">주문 방법 선택</h2>
-      <p className="subtitle">아래 방법 중 선택해 주세요</p>
+  const navigate = useNavigate();
 
-      <div className="buttons">
-        <button className="large-button">
-          <strong>음성주문</strong>
-          <img src={voiceImg} alt="음성주문 아이콘" className="icon" />
-          <div className="desc">간편하게 말로 주문</div>
+  /** 내부 동작 함수(선언식): 공통 선택 처리 */
+  function handleSelect(path) {
+    navigate(path);
+  }
+
+  /** 내부 동작 함수(선언식): 각 버튼 전용 핸들러 */
+  function handleVoiceClick() {
+    handleSelect("/order/voice");
+  }
+  function handleTouchClick() {
+    handleSelect("/order/touch");
+  }
+  function handlePhoneClick() {
+    handleSelect("/order/phone");
+  }
+
+  return (
+    <div className="Container">
+      <h1 className="Title">주문 방법 선택</h1>
+      <p className="Subtitle">아래 방법 중 선택해 주세요</p>
+
+      {/* Large Button - 텍스트 왼쪽, 이미지 오른쪽 */}
+      <button type="button" className="LargeButton" onClick={handleVoiceClick}>
+        <div className="TextGroup">
+          <div className="ItemName">음성주문</div>
+          <div className="ItemDesc">간편하게 말로 주문</div>
+        </div>
+        <img src={voiceImg} alt="음성주문 아이콘" className="Icon" />
+      </button>
+
+      {/* Small Buttons - 텍스트 왼쪽, 이미지 오른쪽 / 높이 동일 */}
+      <div className="ButtonGroup">
+        <button type="button" className="ButtonTouch" onClick={handleTouchClick}>
+          <div className="TextGroup">
+            <div className="ItemName">손가락 주문</div>
+            <div className="ItemDesc">화면을 눌러 간편하게 주문</div>
+          </div>
+          <img src={fingerImg} alt="손가락 주문 아이콘" className="Icon" />
         </button>
 
-        <div className="small-buttons">
-          <button className="small-button">
-            <strong>손가락 주문</strong>
-            <img src={fingerImg} alt="손가락 주문 아이콘" className="icon" />
-            <div className="desc">화면을 눌러 간편하게 주문</div>
-          </button>
-
-          <button className="small-button">
-            <strong>전화번호 간편주문</strong>
-            <img src={phoneImg} alt="전화번호 간편주문 아이콘" className="icon" />
-            <div className="desc">간편하게 말로 주문</div>
-          </button>
-        </div>
+        <button type="button" className="ButtonPhone" onClick={handlePhoneClick}>
+          <div className="TextGroup">
+            <div className="ItemName">전화번호 간편주문</div>
+            <div className="ItemDesc">간편하게 말로 주문</div>
+          </div>
+          <img src={phoneImg} alt="전화번호 간편주문 아이콘" className="Icon" />
+        </button>
       </div>
+
+      {/* 하단 둥근 직사각형 액센트 */}
+      <div className="BottomAccentBar" aria-hidden="true" />
     </div>
   );
 }
