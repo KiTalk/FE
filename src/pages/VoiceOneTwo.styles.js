@@ -58,6 +58,10 @@ export const MicButton = styled.button`
   border-radius: 30px;
   border: none;
   cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
 `;
 
 export const MicIcon = styled.img`
