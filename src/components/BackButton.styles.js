@@ -24,6 +24,13 @@ export const BackButtonRoot = styled.button`
   user-select: none;
   transition: none;
 
+  &:hover {
+    background: transparent;
+    transform: none;
+    box-shadow: none;
+    filter: none;
+  }
+
   &:focus {
     outline: none;
   }
