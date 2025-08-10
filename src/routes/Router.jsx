@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import OrderMethod from "../pages/OrderMethod";
 import TouchOrder from "../pages/TouchOrder";
+import VoiceOrder from "../pages/VoiceOrder";
 // 추후 추가될 페이지들을 위한 임포트 (현재는 주석 처리)
 // import NotFound from "./pages/NotFound";
 
@@ -14,6 +15,7 @@ export default function AppRouter() {
         <Route path="/" element={<Home />} />
         <Route path="/order-method" element={<OrderMethod />} />
         <Route path="/order/touch" element={<TouchOrder />} />
+        <Route path="/order/voice" element={<VoiceOrder />} />
 
         {/* 404 페이지 (모든 라우트의 마지막에 위치) */}
         {/* <Route path="*" element={<NotFound />} /> */}
