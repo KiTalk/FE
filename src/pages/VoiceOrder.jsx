@@ -22,7 +22,7 @@ function VoiceOrder() {
   }
 
   function handleOneTwo() {
-    // TODO: route to 1~2 items voice flow
+    navigate("/order/voice/one-two");
   }
 
   function handleThreePlus() {
