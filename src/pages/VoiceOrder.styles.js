@@ -34,7 +34,7 @@ export const Title = styled.h1`
   font-family: Pretendard;
   font-size: 4rem;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 570;
   line-height: normal;
   letter-spacing: -0.06rem;
 `;
@@ -72,7 +72,7 @@ export const CardTitle = styled.div`
   top: 24.44rem;
   left: 50%;
   transform: translateX(-50%);
-  font-weight: 700;
+  font-weight: 650;
   font-size: 70px;
   line-height: 84px;
   display: flex;
