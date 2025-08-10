@@ -167,7 +167,7 @@ export const TitleBlack = styled.div`
 `;
 
 // 주문하기 버튼 컨테이너
-export const OrderButton = styled.div`
+export const OrderButton = styled.button`
   position: absolute;
   width: 55rem;
   height: 9.375rem;
