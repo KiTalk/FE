@@ -189,6 +189,10 @@ export const OrderButton = styled.button`
     box-shadow: 0 8px 20px rgba(34, 55, 112, 0.3);
   }
 
+  &:focus {
+    outline: none;
+  }
+
   &:active {
     transform: translateY(0);
   }
