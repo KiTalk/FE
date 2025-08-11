@@ -1,4 +1,5 @@
-import styled, { css } from "styled-components";
+// ./src/pages/TouchOrder.styled.js
+import styled from "styled-components";
 
 export const ProductCard = styled.div`
   position: relative;
@@ -46,14 +47,20 @@ export const InfoArea = styled.div`
   height: calc(100% - 310px);
   background: #ffffff;
   box-sizing: border-box;
-  /* Add bottom padding to prevent content from being overlapped by the absolute AddButton (90px) */
-  padding: 28px 24px 110px 24px;
+  padding: 28px 24px 110px 24px; /* 하단 담기 버튼(90px) 피해서 여백 */
+`;
+
+/* ✅ 추가: 이름과 뱃지를 한 줄로 배치 */
+export const NameRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 `;
 
 export const ProductName = styled.div`
   color: #272727;
   font-family: Pretendard;
-  font-size: 2rem;
+  font-size: 1.9rem;
   font-style: normal;
   font-weight: 600;
   line-height: 1.875rem;
@@ -68,7 +75,7 @@ export const ProductPrice = styled.div`
   font-weight: 700;
   line-height: 1.875rem;
   letter-spacing: -0.0375rem;
-  margin-top: 1.31rem;
+  margin-top: 0.75rem;
 `;
 
 export const QuantityRow = styled.div`
@@ -81,7 +88,8 @@ export const QuantityRow = styled.div`
   margin-top: 3rem;
 `;
 
-export const QuantityButton = styled.button`
+/* 공통 수량 버튼 */
+const QuantityButtonBase = styled.button`
   width: 36px;
   height: 36px;
   border: none;
@@ -131,29 +139,27 @@ export const QuantityButton = styled.button`
   &::-moz-focus-inner {
     border: 0;
   }
+`;
 
-  ${(p) =>
-    p.$type === "minus" &&
-    css`
-      &::after {
-        display: none;
-      }
-      &::before {
-        background: #adadad;
-      }
-      &:hover::before,
-      &:active::before {
-        background: #223770;
-      }
-    `}
+/* - 버튼 */
+export const QuantityButtonMinus = styled(QuantityButtonBase)`
+  &::after {
+    display: none;
+  }
+  &::before {
+    background: #adadad;
+  }
+  &:hover::before,
+  &:active::before {
+    background: #223770;
+  }
+`;
 
-  ${(p) =>
-    p.$type === "plus" &&
-    css`
-      &::after {
-        transform: translate(-50%, -50%) rotate(90deg);
-      }
-    `}
+/* + 버튼 */
+export const QuantityButtonPlus = styled(QuantityButtonBase)`
+  &::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
 `;
 
 export const QuantityValue = styled.div`
@@ -163,7 +169,7 @@ export const QuantityValue = styled.div`
   font-size: 3rem;
   font-style: normal;
   font-weight: 500;
-  line-height: 1.875rem; /* 62.5% */
+  line-height: 1.875rem;
   letter-spacing: -0.045rem;
 `;
 
@@ -176,7 +182,7 @@ export const AddButton = styled.button`
   border: none;
   background: #223770;
   color: #ffffff;
-  font-weight: 600;
+  font-weight:600;
   font-size: 32px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -189,22 +195,79 @@ export const AddButton = styled.button`
   }
 
   &:active {
-    background: #1b2d66; /* pressed */
+    background: #1b2d66;
     color: #ffffff;
     box-shadow: none;
   }
 
-  &:focus {
-    outline: none;
-    box-shadow: none;
-  }
-
+  &:focus,
   &:focus-visible {
     outline: none;
     box-shadow: none;
   }
-
   &::-moz-focus-inner {
     border: 0;
   }
+
+  /* 수량 0일 때 비활성 및 회색(#C0C0C0) */
+  &:disabled {
+    background: #c0c0c0;
+    cursor: default;
+  }
+  &:disabled:hover,
+  &:disabled:active {
+    background: #c0c0c0;
+  }
 `;
+
+/* =========================
+   ✅ 추가 파트 (함수 선언식 + 뱃지)
+   ========================= */
+
+/* 온도별 색상 헬퍼 — 함수 선언식 */
+function tempBg(p) {
+  return p.$temp === "cold" ? "#EFF6FF" : "#FEF2F2";
+}
+function tempFg(p) {
+  return p.$temp === "cold" ? "#3191FF" : "#DA2525";
+}
+function tempBd(p) {
+  return p.$temp === "cold" ? "#3191FF" : "#DA2525";
+}
+
+export const TempBadge = styled.span`
+  --bg: ${tempBg};
+  --fg: ${tempFg};
+  --bd: ${tempBd};
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1.7;
+  background: transparent;
+  color: var(--fg);
+  border: 2.5px solid var(--bd);
+  white-space: nowrap;
+  letter-spacing: -0.2px;
+
+  &::before{
+    content: none;
+  }
+`;
+
+/* =========================
+   ✅ 추가 파트 (스크롤 영역)
+   ========================= */
+
+/* 페이지 내부 스크롤 컨테이너가 필요할 때 사용 */
+export const ScrollArea = styled.div`
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-bottom: 24px;
+`

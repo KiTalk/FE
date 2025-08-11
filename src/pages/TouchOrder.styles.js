@@ -1,3 +1,4 @@
+// ./src/pages/TouchOrder.styles.js
 import styled from "styled-components";
 
 export const Page = styled.div`
@@ -9,6 +10,9 @@ export const Page = styled.div`
   padding-bottom: 1rem;
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
+
+  /* ✅ 전체 가로 스크롤 제거 */
+  overflow-x: hidden;
 `;
 
 export const Hero = styled.div`
@@ -34,7 +38,7 @@ export const HeroTitle = styled.h2`
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
   font-weight: 700;
-  font-size: 3rem;
+  font-size: 4.5rem;
   line-height: 100%;
   letter-spacing: -0.015em;
   display: flex;
@@ -130,11 +134,7 @@ export const CartBadgeCount = styled.div`
   font-weight: 500;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  /* 배지 카운트 오프셋 */
-  transform: translate(
-    var(--badge-count-offset-x, 0px),
-    var(--badge-count-offset-y, -2px)
-  );
+  transform: translate(var(--badge-count-offset-x, 0px), var(--badge-count-offset-y, -2px));
 `;
 
 export const CartArrow = styled.img`
@@ -162,7 +162,7 @@ export const CartRight = styled.div`
   gap: 12px;
 `;
 
-// Sections
+/* Sections */
 export const Section = styled.section`
   position: relative;
   width: 1220px;
@@ -193,6 +193,53 @@ export const SectionTitle = styled.h3`
 
 export const ProductRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 381px);
+  /* ✅ 항상 3열: 각 칼럼은 가용 영역을 균등 분할 */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 38px;
+
+  /* ✅ 혹시 모를 가로 오버플로 방지 */
+  overflow: visible;
+`;
+
+/* =========================
+   ✅ 리스트 전용 세로 스크롤 영역
+   ========================= */
+export const ScrollArea = styled.div`
+  width: 100%;
+  /* 히어로 높이 + (대략적인) 탭 영역 높이만큼 뺀 높이 */
+  max-height: calc(100dvh - 13.375rem - 6rem);
+
+  /* ✅ 세로만 스크롤, 가로는 숨김 */
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-bottom: 24px;
+
+  /* ✅ 커스텀 스크롤바 (크롬/엣지/사파리) - 화살표 버튼 제거 */
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
+  &::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  &::-webkit-scrollbar-track {
+    background: #e5e7eb;
+    border-radius: 999px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border-radius: 999px;
+    border: 3px solid #e5e7eb;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
+
+  /* 파이어폭스 */
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af #e5e7eb;
 `;
