@@ -78,6 +78,8 @@ export class AudioRecorder {
       console.error("MediaRecorder 오류:", event.error);
     };
 
+    // Start without a timeslice. We'll explicitly flush buffered data via requestData()
+    // when creating interim snapshots, so recording can continue seamlessly.
     this.mediaRecorder.start();
     this.isRecording = true;
 
@@ -170,6 +172,47 @@ export class AudioRecorder {
 
       this.mediaRecorder.stop();
     });
+  }
+
+  // 현재까지 수집된 청크를 기반으로 스냅샷 파일 생성 (녹음은 지속)
+  // 원본 청크 배열을 건드리지 않으며, MediaRecorder.requestData()로 버퍼를 플러시합니다.
+  async getSnapshotFile(prefix = "recording-snapshot") {
+    if (!this.isRecording || !this.mediaRecorder) {
+      return null;
+    }
+
+    try {
+      if (typeof this.mediaRecorder.requestData === "function") {
+        // Flush pending data into ondataavailable
+        this.mediaRecorder.requestData();
+      }
+    } catch {
+      // no-op
+    }
+
+    // 잠시 대기하여 requestData()로 밀어넣은 버퍼가 수집되도록 함
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    if (!this.audioChunks || this.audioChunks.length === 0) {
+      return null;
+    }
+
+    const mimeType = this.actualMimeType || this.getSupportedMimeType();
+    const audioBlob = new Blob(this.audioChunks, { type: mimeType });
+
+    let extension = "webm";
+    if (mimeType.includes("webm")) extension = "webm";
+    else if (mimeType.includes("wav")) extension = "wav";
+    else if (mimeType.includes("ogg")) extension = "ogg";
+    else if (mimeType.includes("mpeg") || mimeType.includes("mp3"))
+      extension = "mp3";
+    else if (mimeType.includes("mp4")) extension = "mp4";
+    else if (mimeType.includes("flac")) extension = "flac";
+
+    const fileName = `${prefix}-${Date.now()}.${extension}`;
+    const snapshotFile = new File([audioBlob], fileName, { type: mimeType });
+
+    return snapshotFile;
   }
 
   // 녹음 취소

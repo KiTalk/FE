@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import AudioSpectrum from "../components/AudioSpectrum";
@@ -23,7 +29,9 @@ function VoiceRecognize() {
   const [recognized, setRecognized] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [voiceDetected, setVoiceDetected] = useState(false);
+  const [voiceDetected, setVoiceDetected] = useState(false); // eslint-disable-line no-unused-vars
+  const interimTimerRef = useRef(null);
+  const snapshotInFlightRef = useRef(false);
 
   const language = useMemo(() => getSettings().defaultLanguage || "ko", []);
   const MIN_DURATION_SEC = 1.0; // STT 전송을 위한 최소 녹음 시간
@@ -81,6 +89,11 @@ function VoiceRecognize() {
 
   async function toggleRecording() {
     setError("");
+    // 안전 장치: 완료 시 임시 전송 타이머 중지
+    if (interimTimerRef.current) {
+      clearInterval(interimTimerRef.current);
+      interimTimerRef.current = null;
+    }
     if (!recorderRef.current) {
       recorderRef.current = new AudioRecorder();
       const init = await recorderRef.current.initializeRecording();
@@ -172,6 +185,27 @@ function VoiceRecognize() {
     }
   }
 
+  // 2초마다 스냅샷을 생성해서 STT 전송 (녹음 유지)
+  const sendInterimSnapshot = useCallback(async () => {
+    if (!recorderRef.current || snapshotInFlightRef.current) return;
+    snapshotInFlightRef.current = true;
+    try {
+      const snapshotFile = await recorderRef.current.getSnapshotFile(
+        "recording-interim"
+      );
+      if (!snapshotFile || snapshotFile.size < 2000) return; // 너무 작은 경우 생략
+
+      const data = await sttService.convertSpeechToText(snapshotFile, language);
+      const text = extractTextFromSttResponse(data);
+      if (text) setRecognized(text);
+    } catch (err) {
+      // 임시 전송 실패는 UI 에러로 노출하지 않음
+      console.warn("Interim STT failed:", err?.message || err);
+    } finally {
+      snapshotInFlightRef.current = false;
+    }
+  }, [language]);
+
   // 페이지 진입 시 자동 녹음 시작
   useEffect(() => {
     let isCancelled = false;
@@ -205,6 +239,26 @@ function VoiceRecognize() {
       isCancelled = true;
     };
   }, []);
+
+  // 녹음 상태에 따라 2초 간격 스냅샷 타이머 관리
+  useEffect(() => {
+    if (isRecording) {
+      if (interimTimerRef.current) clearInterval(interimTimerRef.current);
+      interimTimerRef.current = setInterval(() => {
+        // 음성이 감지될 때만 전송하고 싶다면 voiceDetected를 체크 가능
+        sendInterimSnapshot();
+      }, 3000);
+    } else if (interimTimerRef.current) {
+      clearInterval(interimTimerRef.current);
+      interimTimerRef.current = null;
+    }
+    return () => {
+      if (interimTimerRef.current) {
+        clearInterval(interimTimerRef.current);
+        interimTimerRef.current = null;
+      }
+    };
+  }, [isRecording, sendInterimSnapshot]);
 
   useEffect(() => {
     return () => {
@@ -240,13 +294,7 @@ function VoiceRecognize() {
         <ExampleGray>“아이스 아메리카노 1잔 포장”</ExampleGray>
       </ExampleBox>
 
-      <RecognizedText>
-        {recognized
-          ? `“${recognized}”`
-          : voiceDetected
-          ? "말씀하시면 인식합니다..."
-          : "“어 아 아이스 아메리카노 1잔 포장해줘”"}
-      </RecognizedText>
+      <RecognizedText>{recognized ? `“${recognized}”` : ""}</RecognizedText>
 
       {/* 자동 시작으로 중앙 토글 버튼은 제거 */}
 
