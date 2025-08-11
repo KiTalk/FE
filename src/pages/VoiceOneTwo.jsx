@@ -19,13 +19,14 @@ function VoiceOneTwo() {
     navigate(-1);
   }
 
-  function handleMic() {
-    // 음성 인식 플로우 시작 예정 (후속 작업)
+  function handleMikeClick() {
+    console.log("주문하기 버튼 클릭");
+    navigate("/order/voice/recognize");
   }
 
   return (
     <Page>
-      <MicButton onClick={handleMic} aria-label="음성 주문 버튼" />
+      <MicButton onClick={handleMikeClick} aria-label="음성 주문 버튼" />
       <MicIcon src={micImg} alt="마이크 아이콘" />
       <FingerGuide src={fingerImg} alt="손가락 가이드" />
 
