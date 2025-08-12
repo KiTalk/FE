@@ -69,7 +69,7 @@ export const ProductPrice = styled.div`
   line-height: 1.875rem;
   letter-spacing: -0.0375rem;
   margin-top: 1.31rem;
-`;
+`; 
 
 export const QuantityRow = styled.div`
   display: grid;
@@ -208,3 +208,6 @@ export const AddButton = styled.button`
     border: 0;
   }
 `;
+
+
+//
