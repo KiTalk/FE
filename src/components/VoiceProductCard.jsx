@@ -29,11 +29,26 @@ function VoiceProductCard({
       </ImageArea>
       <InfoArea>
         <ProductName>{productName}</ProductName>
-        <ProductPrice>{productPrice}</ProductPrice>
+        <ProductPrice>
+          {typeof productPrice === "number"
+            ? `${productPrice.toLocaleString()}원`
+            : productPrice}
+        </ProductPrice>
         <QuantityRow>
-          <QuantityButton $type="minus" onClick={onMinus} />
+          <QuantityButton
+            $type="minus"
+            onClick={onMinus}
+            type="button"
+            aria-label="수량 감소"
+            disabled={quantity <= 1}
+          />
           <QuantityValue>{quantity}</QuantityValue>
-          <QuantityButton $type="plus" onClick={onPlus} />
+          <QuantityButton
+            $type="plus"
+            onClick={onPlus}
+            type="button"
+            aria-label="수량 증가"
+          />
         </QuantityRow>
       </InfoArea>
     </ItemCard>

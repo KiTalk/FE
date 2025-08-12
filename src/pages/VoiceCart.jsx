@@ -33,8 +33,6 @@ function VoiceCart() {
     setQuantity((q) => q + 1);
   }
 
-  function handleOrder() {}
-
   function handleAddMore() {
     navigate(-1);
   }
@@ -42,7 +40,7 @@ function VoiceCart() {
   return (
     <Page>
       <VoiceRecorder language={language}>
-        {({ isRecording, loading, stream, recognized }) => (
+        {({ isRecording, loading, stream, recognized, toggleRecording }) => (
           <>
             <HeadingRow>
               <HeadingPrimary>{recognizedText}</HeadingPrimary>
@@ -69,7 +67,15 @@ function VoiceCart() {
               더 담기 <PlusIcon />
             </OutlineButton>
 
-            <PrimaryButton onClick={handleOrder}>주문하기</PrimaryButton>
+            <PrimaryButton
+              onClick={() => {
+                if (isRecording) {
+                  toggleRecording();
+                }
+              }}
+            >
+              주문하기
+            </PrimaryButton>
 
             {(isRecording || loading) && (
               <>
