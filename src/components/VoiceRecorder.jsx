@@ -3,30 +3,6 @@ import { AudioRecorder, getAudioDuration } from "../utils/audioUtils";
 import { addToHistory } from "../utils/historyUtils";
 import { sttService } from "../services/api";
 
-/**
- * A render-prop React component that manages live audio recording and speech-to-text (STT) processing.
- *
- * Starts recording automatically on mount, takes interim audio snapshots while recording (every ~3s)
- * to provide live/interim recognition updates, and performs a final STT request when recording is stopped.
- * Exposes recording state and controls to children via a render function.
- *
- * Side effects:
- * - Initializes and controls an AudioRecorder instance.
- * - Calls sttService to convert audio (interim snapshots and final audio) to text.
- * - Persists successful final transcriptions to history via addToHistory.
- * - Cleans up recorder resources on unmount.
- *
- * @param {string} language - BCP-47 style language code used for STT requests (e.g., "en-US", "ko-KR").
- * @param {function({ isRecording: boolean, loading: boolean, error: string, stream: MediaStream | undefined, recognized: string, toggleRecording: function }): any} children
- *        Render-prop function that receives the component API:
- *        - isRecording: true when recording is active.
- *        - loading: true while final STT processing is in progress.
- *        - error: user-facing error message, empty when none.
- *        - stream: the MediaStream from the recorder (if available).
- *        - recognized: latest interim or final recognized text.
- *        - toggleRecording: function to start/stop recording and trigger final STT on stop.
- * @returns {any} The result of calling the `children` render function.
- */
 function VoiceRecorder({ language, children }) {
   const recorderRef = useRef(null);
   const interimTimerRef = useRef(null);
