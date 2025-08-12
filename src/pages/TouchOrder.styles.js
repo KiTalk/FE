@@ -196,3 +196,4 @@ export const ProductRow = styled.div`
   grid-template-columns: repeat(2, 381px);
   gap: 38px;
 `;
+//
