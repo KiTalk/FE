@@ -14,6 +14,17 @@ import {
 } from "./VoiceRecognize.styles";
 import { getSettings } from "../utils/settingsUtils";
 
+/**
+ * Page component that records speech, shows a live audio spectrum, and displays automatic speech-to-text results.
+ *
+ * Uses the VoiceRecorder render-prop to manage recording/STT; it renders a status Title, an AudioSpectrum visualizer,
+ * an example sentence, the recognized text when available, and Back/Done controls. Language is taken from application
+ * settings (`getSettings().defaultLanguage` with fallback "ko"). The Done button stops recording if currently recording
+ * (by calling the recorder's toggleRecording) or navigates back when not recording. Errors reported by VoiceRecorder
+ * are displayed inline.
+ *
+ * @returns {JSX.Element} The VoiceRecognize page UI.
+ */
 function VoiceRecognize() {
   const navigate = useNavigate();
   const [voiceDetected, setVoiceDetected] = useState(false); // eslint-disable-line no-unused-vars
