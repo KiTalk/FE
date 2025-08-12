@@ -1,11 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Page,
   Hero,
   HeroInner,
   HeroTitle,
-  HeroSubtitle,
   CartWidget,
   CartIcon,
   CartText,
@@ -21,7 +20,7 @@ import {
 import marketImage from "../assets/images/market.png";
 import arrowImage from "../assets/images/arrow.png";
 import badgeImage from "../assets/images/badge.png";
-import { TABS, SECTIONS, SECTION_PRODUCTS } from "../data/TouchOrder.data";
+import { MENU_DATA } from "../data/TouchOrder.data.js";
 import CategoryTabs from "../components/CategoryTabs";
 import ProductCard from "../components/ProductCard";
 
@@ -30,10 +29,7 @@ function TouchOrder() {
   const [activeTabId, setActiveTabId] = useState("all");
   const [cartCount, setCartCount] = useState(0);
 
-  const sectionProducts = useMemo(() => SECTION_PRODUCTS, []);
-
   function handleAddToCart({ quantity }) {
-    // 향후 장바구니 상세 상태로 확장 가능
     setCartCount((prev) => prev + (quantity ?? 1));
   }
 
@@ -41,15 +37,13 @@ function TouchOrder() {
     navigate("/cart");
   }
 
+  const activeMenu = MENU_DATA.find((menu) => menu.id === activeTabId);
+
   return (
     <Page>
       <Hero>
         <HeroInner>
-          <HeroTitle>최고의 선택</HeroTitle>
-          <HeroSubtitle>
-            모든 메뉴 중 가장 인기있는 상품을 AI가 모아두었어요
-          </HeroSubtitle>
-
+          <HeroTitle>무엇을 드시겠어요?</HeroTitle>
           <CartWidget onClick={handleCartClick}>
             <CartTextWrap>
               <CartText>장바구니</CartText>
@@ -65,16 +59,16 @@ function TouchOrder() {
       </Hero>
 
       <CategoryTabs
-        tabs={TABS}
+        tabs={MENU_DATA.map(({ id, label }) => ({ id, label }))}
         activeId={activeTabId}
         onChange={setActiveTabId}
       />
 
-      {SECTIONS.map((section) => (
+      {activeMenu?.sections.map((section) => (
         <Section key={section.id}>
           <SectionTitle>{section.title}</SectionTitle>
           <ProductRow>
-            {sectionProducts[section.id].map((item) => (
+            {section.products.map((item) => (
               <ProductCard
                 key={item.id}
                 product={item}
@@ -89,5 +83,3 @@ function TouchOrder() {
 }
 
 export default TouchOrder;
-
-///
