@@ -3,6 +3,8 @@ import styled from "styled-components";
 
 export const Page = styled.div`
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: 1440px;
   min-height: 1024px;
   margin: 0 auto;

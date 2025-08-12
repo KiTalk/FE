@@ -15,6 +15,7 @@ import {
   QuantityValue,
   AddButton,
   TempBadge,
+  AddedOverlay, // ✅ 오버레이를 같은 파일에서 가져옵니다
 } from "/src/components/Product.styles.js";
 
 function formatKRW(value) {
@@ -35,6 +36,8 @@ export default function ProductCard({
   onAdd,               // (qty) => void
 }) {
   const [qty, setQty] = useState(0);
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [totalAdded, setTotalAdded] = useState(0);
 
   const canDecrement = qty > 0;
   const canAdd = qty > 0;
@@ -52,9 +55,10 @@ export default function ProductCard({
 
   const handleAdd = () => {
     if (!canAdd) return;
-    onAdd?.(qty);
-    // 필요 시 장바구니 담은 후 수량 초기화
-    // setQty(0);
+    onAdd?.(qty);          // ✅ 부모에 알리기
+    setTotalAdded(prev => prev + qty);
+    setShowOverlay(true);  // ✅ 오버레이 켜기
+    setQty(0);             // ✅ 필요 시 초기화
   };
 
   return (
@@ -72,11 +76,17 @@ export default function ProductCard({
         )}
       </ImageArea>
 
+      {/* InfoArea는 styles에서 position: relative; 이므로 별도 style 불필요 */}
       <InfoArea>
+        <AddedOverlay $visible={showOverlay}>
+          {totalAdded}개 담김
+        </AddedOverlay>
+
         <NameRow>
           <ProductName>{name}</ProductName>
-          {/* 온도 뱃지: temp="cold" | "hot" */}
-          <TempBadge $temp={temp}>{temp === "cold" ? "차가운" : "뜨거운"}</TempBadge>
+          <TempBadge $temp={temp}>
+            {temp === "cold" ? "차가운" : "뜨거운"}
+          </TempBadge>
         </NameRow>
 
         <ProductPrice>{priceText}</ProductPrice>

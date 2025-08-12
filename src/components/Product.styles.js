@@ -1,4 +1,4 @@
-// ./src/pages/TouchOrder.styled.js
+// ./src/components/Product.styles.js
 import styled from "styled-components";
 
 export const ProductCard = styled.div`
@@ -50,12 +50,32 @@ export const InfoArea = styled.div`
   padding: 28px 24px 110px 24px; /* 하단 담기 버튼(90px) 피해서 여백 */
 `;
 
-/* ✅ 추가: 이름과 뱃지를 한 줄로 배치 */
+/* ✅ 이름과 뱃지를 한 줄로 배치 */
 export const NameRow = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
 `;
+
+export const AddedOverlay = styled.div`
+  position: absolute;
+  top: -35px;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 1.7rem;
+  text-align: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin: 0 auto;
+  max-width: 90%;
+  transform: translateY(${p => p.$visible ? '0' : '-8px'});
+  opacity: ${(p) => (p.$visible ? 1 : 0)};
+  transition: opacity .25s ease, transform .25s ease;
+  pointer-events: none; /* 클릭 방해 안 하게 */
+  z-index: 2;
+`
 
 export const ProductName = styled.div`
   color: #272727;
@@ -88,7 +108,7 @@ export const QuantityRow = styled.div`
   margin-top: 3rem;
 `;
 
-/* 공통 수량 버튼 */
+/* 공통 수량 버튼(Base) */
 const QuantityButtonBase = styled.button`
   width: 36px;
   height: 36px;
@@ -141,6 +161,9 @@ const QuantityButtonBase = styled.button`
   }
 `;
 
+/* ✅ 추가: 공통 버튼을 이름 있는 export로 노출 */
+export const QuantityButton = QuantityButtonBase;
+
 /* - 버튼 */
 export const QuantityButtonMinus = styled(QuantityButtonBase)`
   &::after {
@@ -182,7 +205,7 @@ export const AddButton = styled.button`
   border: none;
   background: #223770;
   color: #ffffff;
-  font-weight:600;
+  font-weight: 600;
   font-size: 32px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -224,7 +247,6 @@ export const AddButton = styled.button`
    ✅ 추가 파트 (함수 선언식 + 뱃지)
    ========================= */
 
-/* 온도별 색상 헬퍼 — 함수 선언식 */
 function tempBg(p) {
   return p.$temp === "cold" ? "#EFF6FF" : "#FEF2F2";
 }
@@ -263,11 +285,10 @@ export const TempBadge = styled.span`
    ✅ 추가 파트 (스크롤 영역)
    ========================= */
 
-/* 페이지 내부 스크롤 컨테이너가 필요할 때 사용 */
 export const ScrollArea = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   padding-bottom: 24px;
-`
+`;
