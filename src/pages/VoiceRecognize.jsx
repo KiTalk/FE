@@ -67,9 +67,9 @@ function VoiceRecognize() {
               onClick={() => {
                 if (isRecording) {
                   toggleRecording();
-                } else {
-                  navigate(-1);
                 }
+                // 완료 시 장바구니 페이지로 이동하며 인식한 문장을 전달
+                navigate("/cart", { state: { recognized } });
               }}
             >
               완료
