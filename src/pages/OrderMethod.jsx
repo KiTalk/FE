@@ -44,29 +44,29 @@ function OrderMethod() {
 
       {/* Large Button - 텍스트 왼쪽, 이미지 오른쪽 */}
       <LargeButton type="button" onClick={handleVoiceClick}>
+        <Icon src={voiceImg} alt="음성주문 아이콘" />
         <TextGroup>
           <ItemName large>음성주문</ItemName>
           <ItemDesc large>간편하게 말로 주문</ItemDesc>
         </TextGroup>
-        <Icon src={voiceImg} alt="음성주문 아이콘" large />
       </LargeButton>
 
       {/* Small Buttons - 텍스트 왼쪽, 이미지 오른쪽 / 높이 동일 */}
       <ButtonGroup>
         <SmallButton type="button" onClick={handleTouchClick}>
+          <Icon src={fingerImg} alt="손가락 주문 아이콘" />
           <TextGroup>
             <ItemName>손가락 주문</ItemName>
             <ItemDesc>화면을 눌러 간편하게 주문</ItemDesc>
           </TextGroup>
-          <Icon src={fingerImg} alt="손가락 주문 아이콘" />
         </SmallButton>
 
         <SmallButton type="button" onClick={handlePhoneClick}>
+          <Icon src={phoneImg} alt="전화번호 간편주문 아이콘" />
           <TextGroup>
             <ItemName>전화번호 간편주문</ItemName>
             <ItemDesc>간편하게 말로 주문</ItemDesc>
           </TextGroup>
-          <Icon src={phoneImg} alt="전화번호 간편주문 아이콘" />
         </SmallButton>
       </ButtonGroup>
 

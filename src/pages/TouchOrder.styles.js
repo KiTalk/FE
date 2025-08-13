@@ -59,8 +59,8 @@ export const CartIcon = styled.img`
   top: 50%;
   left: 1.88rem;
   transform: translateY(-50%);
-  width: 3rem;
-  height: 3rem;
+  width: 3.5rem;
+  height: 3.5rem;
   object-fit: contain;
 `;
 
