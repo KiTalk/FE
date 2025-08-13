@@ -1,19 +1,18 @@
 import styled, { css } from "styled-components";
 
 export const Page = styled.div`
-  /* [UPDATED] displayName 적용 */
   position: relative;
   width: 1440px;
-  height: 1024px; /* 고정 캔버스 */
+  min-height: 1024px;
+  height: 100vh;
   margin: 0 auto;
   background: #ffffff;
-  overflow: hidden; /* 스크롤 방지 */
+  overflow-y: auto;
+  overflow-x: hidden;
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
-  position: relative; /* FooterBar absolute 기준점 */
+  position: relative;
 `;
-
-/* design tokens 제거: 직접 값 적용 */
 
 export const CartPageContainer = styled.div`
   position: relative;
@@ -25,7 +24,6 @@ export const CartPageContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  /* Footer가 absolute로 겹치지 않도록 하단 공간 확보 */
   padding-bottom: 10rem;
 `;
 
@@ -102,8 +100,8 @@ export const CardsViewport = styled.div`
   margin: 0 auto 0.75rem auto; /* 카드와 스크롤바 사이 적정 간격 */
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0 6.875rem 0; /* 좌우 여백 */
-  box-sizing: content-box; /* 패딩이 트랙 길이를 줄이도록 */
+  padding: 0 6.875rem 0;
+  box-sizing: content-box;
   scroll-snap-type: x proximity;
   scroll-padding-left: 6.875rem;
 

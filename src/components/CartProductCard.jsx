@@ -28,10 +28,14 @@ export default function CartProductCard({
   onDecrease,
 }) {
   function handleMinus() {
-    if (typeof onDecrease === "function") onDecrease(product?.id);
+    if (typeof onDecrease === "function" && product?.id) {
+      onDecrease(product.id);
+    }
   }
   function handlePlus() {
-    if (typeof onIncrease === "function") onIncrease(product?.id);
+    if (typeof onIncrease === "function" && product?.id) {
+      onIncrease(product.id);
+    }
   }
 
   return (

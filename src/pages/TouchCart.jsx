@@ -150,9 +150,14 @@ function TouchCartContent(props) {
     const thumb = document.getElementById("cards-thumb");
     if (!viewport || !thumb) return;
 
+    // 이벤트 리스너를 위한 참조 보관
+    let pointerMoveHandler = null;
+    let pointerUpHandler = null;
+
     function updateThumb() {
       const { scrollWidth, clientWidth, scrollLeft } = viewport;
-      const trackWidth = 1222; // CustomScrollbar width
+      const track = thumb.parentElement;
+      const trackWidth = track ? track.offsetWidth : 1222;
       const visibleRatio = clientWidth / scrollWidth;
       const thumbWidth = Math.max(80, Math.round(trackWidth * visibleRatio));
       const maxThumbOffset = trackWidth - thumbWidth;
@@ -167,21 +172,28 @@ function TouchCartContent(props) {
 
     updateThumb();
     viewport.addEventListener("scroll", updateThumb, { passive: true });
+
     // 드래그로 썸을 움직여 스크롤 조작
     let isDragging = false;
     let startX = 0;
     let startLeft = 0;
+
     function onPointerDown(e) {
       isDragging = true;
+      e.preventDefault(); // 기본 드래그 동작 방지
       startX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
       const matrix = new DOMMatrixReadOnly(getComputedStyle(thumb).transform);
       startLeft = matrix.m41 || 0;
-      document.addEventListener("pointermove", onPointerMove);
-      document.addEventListener("pointerup", onPointerUp);
+      pointerMoveHandler = onPointerMove;
+      pointerUpHandler = onPointerUp;
+      document.addEventListener("pointermove", pointerMoveHandler);
+      document.addEventListener("pointerup", pointerUpHandler);
     }
+
     function onPointerMove(e) {
       if (!isDragging) return;
-      const trackWidth = 1222;
+      const track = thumb.parentElement;
+      const trackWidth = track ? track.offsetWidth : 1222;
       const { scrollWidth, clientWidth } = viewport;
       const visibleRatio = clientWidth / scrollWidth;
       const thumbWidth = Math.max(80, Math.round(trackWidth * visibleRatio));
@@ -193,17 +205,33 @@ function TouchCartContent(props) {
       const scrollLeft = (nextLeft / maxThumbOffset) * maxScrollLeft;
       viewport.scrollLeft = isFinite(scrollLeft) ? scrollLeft : 0;
     }
+
     function onPointerUp() {
       isDragging = false;
-      document.removeEventListener("pointermove", onPointerMove);
-      document.removeEventListener("pointerup", onPointerUp);
+      if (pointerMoveHandler) {
+        document.removeEventListener("pointermove", pointerMoveHandler);
+        pointerMoveHandler = null;
+      }
+      if (pointerUpHandler) {
+        document.removeEventListener("pointerup", pointerUpHandler);
+        pointerUpHandler = null;
+      }
     }
+
     thumb.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("resize", updateThumb);
+
     return function cleanup() {
       viewport.removeEventListener("scroll", updateThumb);
       thumb.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("resize", updateThumb);
+      // 드래그 중 컴포넌트가 언마운트되는 경우를 위한 정리
+      if (pointerMoveHandler) {
+        document.removeEventListener("pointermove", pointerMoveHandler);
+      }
+      if (pointerUpHandler) {
+        document.removeEventListener("pointerup", pointerUpHandler);
+      }
     };
   }, []);
 
@@ -233,9 +261,20 @@ function TouchCartContent(props) {
           })}
         </CardsScrollArea>
       </CardsViewport>
-      <CustomScrollbar role="presentation">
+      <CustomScrollbar
+        role="scrollbar"
+        aria-controls="cards-viewport"
+        aria-orientation="horizontal"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
         <CustomTrack />
-        <CustomThumb id="cards-thumb" />
+        <CustomThumb
+          id="cards-thumb"
+          tabIndex="0"
+          aria-label="장바구니 스크롤"
+        />
       </CustomScrollbar>
 
       <FooterBar>
