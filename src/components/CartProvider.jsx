@@ -25,7 +25,9 @@ function saveToStorage(state) {
   try {
     const safe = { itemsById: state.itemsById ?? {} };
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(safe));
-  } catch {}
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 /** ---------------- Reducer ---------------- **/
@@ -39,13 +41,17 @@ function cartReducer(state, action) {
   if (action.type === "INC") {
     const cur = state.itemsById[action.payload.id];
     if (!cur) return state;
-    return { itemsById: { ...state.itemsById, [cur.id]: { ...cur, qty: cur.qty + 1 } } };
+    return {
+      itemsById: { ...state.itemsById, [cur.id]: { ...cur, qty: cur.qty + 1 } },
+    };
   }
   if (action.type === "DEC") {
     const cur = state.itemsById[action.payload.id];
     if (!cur) return state;
     const nextQty = Math.max(0, cur.qty - 1);
-    return { itemsById: { ...state.itemsById, [cur.id]: { ...cur, qty: nextQty } } };
+    return {
+      itemsById: { ...state.itemsById, [cur.id]: { ...cur, qty: nextQty } },
+    };
   }
   if (action.type === "CLEAR_ZEROES") {
     const next = {};
@@ -68,22 +74,59 @@ export default function CartProvider(props) {
     if (!product?.id || qty <= 0) return;
     dispatch({ type: "ADD", payload: { product, qty } });
   }
-  function increase(id) { dispatch({ type: "INC", payload: { id } }); }
+  function increase(id) {
+    dispatch({ type: "INC", payload: { id } });
+  }
   function decrease(id) {
     dispatch({ type: "DEC", payload: { id } });
     dispatch({ type: "CLEAR_ZEROES" });
   }
-  function resetCart() { dispatch({ type: "RESET" }); }
+  function resetCart() {
+    dispatch({ type: "RESET" });
+  }
 
-  const items = useMemo(function () { return Object.values(state.itemsById); }, [state.itemsById]);
-  const totalQty = useMemo(function () { return items.reduce((a,c)=>a+c.qty,0); }, [items]);
-  const totalPrice = useMemo(function () { return items.reduce((a,c)=>a+c.price*c.qty,0); }, [items]);
+  const items = useMemo(
+    function () {
+      return Object.values(state.itemsById);
+    },
+    [state.itemsById]
+  );
+  const totalQty = useMemo(
+    function () {
+      return items.reduce((a, c) => a + c.qty, 0);
+    },
+    [items]
+  );
+  const totalPrice = useMemo(
+    function () {
+      return items.reduce((a, c) => a + c.price * c.qty, 0);
+    },
+    [items]
+  );
 
-  const value = useMemo(function () {
-    return { items, totalQty, totalPrice, addItem, increase, decrease, resetCart };
-  }, [items, totalQty, totalPrice]);
+  const value = useMemo(
+    function () {
+      return {
+        items,
+        totalQty,
+        totalPrice,
+        addItem,
+        increase,
+        decrease,
+        resetCart,
+      };
+    },
+    [items, totalQty, totalPrice]
+  );
 
-  useEffect(function persist() { saveToStorage(state); }, [state]);
+  useEffect(
+    function persist() {
+      saveToStorage(state);
+    },
+    [state]
+  );
 
-  return <CartContext.Provider value={value}>{props.children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>{props.children}</CartContext.Provider>
+  );
 }
