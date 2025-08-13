@@ -26,15 +26,15 @@ export const HeroInner = styled.div`
   margin: 0 auto;
 `;
 
-export const HeroTitle = styled.h2`
+export const HeroTitle = styled.h1`
   position: absolute;
-  top: 4.4375rem;
+  top: 6.5rem;
   left: 0;
   margin: 0;
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
   font-weight: 700;
-  font-size: 3rem;
+  font-size: 3.5rem;
   line-height: 100%;
   letter-spacing: -0.015em;
   display: flex;
@@ -166,7 +166,7 @@ export const CartRight = styled.div`
 export const Section = styled.section`
   position: relative;
   width: 1220px;
-  margin: 60px auto 40px auto;
+  margin: 40px auto 40px auto;
 `;
 
 export const SectionTitle = styled.h3`
@@ -194,5 +194,5 @@ export const SectionTitle = styled.h3`
 export const ProductRow = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 381px);
-  gap: 38px;
+  gap: 70px;
 `;
