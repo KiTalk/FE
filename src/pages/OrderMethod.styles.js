@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-  --ButtonHeight: 260px; /* 공통 변수: 버튼 높이를 한 곳에서 관리 */
+  --ButtonHeight: 16.25rem; /* 공통 변수: 버튼 높이를 한 곳에서 관리 */
 
   position: relative;
   width: 100%;
@@ -9,9 +9,9 @@ export const Container = styled.div`
   height: 1024px;
   margin: 0 auto;
   background: #f6f8fa;
-  border-radius: 32px;
-  box-shadow: 0 4px 24px rgba(23, 78, 149, 0.09);
-  padding: 112px 0 0 0;
+  border-radius: 2rem;
+  box-shadow: 0 0.25rem 1.5rem rgba(23, 78, 149, 0.09);
+  padding: 7rem 0 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,7 +20,7 @@ export const Container = styled.div`
   @media (max-width: 900px) {
     max-width: 100vw;
     height: auto;
-    padding: 36.4px 2vw;
+    padding: 2.275rem 2vw;
   }
 `;
 
@@ -29,14 +29,14 @@ export const BottomAccentBar = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  height: 168px;
+  height: 10.5rem;
   background: #223770;
-  border-top-left-radius: 39px;
-  border-top-right-radius: 39px;
+  border-top-left-radius: 2.4375rem;
+  border-top-right-radius: 2.4375rem;
   z-index: 0; /* 뒤로 */
 
   @media (max-width: 900px) {
-    height: 134.4px;
+    height: 8.4rem;
   }
 `;
 
@@ -44,8 +44,8 @@ export const Title = styled.h1`
   font-size: 4.5rem;
   font-weight: 700;
   color: #252830;
-  margin-bottom: 19.5px;
-  letter-spacing: -1px;
+  margin-bottom: 1.21875rem;
+  letter-spacing: -0.0625rem;
   position: relative;
   z-index: 1; /* 바 위로 */
 `;
@@ -53,36 +53,37 @@ export const Title = styled.h1`
 export const Subtitle = styled.p`
   font-size: 2.7rem;
   color: #607185;
-  margin-bottom: 49px;
+  margin-bottom: 3.0625rem;
   position: relative;
   z-index: 1;
 `;
 
 export const LargeButton = styled.button`
   display: flex;
-  flex-direction: row; /* 텍스트 왼쪽, 이미지 오른쪽 */
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 24px; /* 텍스트와 아이콘 간격 */
+  justify-content: flex-start;
+  gap: 0.75rem; /* 텍스트와 아이콘 간격 */
   background: #fff;
   border: none;
   cursor: pointer;
   text-align: center;
   transition: box-shadow 0.18s;
   position: relative;
-  z-index: 1; /* 바(AccentBar)보다 위에 보이도록 */
+  z-index: 1;
   min-height: var(--ButtonHeight);
 
   width: 91%;
   min-width: 756px;
   max-width: 1148px;
-  padding: 78px 67px;
-  border-radius: 36px;
-  box-shadow: 0 4px 20px rgba(23, 78, 149, 0.11);
-  margin-bottom: 39px;
+  padding: 4.875rem 4.1875rem;
+  padding-left: 22rem;
+  border-radius: 2.25rem;
+  box-shadow: 0 0.25rem 1.25rem rgba(23, 78, 149, 0.11);
+  margin-bottom: 2.4375rem;
 
   &:hover {
-    box-shadow: 0 12px 48px rgba(23, 78, 149, 0.18);
+    box-shadow: 0 0.75rem 3rem rgba(23, 78, 149, 0.18);
   }
 
   &:focus {
@@ -93,17 +94,18 @@ export const LargeButton = styled.button`
     width: 100%;
     min-width: 0;
     max-width: 100vw;
+    padding-left: 2.5rem; /* 모바일에서 왼쪽 여백 조정 */
   }
 `;
 
 export const ButtonGroup = styled.div`
   display: flex;
-  gap: 28px;
+  gap: 1.75rem;
   width: 91%;
   min-width: 756px;
   max-width: 1148px;
   justify-content: center;
-  margin-bottom: 21px;
+  margin-bottom: 1.3125rem;
   position: relative;
   z-index: 1; /* 바 위로 */
 
@@ -116,27 +118,28 @@ export const ButtonGroup = styled.div`
 
 export const SmallButton = styled.button`
   display: flex;
-  flex-direction: row; /* 텍스트 왼쪽, 이미지 오른쪽 */
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 24px; /* 텍스트와 아이콘 간격 */
+  justify-content: flex-start;
+  gap: 0.75rem;
   background: #fff;
   border: none;
   cursor: pointer;
   text-align: center;
   transition: box-shadow 0.18s;
   position: relative;
-  z-index: 1; /* 바(AccentBar)보다 위에 보이도록 */
+  z-index: 1;
   min-height: var(--ButtonHeight);
 
   flex: 1 1 0;
   min-width: 350px;
-  padding: 50.4px 39.2px;
-  border-radius: 28px;
-  box-shadow: 0 2px 12px rgba(23, 78, 149, 0.07);
+  padding: 3.15rem 2.45rem;
+  padding-left: 2.5rem;
+  border-radius: 1.75rem;
+  box-shadow: 0 0.125rem 0.75rem rgba(23, 78, 149, 0.07);
 
   &:hover {
-    box-shadow: 0 8px 32px rgba(23, 78, 149, 0.16);
+    box-shadow: 0 0.5rem 2rem rgba(23, 78, 149, 0.16);
   }
 
   &:focus {
@@ -144,39 +147,42 @@ export const SmallButton = styled.button`
   }
 
   @media (max-width: 900px) {
-    padding: 30.8px 14px;
+    padding: 1.925rem 0.875rem;
     min-width: 168px;
+  }
+`;
+
+export const Icon = styled.img`
+  order: 1;
+  margin: 0;
+  object-fit: contain;
+  width: 7.75rem;
+  height: 7.75rem;
+
+  @media (max-width: 900px) {
+    width: 3.325rem;
+    height: 3.325rem;
   }
 `;
 
 export const TextGroup = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  order: 1;
+  align-items: flex-start;
+  text-align: left;
+  order: 2;
 `;
 
 export const ItemName = styled.div`
-  font-size: ${(props) => (props.large ? "2.66rem" : "2.1rem")};
+  font-size: 2.7rem;
   font-weight: 700;
-  color: #252830;
-  margin-bottom: ${(props) => (props.large ? "8.4px" : "5.6px")};
+  color: #272727;
+  white-space: nowrap;
+  margin-bottom: ${(props) => (props.large ? "0.525rem" : "0.35rem")};
 `;
 
 export const ItemDesc = styled.div`
-  font-size: ${(props) => (props.large ? "1.89rem" : "1.61rem")};
-  color: #697d8c;
-`;
-
-export const Icon = styled.img`
-  order: 2; /* 이미지 오른쪽 */
-  margin: 0;
-  object-fit: contain;
-  width: ${(props) => (props.large ? "101px" : "75.6px")};
-  height: ${(props) => (props.large ? "101px" : "75.6px")};
-
-  @media (max-width: 900px) {
-    width: 53.2px;
-    height: 53.2px;
-  }
+  font-size: 1.9rem;
+  font-weight: 400;
+  color: #272727;
 `;
