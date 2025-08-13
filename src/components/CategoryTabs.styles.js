@@ -35,7 +35,7 @@ const activeTab = css`
 export const CategoryTab = styled.button`
   flex: 0 0 230px;
   width: 230px;
-  height: 90px;
+  height: 5.625rem;
   border: none;
   border-radius: 20px 20px 0 0;
   cursor: pointer;

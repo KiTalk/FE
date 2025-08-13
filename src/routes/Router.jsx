@@ -23,7 +23,7 @@ export default function AppRouter() {
         <Route path="/order/voice/one-two" element={<VoiceOneTwo />} />
         <Route path="/order/voice/recognize" element={<VoiceRecognize />} />
         <Route path="/order/phone" element={<PhoneOrder />} />
-        <Route path="/cart" element={<VoiceCart />} />
+        <Route path="/order/voice/cart" element={<VoiceCart />} />
 
         {/* 404 페이지 (모든 라우트의 마지막에 위치) */}
         {/* <Route path="*" element={<NotFound />} /> */}

@@ -69,7 +69,7 @@ function VoiceRecognize() {
                   toggleRecording();
                 }
                 // 완료 시 장바구니 페이지로 이동하며 인식한 문장을 전달
-                navigate("/cart", { state: { recognized } });
+                navigate("/order/voice/cart", { state: { recognized } });
               }}
             >
               완료

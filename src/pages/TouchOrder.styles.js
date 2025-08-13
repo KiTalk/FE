@@ -14,7 +14,7 @@ export const Page = styled.div`
 export const Hero = styled.div`
   position: relative;
   width: 90rem;
-  height: 13.375rem;
+  height: 13.5rem;
   margin: 0 auto;
   background: #f2f6fb;
 `;
@@ -28,7 +28,7 @@ export const HeroInner = styled.div`
 
 export const HeroTitle = styled.h1`
   position: absolute;
-  top: 6.5rem;
+  top: 5.75rem;
   left: 0;
   margin: 0;
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -42,26 +42,9 @@ export const HeroTitle = styled.h1`
   color: #272727;
 `;
 
-export const HeroSubtitle = styled.p`
-  position: absolute;
-  top: 8.75rem;
-  left: 0;
-  width: 839px;
-  margin: 0;
-  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, sans-serif;
-  font-weight: 400;
-  font-size: 2rem;
-  line-height: 100%;
-  letter-spacing: -0.015em;
-  display: flex;
-  align-items: center;
-  color: #272727;
-`;
-
 export const CartWidget = styled.button`
   position: absolute;
-  top: 4.375rem;
+  top: 3.75rem;
   left: 55.4375rem;
   width: 20.625rem;
   height: 6.875rem;
