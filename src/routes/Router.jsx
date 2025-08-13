@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import OrderMethod from "../pages/OrderMethod";
 import TouchOrder from "../pages/TouchOrder";
+import TouchCart from "../pages/TouchCart";
 import VoiceOrder from "../pages/VoiceOrder";
 import VoiceOneTwo from "../pages/VoiceOneTwo";
 import VoiceRecognize from "../pages/VoiceRecognize";
@@ -19,6 +20,7 @@ export default function AppRouter() {
         <Route path="/" element={<Home />} />
         <Route path="/order-method" element={<OrderMethod />} />
         <Route path="/order/touch" element={<TouchOrder />} />
+        <Route path="/order/touch/cart" element={<TouchCart/>}/>
         <Route path="/order/voice" element={<VoiceOrder />} />
         <Route path="/order/voice/one-two" element={<VoiceOneTwo />} />
         <Route path="/order/voice/recognize" element={<VoiceRecognize />} />
