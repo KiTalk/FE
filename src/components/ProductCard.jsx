@@ -15,29 +15,25 @@ import {
   AddedOverlay,
 } from "./Product.styles";
 
-export default function ProductCard({ product, onAdd }) {
+/**
+ * props
+ * - mode: 'order' | 'cart' (default 'order')
+ * - cartQty: cart 모드에서 표시할 수량
+ * - onIncrease(id), onDecrease(id): cart 모드에서 ± 트리거
+ * - onAdd({ product, quantity, total }): order 모드에서 담기
+ */
+export default function ProductCard({
+  product,
+  onAdd,
+  mode = "order",
+  cartQty = 0,
+  onIncrease,
+  onDecrease,
+}) {
   const [quantity, setQuantity] = useState(0);
-  const [addedTotal, setAddedTotal] = useState(0); // 메뉴(제품)별 누적 수량
+  const [addedTotal, setAddedTotal] = useState(0);
 
-  function handleMinus() {
-    setQuantity(function (q) { return Math.max(0, q - 1); });
-  }
-
-  function handlePlus() {
-    setQuantity(function (q) { return q + 1; });
-  }
-
-  function handleAdd() {
-    if (quantity <= 0) return; // 0개는 담지 않음
-    const nextTotal = addedTotal + quantity;
-    setAddedTotal(nextTotal);
-
-    if (typeof onAdd === "function") {
-      onAdd({ product, quantity, total: nextTotal });
-    }
-    setQuantity(0);
-  }
-
+  /* 내부 동작 함수 선언식 */
   function getTemperatureLabel(id) {
     if (!id) return null;
     const lowered = String(id).toLowerCase();
@@ -45,53 +41,61 @@ export default function ProductCard({ product, onAdd }) {
     if (lowered.includes("hot")) return "뜨거운";
     return null;
   }
-
   const temperatureLabel = getTemperatureLabel(product?.id);
   const temperatureVariant =
     temperatureLabel === "시원한" ? "cold" : temperatureLabel === "뜨거운" ? "hot" : null;
 
+  function handleMinus() {
+    setQuantity(function (q) { return Math.max(0, q - 1); });
+  }
+  function handlePlus() {
+    setQuantity(function (q) { return q + 1; });
+  }
+  function handleAdd() {
+    if (quantity <= 0) return;
+    const nextTotal = addedTotal + quantity;
+    setAddedTotal(nextTotal);
+    if (typeof onAdd === "function") onAdd({ product, quantity, total: nextTotal });
+    setQuantity(0);
+  }
+
+  function handleCartMinus() { if (typeof onDecrease === "function") onDecrease(product.id); }
+  function handleCartPlus() { if (typeof onIncrease === "function") onIncrease(product.id); }
+
+  const displayedQty = mode === "cart" ? Number(cartQty ?? 0) : quantity;
+  const overlayCount  = mode === "cart" ? Number(cartQty ?? 0) : addedTotal;
+  const showOverlay   = overlayCount > 0;
+
   return (
     <ProductCardBox>
       {product.popular && <PopularTag>인기</PopularTag>}
-
-      <ImageArea>
-        {/* <ProductImage src={image} alt={product.name} /> */}
-      </ImageArea>
-
+      <ImageArea />
       <InfoArea>
-        <AddedOverlay
-          className="addedOverlayContainer"
-          $show={addedTotal > 0}
-          aria-live="polite"
-        >
-          {addedTotal}개 담김
-        </AddedOverlay>
-
-        <NameRow className="nameRowContainer">
+        <AddedOverlay $show={showOverlay} aria-live="polite">{overlayCount}개 담김</AddedOverlay>
+        <NameRow>
           <ProductName>{product.name}</ProductName>
-
-          {temperatureLabel && (
-            <TemperatureBadge
-              className="temperatureBadgeItem"
-              $variant={temperatureVariant}
-              aria-label={`온도: ${temperatureLabel}`}
-              title={temperatureLabel}
-            >
-              {temperatureLabel}
-            </TemperatureBadge>
-          )}
+          {temperatureLabel && <TemperatureBadge $variant={temperatureVariant}>{temperatureLabel}</TemperatureBadge>}
         </NameRow>
-
         <ProductPrice>{product.price.toLocaleString()}원</ProductPrice>
 
         <QuantityRow>
-          <QuantityButton $type="minus" onClick={handleMinus} />
-          <QuantityValue>{quantity}</QuantityValue>
-          <QuantityButton $type="plus" onClick={handlePlus} />
+          {mode === "cart" ? (
+            <>
+              <QuantityButton $type="minus" onClick={handleCartMinus} />
+              <QuantityValue>{displayedQty}</QuantityValue>
+              <QuantityButton $type="plus" onClick={handleCartPlus} />
+            </>
+          ) : (
+            <>
+              <QuantityButton $type="minus" onClick={handleMinus} />
+              <QuantityValue>{displayedQty}</QuantityValue>
+              <QuantityButton $type="plus" onClick={handlePlus} />
+            </>
+          )}
         </QuantityRow>
       </InfoArea>
 
-      <AddButton onClick={handleAdd}>담기</AddButton>
+      {mode !== "cart" && <AddButton onClick={handleAdd}>담기</AddButton>}
     </ProductCardBox>
   );
 }
