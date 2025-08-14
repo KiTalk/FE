@@ -58,10 +58,10 @@ export default function PointPhone() {
     try {
       const phone = digits.replace(/\D/g, "");
       saveOrderPoint({ phone });
+      navigate("/order/complete", { replace: true });
     } catch (error) {
       console.error(error);
     }
-    navigate("/order/complete");
   }
 
   function handleGoBack() {

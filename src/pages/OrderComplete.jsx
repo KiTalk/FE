@@ -41,14 +41,14 @@ function OrderCompletePage() {
     // 지연 후 홈으로 이동 예약하고 타이머 id 반환
     function scheduleNavigateHome(delayMs) {
       const timerId = setTimeout(() => {
-        navigate("/");
+        navigate("/", { replace: true });
       }, delayMs);
       return timerId;
     }
 
     // 현재 localStorage의 모든 키-값을 객체로 정리
     const storageSnapshot = collectLocalStorageSnapshot();
-    console.log(storageSnapshot);
+    console.log(storageSnapshot); /* 추후 삭제 */
 
     // 임시: 백엔드 전송 코드 예시 (주석처리)
     // import apiClient from "../services/api";
@@ -72,7 +72,7 @@ function OrderCompletePage() {
 
   return (
     <Page>
-      <CheckImage src={checkImg} alt="주문 완료 체크" aria-hidden="true" />
+      <CheckImage src={checkImg} alt="" aria-hidden="true" />
       <Frame>
         <Title>주문이 완료되었습니다</Title>
         <Subtitle>결제는 직원에게 직접 해주세요</Subtitle>
