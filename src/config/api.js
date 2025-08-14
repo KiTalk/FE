@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
   STT: "/stt",
   HEALTH: "/health",
   LANGUAGES: "/languages",
+  ORDER_COMPLETE: "/order/complete",
 };
 
 // 지원 언어 목록
