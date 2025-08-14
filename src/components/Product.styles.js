@@ -1,5 +1,6 @@
 import styled, { css } from "styled-components";
 
+/* 📦 전체 상품 카드 컨테이너 */
 export const ProductCard = styled.div`
   position: relative;
   width: 25.5rem;
@@ -10,6 +11,7 @@ export const ProductCard = styled.div`
   background: #ffffff;
 `;
 
+/* 🔥 인기 상품 태그 (왼쪽 상단 리본 형태) */
 export const PopularTag = styled.div`
   position: absolute;
   left: 0;
@@ -26,6 +28,7 @@ export const PopularTag = styled.div`
   font-size: 28px;
 `;
 
+/* 🖼 상품 이미지 영역 (ice/hot에 따라 배경색 변경) */
 export const ImageArea = styled.div`
   width: 100%;
   height: 12.5rem;
@@ -37,21 +40,24 @@ export const ImageArea = styled.div`
   justify-content: center;
 `;
 
+/* 🖼 상품 이미지 (이미지 비율 유지, contain) */
 export const ProductImage = styled.img`
   width: 180px;
   height: 180px;
   object-fit: contain;
 `;
 
+/* 📄 상품 정보 영역 (이름, 가격, 수량 버튼 등) */
 export const InfoArea = styled.div`
   position: relative;
   height: calc(100% - 230px - 17%);
   background: #ffffff;
   box-sizing: border-box;
-  /* Add bottom padding to prevent content from being overlapped by the absolute AddButton (90px) */
+  /* 하단 AddButton과 겹치지 않도록 패딩 */
   padding: 28px 24px 24px 24px;
 `;
 
+/* ➕ '몇 개 담김' 오버레이 */
 export const AddedOverlay = styled.div`
   position: absolute;
   left: 24px;
@@ -71,20 +77,21 @@ export const AddedOverlay = styled.div`
   pointer-events: none;
   z-index: 2;
 
-  /* 1개 이상일 때만 표시 */
+  /* 표시 여부 (애니메이션 포함) */
   opacity: ${(p) => (p.$show ? 1 : 0)};
   transform: translateY(${(p) => (p.$show ? "0" : "-6px")});
   transition: opacity 180ms ease, transform 180ms ease;
 `;
 
+/* 📝 상품명과 온도 배지를 가로로 배치하는 행 */
 export const NameRow = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem; /* 한 칸 이상의 간격 */
+  gap: 0.75rem; /* 간격 확보 */
   width: 100%;
-  /* justify-content: space-between;  ← 제거 */
 `;
 
+/* 📝 상품명 스타일 */
 export const ProductName = styled.div`
   color: #272727;
   font-family: Pretendard;
@@ -95,45 +102,45 @@ export const ProductName = styled.div`
   letter-spacing: -0.03rem;
 `;
 
-/* ✅ 온도 배지: 매우 둥근 알약 형태 */
+/* 🌡 온도 배지 (시원한/뜨거운) */
 export const TemperatureBadge = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  padding: 0.25rem 0.6rem; /* 컴팩트 패딩 */
-  min-width: 6rem; /* 텍스트 길이 상관 없이 최소 너비 */
-  height: 3rem; /* 균일한 높이 */
-  border-radius: 8rem; /* 매우 뭉뚝한 원에 가까운 네모 */
-  font-size: 1.4rem; /* 살짝 작은 텍스트 */
+  padding: 0.25rem 0.6rem;
+  min-width: 6rem;
+  height: 3rem;
+  border-radius: 8rem; /* 알약 모양 */
+  font-size: 1.4rem;
   font-weight: 500;
   line-height: 3;
   white-space: nowrap;
 
-  /* 기본 톤 */
+  /* 기본 스타일 */
   color: #0b1b2b;
   background: #e7eef7;
   border: 3px solid #c8d6ea;
 
+  /* 시원한 */
   ${(props) =>
     props.$variant === "cold" &&
     css`
-      /* 시원한: 시원한 블루 톤 */
       color: #3191ff;
       background: transparent;
       border-color: #3191ff;
     `}
 
+  /* 뜨거운 */
   ${(props) =>
     props.$variant === "hot" &&
     css`
-      /* 뜨거운: 따뜻한 레드/오렌지 톤 */
       color: #da2525;
       background: transparent;
       border-color: #da2525;
     `}
 `;
 
+/* 💰 상품 가격 */
 export const ProductPrice = styled.div`
   color: #223770;
   font-family: Pretendard;
@@ -145,17 +152,19 @@ export const ProductPrice = styled.div`
   margin-top: 1rem;
 `;
 
+/* 🔢 수량 조절 버튼과 값 배치 */
 export const QuantityRow = styled.div`
   display: grid;
   grid-template-columns: 36px 1fr 36px;
-  align-items: center; /* 세로 가운데 */
-  justify-content: center; /* 가로 가운데 */
+  align-items: center;
+  justify-content: center;
   gap: 16px;
   width: 318px;
   height: 36px;
-  margin: 2rem auto 0; /* 가로 중앙 정렬 */
+  margin: 2rem auto 0;
 `;
 
+/* ➖➕ 수량 버튼 */
 export const QuantityButton = styled.button`
   width: 36px;
   height: 36px;
@@ -173,6 +182,7 @@ export const QuantityButton = styled.button`
   align-items: center;
   justify-content: center;
 
+  /* 아이콘 모양 (가로줄 + 세로줄) */
   &::before,
   &::after {
     content: "";
@@ -185,15 +195,18 @@ export const QuantityButton = styled.button`
     transform: translate(-50%, -50%);
   }
 
+  /* 호버 효과 */
   &:hover {
     background: rgba(34, 55, 112, 0.08);
   }
 
+  /* 클릭 시 효과 */
   &:active {
     background: rgba(34, 55, 112, 0.16);
     transform: scale(0.95);
   }
 
+  /* 호버/클릭 시 아이콘 색 변경 */
   &:hover::before,
   &:hover::after,
   &:active::before,
@@ -201,6 +214,7 @@ export const QuantityButton = styled.button`
     background: #223770;
   }
 
+  /* 포커스 시 outline 제거 */
   &:focus,
   &:focus-visible {
     outline: none;
@@ -210,11 +224,12 @@ export const QuantityButton = styled.button`
     border: 0;
   }
 
+  /* ➖ 버튼 스타일 */
   ${(p) =>
     p.$type === "minus" &&
     css`
       &::after {
-        display: none;
+        display: none; /* 세로줄 제거 */
       }
       &::before {
         background: #adadad;
@@ -225,6 +240,7 @@ export const QuantityButton = styled.button`
       }
     `}
 
+  /* ➕ 버튼 스타일 */
   ${(p) =>
     p.$type === "plus" &&
     css`
@@ -234,6 +250,7 @@ export const QuantityButton = styled.button`
     `}
 `;
 
+/* 🔢 수량 표시 숫자 */
 export const QuantityValue = styled.div`
   color: #272727;
   text-align: center;
@@ -241,11 +258,11 @@ export const QuantityValue = styled.div`
   font-size: 3rem;
   font-style: normal;
   font-weight: 500;
-  line-height: 1.875rem; /* 62.5% */
+  line-height: 1.875rem;
   letter-spacing: -0.045rem;
 `;
 
-
+/* 🛒 담기 버튼 (하단 고정) */
 export const AddButton = styled.button`
   position: absolute;
   left: 0;
@@ -265,6 +282,7 @@ export const AddButton = styled.button`
   appearance: none;
   transition: background-color 120ms ease;
 
+  /* 호버/클릭 시 색상 변화 */
   &:hover {
     background: #223770;
     color: #ffffff;
@@ -274,6 +292,8 @@ export const AddButton = styled.button`
     color: #ffffff;
     box-shadow: none;
   }
+
+  /* 포커스 시 outline 제거 */
   &:focus,
   &:focus-visible {
     outline: none;
@@ -283,7 +303,7 @@ export const AddButton = styled.button`
     border: 0;
   }
 
-    /* 🔒 비활성(네이티브/ARIA) — 셀렉터 그룹은 반드시 {}로 닫아주세요 */
+  /* 비활성 상태 */
   &&:disabled,
   &&[aria-disabled="true"] {
     background: #d9d9d9;
@@ -292,7 +312,7 @@ export const AddButton = styled.button`
     pointer-events: none;
   }
 
-  /* (선택) 커스텀 prop으로 강제 비활성 지원 */
+  /* 커스텀 prop으로 비활성 처리 */
   ${(p) =>
     p.$disabled &&
     css`
