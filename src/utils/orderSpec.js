@@ -4,6 +4,7 @@ function getDefaultOrderSpec() {
   return {
     cart: [],
     package: {},
+    point: {},
   };
 }
 
@@ -21,14 +22,15 @@ export function loadOrderSpec() {
     if (raw) {
       const parsed = safeParse(raw);
       if (parsed && typeof parsed === "object") {
-        const pkg = parsed?.package ?? parsed?.meta ?? {};
+        const pkg = parsed?.package ?? {};
+        const point = parsed?.point ?? {};
         const cartRaw = parsed?.cart;
         if (Array.isArray(cartRaw)) {
-          return { cart: cartRaw, package: pkg };
+          return { cart: cartRaw, package: pkg, point };
         }
         const legacyItemsById = cartRaw?.itemsById ?? {};
         const migratedArray = Object.values(legacyItemsById);
-        return { cart: migratedArray, package: pkg };
+        return { cart: migratedArray, package: pkg, point };
       }
     }
     return getDefaultOrderSpec();
@@ -61,6 +63,7 @@ export function saveCartItems(cartOrMap) {
   const next = {
     cart: itemsArray,
     package: current.package ?? {},
+    point: current.point ?? {},
   };
   saveOrderSpec(next);
 }
@@ -70,6 +73,17 @@ export function saveOrderPackage(packagePartial) {
   const next = {
     cart: Array.isArray(current.cart) ? current.cart : [],
     package: { ...(current.package ?? {}), ...(packagePartial ?? {}) },
+    point: current.point ?? {},
+  };
+  saveOrderSpec(next);
+}
+
+export function saveOrderPoint(pointPartial) {
+  const current = loadOrderSpec();
+  const next = {
+    cart: Array.isArray(current.cart) ? current.cart : [],
+    package: current.package ?? {},
+    point: { ...(current.point ?? {}), ...(pointPartial ?? {}) },
   };
   saveOrderSpec(next);
 }
