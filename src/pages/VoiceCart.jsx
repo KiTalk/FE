@@ -49,8 +49,8 @@ function VoiceCart() {
     }
   }
 
-  function handleCheckout() {
-    const name = recognizedText || "";
+  function handleCheckout(recognizedArg) {
+    const name = ((recognizedArg ?? recognizedText) || "").trim();
     const unitPrice = parseCurrencyToNumber("4,000원");
     const qty = Number(quantity || 0);
     if (!name || qty <= 0) {
@@ -71,11 +71,11 @@ function VoiceCart() {
       ]);
       // 음성 주문 플로우에서는 기본 포장("takeout")으로 저장 후 완료로 이동
       saveOrderPackage({ type: "takeout", totalPrice, totalQty });
+      navigate("/order/point");
     } catch (err) {
       console.error(err);
+      alert("주문 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
     }
-
-    navigate("/order/point");
   }
 
   return (
