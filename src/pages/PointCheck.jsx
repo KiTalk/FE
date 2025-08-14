@@ -24,6 +24,11 @@ function PointCheckPage() {
   function handleSelect(save) {
     try {
       saveOrderPoint({ enabled: !!save });
+      if (!save) {
+        navigate("/order/complete");
+      } else {
+        navigate("/order/point/phone");
+      }
     } catch (err) {
       console.error(err);
     }
