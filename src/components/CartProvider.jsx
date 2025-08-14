@@ -1,20 +1,54 @@
 // CartProvider.jsx
 import React, { useMemo, useReducer, useEffect } from "react";
 import { CartContext } from "./CartContext.jsx";
-
-/* ✅ 외부에서 정리할 수 있도록 키를 export */
-export const CART_STORAGE_KEY = "touch-cart-v1";
+import { loadOrderSpec, saveCartItems } from "../utils/orderSpec";
+import { MENU_DATA } from "../data/TouchOrder.data.js";
 
 /** 로컬스토리지 로드 */
+function buildProductLookupByNameAndPrice() {
+  const lookup = {};
+  try {
+    (MENU_DATA || []).forEach(function (category) {
+      (category.sections || []).forEach(function (section) {
+        (section.products || []).forEach(function (product) {
+          const key = `${product.name}|${product.price}`;
+          lookup[key] = product;
+        });
+      });
+    });
+  } catch (err) {
+    console.warn("Failed to build product lookup", err);
+  }
+  return lookup;
+}
+
+const PRODUCT_LOOKUP = buildProductLookupByNameAndPrice();
+
 function loadFromStorage() {
   try {
-    const raw = window.localStorage.getItem(CART_STORAGE_KEY);
-    if (!raw) return { itemsById: {} };
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object" || !parsed.itemsById) {
-      return { itemsById: {} };
-    }
-    return { itemsById: parsed.itemsById };
+    const spec = loadOrderSpec();
+    const cartArray = Array.isArray(spec?.cart) ? spec.cart : [];
+    const itemsById = {};
+    cartArray.forEach(function (stored) {
+      if (!stored || typeof stored !== "object") return;
+      const key = `${stored.name}|${stored.price}`;
+      const base = PRODUCT_LOOKUP[key];
+      const productId = base?.id || key; // fallback key if not found
+      const merged = {
+        id: productId,
+        name: stored.name ?? base?.name,
+        price: Number(stored.price ?? base?.price ?? 0),
+        popular: !!base?.popular,
+        qty: Number(stored.qty ?? 0),
+      };
+      const prev = itemsById[productId];
+      if (prev) {
+        itemsById[productId] = { ...merged, qty: prev.qty + merged.qty };
+      } else {
+        itemsById[productId] = merged;
+      }
+    });
+    return { itemsById };
   } catch {
     return { itemsById: {} };
   }
@@ -23,8 +57,8 @@ function loadFromStorage() {
 /** 로컬스토리지 저장 */
 function saveToStorage(state) {
   try {
-    const safe = { itemsById: state.itemsById ?? {} };
-    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(safe));
+    const itemsById = state.itemsById ?? {};
+    saveCartItems(itemsById);
   } catch (err) {
     console.error(err);
   }

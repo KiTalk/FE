@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { saveOrderPackage } from "../utils/orderSpec";
 import BackButton from "../components/BackButton";
 import packageIcon from "../assets/images/package.png";
 import dineinIcon from "../assets/images/dinein.png";
@@ -14,8 +15,6 @@ import {
   CardLabel,
 } from "./Package.styles";
 
-const ORDER_META_KEY = "package_meta";
-
 function PackagePage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,8 +26,8 @@ function PackagePage() {
 
   function persistAndNext(type) {
     try {
-      const meta = { type, totalPrice, totalQty };
-      window.localStorage.setItem(ORDER_META_KEY, JSON.stringify(meta));
+      const pkg = { type, totalPrice, totalQty };
+      saveOrderPackage(pkg);
     } catch (err) {
       console.error(err);
     }
