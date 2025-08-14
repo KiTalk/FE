@@ -4,6 +4,7 @@ import VoiceRecorder from "../components/VoiceRecorder";
 import AudioSpectrum from "../components/AudioSpectrum";
 import { getSettings } from "../utils/settingsUtils";
 import VoiceProductCard from "../components/VoiceProductCard";
+import { saveCartItems, saveOrderPackage } from "../utils/orderSpec";
 import drink1 from "../assets/images/drink1.png";
 import {
   Page,
@@ -35,6 +36,46 @@ function VoiceCart() {
 
   function handleAddMore() {
     navigate(-1);
+  }
+
+  function parseCurrencyToNumber(text) {
+    try {
+      if (typeof text === "number") return text;
+      const digits = String(text ?? "").replace(/[^0-9]/g, "");
+      const n = Number(digits || 0);
+      return Number.isFinite(n) ? n : 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  function handleCheckout(recognizedArg) {
+    const name = ((recognizedArg ?? recognizedText) || "").trim();
+    const unitPrice = parseCurrencyToNumber("4,000원");
+    const qty = Number(quantity || 0);
+    if (!name || qty <= 0) {
+      alert("상품 정보가 올바르지 않습니다.");
+      return;
+    }
+
+    const totalPrice = unitPrice * qty;
+    const totalQty = qty;
+
+    try {
+      saveCartItems([
+        {
+          name,
+          price: unitPrice,
+          qty,
+        },
+      ]);
+      // 음성 주문 플로우에서는 기본 포장("takeout")으로 저장 후 완료로 이동
+      saveOrderPackage({ type: "takeout", totalPrice, totalQty });
+      navigate("/order/point");
+    } catch (err) {
+      console.error(err);
+      alert("주문 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+    }
   }
 
   return (
@@ -72,6 +113,7 @@ function VoiceCart() {
                 if (isRecording) {
                   toggleRecording();
                 }
+                handleCheckout();
               }}
             >
               주문하기
