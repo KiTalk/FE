@@ -24,7 +24,7 @@ import {
   FooterMetaLabel,
   FooterMetaValue,
 } from "./TouchCart.styles";
-import CartProvider, { CART_STORAGE_KEY } from "../components/CartProvider.jsx";
+import CartProvider from "../components/CartProvider.jsx";
 import { useCart } from "../components/CartContext";
 import CartProductCard from "../components/CartProductCard";
 import helpImage from "../assets/images/help.png";
@@ -93,8 +93,6 @@ function TouchCartContent(props) {
       state: { totalPrice, totalQty },
     });
   }
-
-  // 진행바 제거로 관련 계산 삭제
 
   // 커스텀 스크롤바 동기화
   useEffect(function syncCustomScrollbar() {
