@@ -29,7 +29,9 @@ export const PopularTag = styled.div`
 export const ImageArea = styled.div`
   width: 100%;
   height: 12.5rem;
-  background: #f2f6fb;
+  background: ${(props) =>
+    props.$variant === "cold" ? "#F2F6FB" :
+    props.$variant === "hot" ? "#DBD1C9" : "#f2f6fb"};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -46,7 +48,6 @@ export const InfoArea = styled.div`
   height: calc(100% - 230px - 17%);
   background: #ffffff;
   box-sizing: border-box;
-  /* Add bottom padding to prevent content from being overlapped by the absolute AddButton (90px) */
   padding: 28px 24px 24px 24px;
 `;
 
@@ -68,8 +69,6 @@ export const AddedOverlay = styled.div`
   letter-spacing: -0.02rem;
   pointer-events: none;
   z-index: 2;
-
-  /* 1개 이상일 때만 표시 */
   opacity: ${(p) => (p.$show ? 1 : 0)};
   transform: translateY(${(p) => (p.$show ? "0" : "-6px")});
   transition: opacity 180ms ease, transform 180ms ease;
@@ -78,7 +77,6 @@ export const AddedOverlay = styled.div`
 export const NameRow = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 0.75rem;
   width: 100%;
 `;
@@ -93,39 +91,31 @@ export const ProductName = styled.div`
   letter-spacing: -0.03rem;
 `;
 
-/* ✅ 온도 배지: 매우 둥근 알약 형태 */
 export const TemperatureBadge = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  padding: 0.25rem 0.6rem; /* 컴팩트 패딩 */
-  min-width: 6rem; /* 텍스트 길이 상관 없이 최소 너비 */
-  height: 3rem; /* 균일한 높이 */
-  border-radius: 8rem; /* 매우 뭉뚝한 원에 가까운 네모 */
-  font-size: 1.4rem; /* 살짝 작은 텍스트 */
+  padding: 0.25rem 0.6rem;
+  min-width: 6rem;
+  height: 3rem;
+  border-radius: 8rem;
+  font-size: 1.4rem;
   font-weight: 500;
   line-height: 3;
   white-space: nowrap;
-
-  /* 기본 톤 */
   color: #0b1b2b;
   background: #e7eef7;
   border: 3px solid #c8d6ea;
-
   ${(props) =>
     props.$variant === "cold" &&
     css`
-      /* 시원한: 시원한 블루 톤 */
       color: #3191ff;
       background: transparent;
       border-color: #3191ff;
     `}
-
   ${(props) =>
     props.$variant === "hot" &&
     css`
-      /* 뜨거운: 따뜻한 레드/오렌지 톤 */
       color: #da2525;
       background: transparent;
       border-color: #da2525;
@@ -146,12 +136,12 @@ export const ProductPrice = styled.div`
 export const QuantityRow = styled.div`
   display: grid;
   grid-template-columns: 36px 1fr 36px;
-  align-items: center; /* 세로 가운데 */
-  justify-content: center; /* 가로 가운데 */
+  align-items: center;
+  justify-content: center;
   gap: 16px;
   width: 318px;
   height: 36px;
-  margin: 2rem auto 0; /* 가로 중앙 정렬 */
+  margin: 2rem auto 0;
 `;
 
 export const QuantityButton = styled.button`
@@ -239,7 +229,7 @@ export const QuantityValue = styled.div`
   font-size: 3rem;
   font-style: normal;
   font-weight: 500;
-  line-height: 1.875rem; /* 62.5% */
+  line-height: 1.875rem;
   letter-spacing: -0.045rem;
 `;
 
@@ -266,24 +256,36 @@ export const AddButton = styled.button`
     background: #223770;
     color: #ffffff;
   }
-
   &:active {
-    background: #1b2d66; /* pressed */
+    background: #1b2d66;
     color: #ffffff;
     box-shadow: none;
   }
-
-  &:focus {
-    outline: none;
-    box-shadow: none;
-  }
-
+  &:focus,
   &:focus-visible {
     outline: none;
     box-shadow: none;
   }
-
   &::-moz-focus-inner {
     border: 0;
   }
+
+  &&:disabled,
+  &&[aria-disabled="true"] {
+    background: #d9d9d9;
+    color: #8b8b8b;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  ${(p) =>
+    p.$disabled &&
+    css`
+      && {
+        background: #d9d9d9;
+        color: #8b8b8b;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+    `}
 `;
