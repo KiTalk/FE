@@ -186,7 +186,7 @@ export const ImageArea = styled.div`
   /* [UPDATED] displayName */
   width: 100%;
   height: 4.5rem;
-  background: #f2f6fb;
+  background: #F2F6FB;
 `;
 
 export const ItemInfoArea = styled.div`

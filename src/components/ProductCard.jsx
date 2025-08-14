@@ -41,6 +41,7 @@ export default function ProductCard({
     if (lowered.includes("hot")) return "뜨거운";
     return null;
   }
+
   const temperatureLabel = getTemperatureLabel(product?.id);
   const temperatureVariant =
     temperatureLabel === "시원한" ? "cold" : temperatureLabel === "뜨거운" ? "hot" : null;
@@ -66,15 +67,24 @@ export default function ProductCard({
   const overlayCount  = mode === "cart" ? Number(cartQty ?? 0) : addedTotal;
   const showOverlay   = overlayCount > 0;
 
+  /* ✅ 여기에서 계산해야 함: quantity/useState가 존재한 뒤 */
+  const addDisabled = mode !== "cart" && quantity <= 0;
+
   return (
     <ProductCardBox>
       {product.popular && <PopularTag>인기</PopularTag>}
-      <ImageArea />
+      <ImageArea $variant={temperatureVariant} />
       <InfoArea>
-        <AddedOverlay $show={showOverlay} aria-live="polite">{overlayCount}개 담김</AddedOverlay>
+        <AddedOverlay $show={showOverlay} aria-live="polite">
+          {overlayCount}개 담김
+        </AddedOverlay>
         <NameRow>
           <ProductName>{product.name}</ProductName>
-          {temperatureLabel && <TemperatureBadge $variant={temperatureVariant}>{temperatureLabel}</TemperatureBadge>}
+          {temperatureLabel && (
+            <TemperatureBadge $variant={temperatureVariant}>
+              {temperatureLabel}
+            </TemperatureBadge>
+          )}
         </NameRow>
         <ProductPrice>{product.price.toLocaleString()}원</ProductPrice>
 
@@ -95,7 +105,17 @@ export default function ProductCard({
         </QuantityRow>
       </InfoArea>
 
-      {mode !== "cart" && <AddButton onClick={handleAdd}>담기</AddButton>}
+
+    {mode !== "cart" && (
+      <AddButton
+        onClick={handleAdd}
+        disabled={addDisabled}     // 네이티브 disabled (필수)
+        aria-disabled={addDisabled} // 접근성 + 스타일 fallback
+        $disabled={addDisabled}     // (선택) 위 스타일의 커스텀 prop도 같이 쓸 수 있음
+      >
+        담기
+      </AddButton>
+    )}
     </ProductCardBox>
   );
 }

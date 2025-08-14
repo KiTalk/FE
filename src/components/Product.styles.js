@@ -29,7 +29,9 @@ export const PopularTag = styled.div`
 export const ImageArea = styled.div`
   width: 100%;
   height: 12.5rem;
-  background: #f2f6fb;
+  background: ${(props) =>
+    props.$variant === "cold" ? "#F2F6FB" :
+    props.$variant === "hot" ? "#DBD1C9" : "#f2f6fb"};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,9 +80,9 @@ export const AddedOverlay = styled.div`
 export const NameRow = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.75rem; /* 한 칸 이상의 간격 */
   width: 100%;
+  /* justify-content: space-between;  ← 제거 */
 `;
 
 export const ProductName = styled.div`
@@ -243,6 +245,7 @@ export const QuantityValue = styled.div`
   letter-spacing: -0.045rem;
 `;
 
+
 export const AddButton = styled.button`
   position: absolute;
   left: 0;
@@ -266,24 +269,38 @@ export const AddButton = styled.button`
     background: #223770;
     color: #ffffff;
   }
-
   &:active {
-    background: #1b2d66; /* pressed */
+    background: #1b2d66;
     color: #ffffff;
     box-shadow: none;
   }
-
-  &:focus {
-    outline: none;
-    box-shadow: none;
-  }
-
+  &:focus,
   &:focus-visible {
     outline: none;
     box-shadow: none;
   }
-
   &::-moz-focus-inner {
     border: 0;
   }
+
+    /* 🔒 비활성(네이티브/ARIA) — 셀렉터 그룹은 반드시 {}로 닫아주세요 */
+  &&:disabled,
+  &&[aria-disabled="true"] {
+    background: #d9d9d9;
+    color: #8b8b8b;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* (선택) 커스텀 prop으로 강제 비활성 지원 */
+  ${(p) =>
+    p.$disabled &&
+    css`
+      && {
+        background: #d9d9d9;
+        color: #8b8b8b;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+    `}
 `;
