@@ -30,8 +30,6 @@ import CartProductCard from "../components/CartProductCard";
 import helpImage from "../assets/images/help.png";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 export default function TouchCartPage(props) {
   return (
     <CartProvider>
@@ -91,7 +89,7 @@ function TouchCartContent(props) {
     }
 
     // 다음 페이지로 이동 (포장유무, 적립유무 선택 페이지)
-    navigate("/order/method", {
+    navigate("/order/package", {
       state: { totalPrice, totalQty },
     });
   }

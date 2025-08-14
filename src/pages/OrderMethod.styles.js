@@ -4,8 +4,8 @@ export const Container = styled.div`
   --ButtonHeight: 16.25rem; /* 공통 변수: 버튼 높이를 한 곳에서 관리 */
 
   position: relative;
-  width: 100%;
-
+  width: 1440px;
+  height: 1024px;
   margin: 0 auto;
   background: #f6f8fa;
   border-radius: 2rem;
@@ -32,7 +32,7 @@ export const BottomAccentBar = styled.div`
   background: #223770;
   border-top-left-radius: 2.4375rem;
   border-top-right-radius: 2.4375rem;
-  z-index: 0; /* 뒤로 */
+  z-index: 0;
 
   @media (max-width: 900px) {
     height: 8.4rem;
@@ -46,7 +46,7 @@ export const Title = styled.h1`
   margin-bottom: 1.21875rem;
   letter-spacing: -0.0625rem;
   position: relative;
-  z-index: 1; /* 바 위로 */
+  z-index: 1;
 `;
 
 export const Subtitle = styled.p`
