@@ -72,8 +72,7 @@ function CartHydrator({ initialItems }) {
 
 function TouchCartContent(props) {
   const navigate = useNavigate();
-  const { items, totalQty, totalPrice, increase, decrease, resetCart } =
-    useCart();
+  const { items, totalQty, totalPrice, increase, decrease } = useCart();
 
   function formatCurrency(value) {
     const n = Number(value ?? 0);
@@ -85,61 +84,16 @@ function TouchCartContent(props) {
     navigate(-1);
   }
 
-  async function handleCheckout() {
-    if (!API_BASE_URL) {
-      alert("API 서버 URL이 설정되지 않았습니다. (.env의 VITE_API_BASE_URL)");
-      return;
-    }
+  function handleCheckout() {
     if (items.length === 0) {
       alert("장바구니가 비어있습니다.");
       return;
     }
 
-    const payload = {
-      items: items.map(function (it) {
-        return { id: it.id, name: it.name, price: it.price, qty: it.qty };
-      }),
-      totalQty,
-      totalPrice,
-    };
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const msg = await safeReadText(res);
-        throw new Error(msg || `주문 요청 실패 (status: ${res.status})`);
-      }
-      const data = await res.json().catch(function () {
-        return {};
-      });
-
-      try {
-        window.localStorage.removeItem(CART_STORAGE_KEY);
-      } catch (err) {
-        console.error(err);
-      }
-      resetCart();
-
-      navigate("/order/complete", {
-        replace: true,
-        state: { orderId: data?.id, totalPrice, totalQty },
-      });
-    } catch (err) {
-      console.error(err);
-      alert(err.message || "주문 처리 중 오류가 발생했습니다.");
-    }
-  }
-
-  async function safeReadText(res) {
-    try {
-      return await res.text();
-    } catch {
-      return "";
-    }
+    // 다음 페이지로 이동 (포장유무, 적립유무 선택 페이지)
+    navigate("/order/method", {
+      state: { totalPrice, totalQty },
+    });
   }
 
   // 진행바 제거로 관련 계산 삭제
