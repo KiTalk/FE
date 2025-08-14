@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 
-/* 📦 전체 상품 카드 컨테이너 */
+/* 전체 상품 카드 컨테이너 */
 export const ProductCard = styled.div`
   position: relative;
   width: 25.5rem;
@@ -11,7 +11,7 @@ export const ProductCard = styled.div`
   background: #ffffff;
 `;
 
-/* 🔥 인기 상품 태그 (왼쪽 상단 리본 형태) */
+/* 인기 상품 태그 (왼쪽 상단 리본 형태) */
 export const PopularTag = styled.div`
   position: absolute;
   left: 0;
@@ -28,7 +28,7 @@ export const PopularTag = styled.div`
   font-size: 28px;
 `;
 
-/* 🖼 상품 이미지 영역 (ice/hot에 따라 배경색 변경) */
+/* 상품 이미지 영역 (ice/hot에 따라 배경색 변경) */
 export const ImageArea = styled.div`
   width: 100%;
   height: 12.5rem;
@@ -40,14 +40,14 @@ export const ImageArea = styled.div`
   justify-content: center;
 `;
 
-/* 🖼 상품 이미지 (이미지 비율 유지, contain) */
+/* 상품 이미지 (이미지 비율 유지, contain) */
 export const ProductImage = styled.img`
   width: 180px;
   height: 180px;
   object-fit: contain;
 `;
 
-/* 📄 상품 정보 영역 (이름, 가격, 수량 버튼 등) */
+/* 상품 정보 영역 (이름, 가격, 수량 버튼 등) */
 export const InfoArea = styled.div`
   position: relative;
   height: calc(100% - 230px - 17%);
@@ -57,7 +57,7 @@ export const InfoArea = styled.div`
   padding: 28px 24px 24px 24px;
 `;
 
-/* ➕ '몇 개 담김' 오버레이 */
+/* '몇 개 담김' 오버레이 */
 export const AddedOverlay = styled.div`
   position: absolute;
   left: 24px;
@@ -83,7 +83,7 @@ export const AddedOverlay = styled.div`
   transition: opacity 180ms ease, transform 180ms ease;
 `;
 
-/* 📝 상품명과 온도 배지를 가로로 배치하는 행 */
+/* 상품명과 온도 배지를 가로로 배치하는 행 */
 export const NameRow = styled.div`
   display: flex;
   align-items: center;
@@ -91,7 +91,7 @@ export const NameRow = styled.div`
   width: 100%;
 `;
 
-/* 📝 상품명 스타일 */
+/* 상품명 스타일 */
 export const ProductName = styled.div`
   color: #272727;
   font-family: Pretendard;
@@ -102,7 +102,7 @@ export const ProductName = styled.div`
   letter-spacing: -0.03rem;
 `;
 
-/* 🌡 온도 배지 (시원한/뜨거운) */
+/* 온도 배지 (시원한/뜨거운) */
 export const TemperatureBadge = styled.span`
   display: inline-flex;
   align-items: center;
@@ -140,7 +140,7 @@ export const TemperatureBadge = styled.span`
     `}
 `;
 
-/* 💰 상품 가격 */
+/* 상품 가격 */
 export const ProductPrice = styled.div`
   color: #223770;
   font-family: Pretendard;
@@ -152,7 +152,7 @@ export const ProductPrice = styled.div`
   margin-top: 1rem;
 `;
 
-/* 🔢 수량 조절 버튼과 값 배치 */
+/* 수량 조절 버튼과 값 배치 */
 export const QuantityRow = styled.div`
   display: grid;
   grid-template-columns: 36px 1fr 36px;
@@ -164,7 +164,7 @@ export const QuantityRow = styled.div`
   margin: 2rem auto 0;
 `;
 
-/* ➖➕ 수량 버튼 */
+/* 수량 버튼 */
 export const QuantityButton = styled.button`
   width: 36px;
   height: 36px;
@@ -224,7 +224,7 @@ export const QuantityButton = styled.button`
     border: 0;
   }
 
-  /* ➖ 버튼 스타일 */
+  /* - 버튼 스타일 */
   ${(p) =>
     p.$type === "minus" &&
     css`
@@ -240,7 +240,7 @@ export const QuantityButton = styled.button`
       }
     `}
 
-  /* ➕ 버튼 스타일 */
+  /* + 버튼 스타일 */
   ${(p) =>
     p.$type === "plus" &&
     css`
@@ -250,7 +250,7 @@ export const QuantityButton = styled.button`
     `}
 `;
 
-/* 🔢 수량 표시 숫자 */
+/* 수량 표시 숫자 */
 export const QuantityValue = styled.div`
   color: #272727;
   text-align: center;
@@ -262,7 +262,7 @@ export const QuantityValue = styled.div`
   letter-spacing: -0.045rem;
 `;
 
-/* 🛒 담기 버튼 (하단 고정) */
+/* 담기 버튼 (하단 고정) */
 export const AddButton = styled.button`
   position: absolute;
   left: 0;
