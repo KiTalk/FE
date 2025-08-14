@@ -61,6 +61,11 @@ export const Card = styled.button`
   &:focus {
     outline: none;
   }
+  &:focus-visible {
+    outline: 0.25rem solid #223770;
+    outline-offset: 0.25rem;
+    border-radius: 1.875rem;
+  }
 `;
 
 export const CardLabel = styled.div`

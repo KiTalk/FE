@@ -23,7 +23,7 @@ function PointCheckPage() {
 
   function handleSelect(save) {
     try {
-      saveOrderPoint({ type: !!save });
+      saveOrderPoint({ enabled: !!save });
     } catch (err) {
       console.error(err);
     }
