@@ -10,6 +10,7 @@ import VoiceRecognize from "../pages/VoiceRecognize";
 import PhoneOrder from "../pages/PhoneOrder";
 import VoiceCart from "../pages/VoiceCart";
 import PackagePage from "../pages/Package";
+import PointCheckPage from "../pages/PointCheck";
 // 추후 추가될 페이지들을 위한 임포트 (현재는 주석 처리)
 // import NotFound from "./pages/NotFound";
 
@@ -23,6 +24,7 @@ export default function AppRouter() {
         <Route path="/order/touch" element={<TouchOrder />} />
         <Route path="/order/touch/cart" element={<TouchCart />} />
         <Route path="/order/package" element={<PackagePage />} />
+        <Route path="/order/point" element={<PointCheckPage />} />
         <Route path="/order/voice" element={<VoiceOrder />} />
         <Route path="/order/voice/one-two" element={<VoiceOneTwo />} />
         <Route path="/order/voice/recognize" element={<VoiceRecognize />} />

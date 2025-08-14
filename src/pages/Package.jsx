@@ -31,6 +31,8 @@ function PackagePage() {
     } catch (err) {
       console.error(err);
     }
+
+    navigate("/order/point");
   }
 
   return (
