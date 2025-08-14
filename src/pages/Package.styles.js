@@ -47,6 +47,18 @@ export const CardGrid = styled.div`
   z-index: 1;
 `;
 
+export const IconWrap = styled.div`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+`;
+
+export const IconImage = styled.img`
+  object-fit: contain;
+`;
+
 export const Card = styled.button`
   width: 32.125rem;
   height: 37.5rem;
@@ -61,17 +73,28 @@ export const Card = styled.button`
   &:focus {
     outline: none;
   }
-`;
 
-export const IconWrap = styled.div`
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+  /* First card (takeout) icon position and size */
+  &:nth-child(1) ${IconWrap} {
+    left: 10.02rem;
+    top: 7.37rem;
+  }
 
-export const IconImage = styled.img`
-  object-fit: contain;
+  &:nth-child(1) ${IconImage} {
+    width: 219.7598px;
+    height: 197.6741px;
+  }
+
+  /* Second card (dine-in) icon position and size */
+  &:nth-child(2) ${IconWrap} {
+    left: 9.75rem;
+    top: 7.37rem;
+  }
+
+  &:nth-child(2) ${IconImage} {
+    width: 225px;
+    height: 198.0001px;
+  }
 `;
 
 export const CardLabel = styled.div`

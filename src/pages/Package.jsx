@@ -40,22 +40,14 @@ function PackagePage() {
       <Title>어디에서 드시나요?</Title>
       <CardGrid>
         <Card type="button" onClick={() => persistAndNext("takeout")}>
-          <IconWrap style={{ left: "10.02rem", top: "7.37rem" }}>
-            <IconImage
-              style={{ width: "219.7598px", height: "197.6741px" }}
-              src={packageIcon}
-              alt="포장하기"
-            />
+          <IconWrap>
+            <IconImage src={packageIcon} alt="포장하기" />
           </IconWrap>
           <CardLabel>포장하기</CardLabel>
         </Card>
         <Card type="button" onClick={() => persistAndNext("dinein")}>
-          <IconWrap style={{ left: "9.75rem", top: "7.37rem" }}>
-            <IconImage
-              style={{ width: "225px", height: "198.0001px" }}
-              src={dineinIcon}
-              alt="먹고가기"
-            />
+          <IconWrap>
+            <IconImage src={dineinIcon} alt="먹고가기" />
           </IconWrap>
           <CardLabel>먹고가기</CardLabel>
         </Card>
