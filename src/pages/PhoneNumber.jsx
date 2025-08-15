@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
+import { saveOrderPoint } from "../utils/orderSpec";
 import {
   Page,
   Title,
@@ -18,14 +19,13 @@ import {
   SaveButton,
 } from "./PhoneNumber.styles";
 
-export default function PhoneNumber() {
+export default function PointPhone() {
   const navigate = useNavigate();
-  const [digits, setDigits] = useState("010"); // 010 고정 시작
+  const [digits, setDigits] = useState("010");
 
   const formatted = useMemo(() => {
     const onlyNums = digits.replace(/\D/g, "");
-    // 3-4-4 포맷 기준, 010은 고정이므로 나머지 채움
-    const head = "010"; // left label과 동일하게 보이도록
+    const head = "010";
     const rest = onlyNums.startsWith("010") ? onlyNums.slice(3) : onlyNums;
     const mid = rest.slice(0, 4);
     const tail = rest.slice(4, 8);
@@ -35,7 +35,7 @@ export default function PhoneNumber() {
   function handleDigit(d) {
     setDigits((prev) => {
       const cleaned = prev.replace(/\D/g, "");
-      if (cleaned.length >= 11) return prev; // 최대 11자리
+      if (cleaned.length >= 11) return prev;
       return (cleaned + String(d)).replace(/\D/g, "");
     });
   }
@@ -43,7 +43,7 @@ export default function PhoneNumber() {
   function handleBackspace() {
     setDigits((prev) => {
       const cleaned = prev.replace(/\D/g, "");
-      if (cleaned.length <= 3) return prev; // 010은 유지
+      if (cleaned.length <= 3) return prev;
       return cleaned.slice(0, -1);
     });
   }
@@ -55,9 +55,13 @@ export default function PhoneNumber() {
 
   function handleSave() {
     if (!canSave) return;
-    // TODO: 저장 후 자주 주문한 메뉴 화면으로 이동 또는 API 연동
-    // -> 자주 주문한 메뉴 화면으로 이동 구현함.
-    navigate("/order/phone");
+    try {
+      const phone = digits.replace(/\D/g, "");
+      saveOrderPoint({ enabled: true, phone });
+      navigate("/order/phone");
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   function handleGoBack() {
@@ -89,15 +93,10 @@ export default function PhoneNumber() {
           <InputHeading>전화번호 입력</InputHeading>
 
           <PhoneRow>
-            {/* 앞 3자리 */}
             <Segment slot="head">{formatted.head}</Segment>
-            {/* 고정 하이픈 위치 */}
             <Hyphen index={1} />
-            {/* 중간 4자리: 첫 번째 하이픈 다음 위치에 고정 시작 */}
             <Segment slot="mid">{formatted.mid || ""}</Segment>
-            {/* 두 번째 하이픈 */}
             <Hyphen index={2} />
-            {/* 마지막 4자리: 두 번째 하이픈 다음 위치에 고정 시작 */}
             <Segment slot="tail">{formatted.tail || ""}</Segment>
             <BottomAccent />
           </PhoneRow>
