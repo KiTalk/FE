@@ -1,9 +1,21 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Page, Hero, HeroInner, HeroTitle, CartWidget, CartIcon, CartText,
-  CartBadge, CartBadgeWrap, CartBadgeCount, CartArrow, CartTextWrap,
-  Section, SectionTitle, ProductRow,
+  Page,
+  Hero,
+  HeroInner,
+  HeroTitle,
+  CartWidget,
+  CartIcon,
+  CartText,
+  CartBadge,
+  CartBadgeWrap,
+  CartBadgeCount,
+  CartArrow,
+  CartTextWrap,
+  Section,
+  SectionTitle,
+  ProductRow,
 } from "./TouchOrder.styles";
 import marketImage from "../assets/images/market.png";
 import arrowImage from "../assets/images/arrow.png";
@@ -37,7 +49,16 @@ function TouchOrderContent() {
   function handleAddToCart(product, quantity) {
     const qty = Number(quantity ?? 1);
     if (!product?.id || qty <= 0) return;
-    addItem({ id: product.id, name: product.name, price: product.price, popular: !!product.popular, temp: product.temp }, qty);
+    addItem(
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        popular: !!product.popular,
+        temp: product.temp,
+      },
+      qty
+    );
   }
 
   function makeOnAddHandler(product) {
@@ -46,7 +67,9 @@ function TouchOrderContent() {
     };
   }
 
-  const activeMenu = MENU_DATA.find(function (menu) { return menu.id === activeTabId; });
+  const activeMenu = MENU_DATA.find(function (menu) {
+    return menu.id === activeTabId;
+  });
 
   return (
     <Page>
@@ -54,7 +77,9 @@ function TouchOrderContent() {
         <HeroInner>
           <HeroTitle>무엇을 드시겠어요?</HeroTitle>
           <CartWidget onClick={handleCartClick}>
-            <CartTextWrap><CartText>장바구니</CartText></CartTextWrap>
+            <CartTextWrap>
+              <CartText>장바구니</CartText>
+            </CartTextWrap>
             <CartIcon src={marketImage} alt="장바구니" />
             <CartBadgeWrap>
               <CartBadge src={badgeImage} alt="배지" />
@@ -66,7 +91,9 @@ function TouchOrderContent() {
       </Hero>
 
       <CategoryTabs
-        tabs={MENU_DATA.map(function ({ id, label }) { return { id, label }; })}
+        tabs={MENU_DATA.map(function ({ id, label }) {
+          return { id, label };
+        })}
         activeId={activeTabId}
         onChange={setActiveTabId}
       />
@@ -77,7 +104,13 @@ function TouchOrderContent() {
             <SectionTitle>{section.title}</SectionTitle>
             <ProductRow>
               {section.products.map(function (item) {
-                return <ProductCard key={item.id} product={item} onAdd={makeOnAddHandler(item)} />;
+                return (
+                  <ProductCard
+                    key={item.id}
+                    product={item}
+                    onAdd={makeOnAddHandler(item)}
+                  />
+                );
               })}
             </ProductRow>
           </Section>
