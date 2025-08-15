@@ -107,15 +107,17 @@ export default function OrderHistory({ children }) {
   }
 
   function clearSelectedItems() {
-    const next = { ...selected };
-    Object.keys(next).forEach((date) => {
-      const bucket = { ...next[date] };
-      Object.keys(bucket).forEach((itemId) => {
-        bucket[itemId] = { checked: false, qty: 0 };
+    setSelected(function (prev) {
+      const next = { ...prev };
+      Object.keys(next).forEach(function (date) {
+        const bucket = { ...next[date] };
+        Object.keys(bucket).forEach(function (itemId) {
+          bucket[itemId] = { checked: false, qty: 0 };
+        });
+        next[date] = bucket;
       });
-      next[date] = bucket;
+      return next;
     });
-    setSelected(next);
   }
 
   // 즐겨찾기(자주 시킨 메뉴): 수량>0 이었던 날짜 수로 랭킹
