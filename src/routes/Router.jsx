@@ -7,6 +7,7 @@ import TouchCart from "../pages/TouchCart";
 import VoiceOrder from "../pages/VoiceOrder";
 import VoiceOneTwo from "../pages/VoiceOneTwo";
 import VoiceRecognize from "../pages/VoiceRecognize";
+import PhoneNumber from "../pages/PhoneNumber";
 import PhoneOrder from "../pages/PhoneOrder";
 import VoiceCart from "../pages/VoiceCart";
 import PackagePage from "../pages/Package";
@@ -31,7 +32,8 @@ export default function AppRouter() {
         <Route path="/order/voice" element={<VoiceOrder />} />
         <Route path="/order/voice/one-two" element={<VoiceOneTwo />} />
         <Route path="/order/voice/recognize" element={<VoiceRecognize />} />
-        <Route path="/order/phone" element={<PhoneOrder />} />
+        <Route path="/order/phone/number" element={<PhoneNumber />} />
+        <Route path="order/phone" element={<PhoneOrder/>}/>
         <Route path="/order/voice/cart" element={<VoiceCart />} />
         <Route path="/order/complete" element={<OrderCompletePage />} />
 

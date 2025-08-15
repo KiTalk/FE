@@ -2,8 +2,8 @@ import styled, { css } from "styled-components";
 
 export const ProductCard = styled.div`
   position: relative;
-  width: 25.5rem;
-  height: 31.6875rem;
+  width: 381px;
+  height: 507px;
   border: 1px solid #adadad;
   border-radius: 20px;
   overflow: hidden;
@@ -84,7 +84,7 @@ export const NameRow = styled.div`
 export const ProductName = styled.div`
   color: #272727;
   font-family: Pretendard;
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-style: normal;
   font-weight: 700;
   line-height: 1.875rem;
@@ -125,9 +125,9 @@ export const TemperatureBadge = styled.span`
 export const ProductPrice = styled.div`
   color: #223770;
   font-family: Pretendard;
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-style: normal;
-  font-weight: 750;
+  font-weight: 800;
   line-height: 1.875rem;
   letter-spacing: -0.0375rem;
   margin-top: 1rem;
