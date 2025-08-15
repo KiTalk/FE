@@ -106,6 +106,18 @@ export default function OrderHistory({ children }) {
     return out;
   }
 
+  function clearSelectedItems() {
+    const next = { ...selected };
+    Object.keys(next).forEach((date) => {
+      const bucket = { ...next[date] };
+      Object.keys(bucket).forEach((itemId) => {
+        bucket[itemId] = { checked: false, qty: 0 };
+      });
+      next[date] = bucket;
+    });
+    setSelected(next);
+  }
+
   // 즐겨찾기(자주 시킨 메뉴): 수량>0 이었던 날짜 수로 랭킹
   const favorites = useMemo(
     function () {
@@ -152,6 +164,7 @@ export default function OrderHistory({ children }) {
     qtyMinus,
     qtyPlus,
     getSelectedList,
+    clearSelectedItems,
   };
 
   return typeof children === "function" ? children(api) : null;

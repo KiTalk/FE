@@ -13,9 +13,9 @@ import {
   IconWrap,
   IconImage,
   CardLabel,
-} from "./Package.styles";
+} from "./PhonePackage.styles";
 
-function PackagePage() {
+function PhonePackagePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { totalPrice = 0, totalQty = 0 } = location.state || {};
@@ -32,7 +32,7 @@ function PackagePage() {
       console.error(err);
     }
 
-    navigate("/order/point");
+    navigate("/order/complete");
   }
 
   return (
@@ -58,4 +58,4 @@ function PackagePage() {
   );
 }
 
-export default PackagePage;
+export default PhonePackagePage;

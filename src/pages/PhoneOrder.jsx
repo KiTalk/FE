@@ -111,7 +111,7 @@ function TouchOrderContent() {
 
   /* 내부 동작 함수 선언식 */
   function handleCartClick() {
-    navigate("/order/touch/cart");
+    navigate("/order/phone/cart");
   }
 
   function handleAddToCart(product, quantity) {
@@ -133,11 +133,15 @@ function TouchOrderContent() {
     navigate("/order-method");
   }
 
-  function handleAddSelectedToCart(getSelectedList) {
+  function handleAddSelectedToCart(getSelectedList, clearSelectedItems) {
     getSelectedList().forEach(function ({ product, quantity }) {
       const onAdd = makeOnAddHandler(product);
       onAdd({ product, quantity });
     });
+    // 장바구니에 추가한 후 선택 상태 초기화
+    if (clearSelectedItems) {
+      clearSelectedItems();
+    }
   }
 
   function makeOnAddHandler(product) {
@@ -392,6 +396,7 @@ function TouchOrderContent() {
                   qtyMinus,
                   qtyPlus,
                   getSelectedList,
+                  clearSelectedItems,
                 }) {
                   /* 내부 동작 함수 선언식: 날짜의 전체 선택 여부 */
                   function isAllChecked(date) {
@@ -563,7 +568,10 @@ function TouchOrderContent() {
                         <PrimaryButton
                           type="button"
                           onClick={() =>
-                            handleAddSelectedToCart(getSelectedList)
+                            handleAddSelectedToCart(
+                              getSelectedList,
+                              clearSelectedItems
+                            )
                           }
                         >
                           선택한 메뉴 담기

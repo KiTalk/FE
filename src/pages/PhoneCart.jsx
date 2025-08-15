@@ -23,19 +23,19 @@ import {
   FooterDivider,
   FooterMetaLabel,
   FooterMetaValue,
-} from "./TouchCart.styles";
+} from "./PhoneCart.styles";
 import CartProvider from "../components/CartProvider.jsx";
 import { useCart } from "../components/CartContext";
 import CartProductCard from "../components/CartProductCard";
 import helpImage from "../assets/images/help.png";
 import { useNavigate } from "react-router-dom";
 
-export default function TouchCartPage(props) {
+export default function PhoneCartPage(props) {
   return (
     <CartProvider>
       <Page>
         <CartHydrator initialItems={props.initialCart} />
-        <TouchCartContent {...props} />
+        <PhoneCartContent {...props} />
       </Page>
     </CartProvider>
   );
@@ -68,7 +68,7 @@ function CartHydrator({ initialItems }) {
   return null;
 }
 
-function TouchCartContent(props) {
+function PhoneCartContent(props) {
   const navigate = useNavigate();
   const { items, totalQty, totalPrice, increase, decrease } = useCart();
 
@@ -78,8 +78,7 @@ function TouchCartContent(props) {
   }
 
   function handleContinue() {
-    // 이전 페이지로 이동
-    navigate(-1);
+    navigate("/order/touch");
   }
 
   function handleCheckout() {
@@ -89,7 +88,7 @@ function TouchCartContent(props) {
     }
 
     // 다음 페이지로 이동 (포장유무, 적립유무 선택 페이지)
-    navigate("/order/touch/package", {
+    navigate("/order/phone/package", {
       state: { totalPrice, totalQty },
     });
   }
