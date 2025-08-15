@@ -34,7 +34,7 @@ function OrderMethod() {
     handleSelect("/order/touch");
   }
   function handlePhoneClick() {
-    handleSelect("/order/phone");
+    handleSelect("/order/phone/Number");
   }
 
   return (

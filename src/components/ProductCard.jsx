@@ -15,6 +15,11 @@ import {
   AddedOverlay,
 } from "./Product.styles";
 
+/* ★ 변경사항
+   - tagLabel prop 추가: 좌측 상단 뱃지 텍스트를 외부에서 지정(예: '1위', '2위', '3위')
+   - 기본 동작: tagLabel이 있으면 '인기' 대신 tagLabel을 표시, 없으면 기존 popular=true일 때 '인기' 표시
+*/
+
 export default function ProductCard({
   product,
   onAdd,
@@ -22,6 +27,7 @@ export default function ProductCard({
   cartQty = 0,
   onIncrease,
   onDecrease,
+  tagLabel, // ★ 추가
 }) {
   const [quantity, setQuantity] = useState(0);
   const [addedTotal, setAddedTotal] = useState(0);
@@ -67,21 +73,25 @@ export default function ProductCard({
   }
 
   const displayedQty = mode === "cart" ? Number(cartQty ?? 0) : quantity;
-
   const overlayCount  = mode === "cart" ? Number(cartQty ?? 0) : addedTotal;
-
   const showOverlay   = overlayCount > 0;
-
   const addDisabled = mode !== "cart" && quantity <= 0;
 
   return (
     <ProductCardBox>
-      {product.popular && <PopularTag>인기</PopularTag>}
+      {/* ★ 랭킹 뱃지 우선 표시, 없으면 기존 인기 태그 표시 */}
+      {tagLabel ? (
+        <PopularTag>{tagLabel}</PopularTag>
+      ) : (
+        product.popular && <PopularTag>인기</PopularTag>
+      )}
+
       <ImageArea $variant={temperatureVariant} />
       <InfoArea>
         <AddedOverlay $show={showOverlay} aria-live="polite">
           {overlayCount}개 담김
         </AddedOverlay>
+
         <NameRow>
           <ProductName>{product.name}</ProductName>
           {temperatureLabel && (
@@ -90,7 +100,9 @@ export default function ProductCard({
             </TemperatureBadge>
           )}
         </NameRow>
+
         <ProductPrice>{product.price.toLocaleString()}원</ProductPrice>
+
         <QuantityRow>
           {mode === "cart" ? (
             <>
@@ -107,6 +119,7 @@ export default function ProductCard({
           )}
         </QuantityRow>
       </InfoArea>
+
       {mode !== "cart" && (
         <AddButton
           onClick={handleAdd}
