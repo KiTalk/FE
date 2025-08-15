@@ -227,7 +227,7 @@ export const SubSectionContext = styled.h5`
   font-weight: 400;
   letter-spacing: -0.015em;
   color: #272727;
-`
+`;
 
 export const HistoryNav = styled.div`
   display: flex;

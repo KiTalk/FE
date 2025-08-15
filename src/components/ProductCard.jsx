@@ -101,7 +101,7 @@ export default function ProductCard({
           )}
         </NameRow>
 
-        <ProductPrice>{product.price.toLocaleString()}원</ProductPrice>
+        <ProductPrice>{Number(product?.price ?? 0).toLocaleString()}원</ProductPrice>
 
         <QuantityRow>
           {mode === "cart" ? (
