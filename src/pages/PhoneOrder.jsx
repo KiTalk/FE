@@ -151,7 +151,8 @@ function TouchOrderContent() {
     try {
       const stored = localStorage.getItem("order_spec");
       return stored ? JSON.parse(stored) : {};
-    } catch {
+    } catch (err) {
+      console.error(err);
       return {};
     }
   };

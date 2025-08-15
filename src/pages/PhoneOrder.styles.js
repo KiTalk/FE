@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import checkIcon from "/src/assets/images/check2.png";
 
 export const Page = styled.div`
   position: relative;
@@ -378,7 +379,7 @@ export const DateCheck = styled.input.attrs({ type: "checkbox" })`
     top: 0;
     width: 100%;
     height: 100%;
-    background-image: url("/src/assets/images/check2.png");
+    background-image: url(${checkIcon});
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -599,11 +600,12 @@ export const PageViewport = styled.div`
 
 export const PageScrollbar = styled.div`
   width: 0.875rem;
-  /* 초기값은 JS에서 동적 계산으로 덮어씀 */
   height: 50vh;
   position: fixed;
   top: 200px;
-  right: calc((100vw - 1440px) / 2 + var(--page-scrollbar-right-inset));
+  right: calc(
+    max((100vw - 1440px) / 2, 0px) + var(--page-scrollbar-right-inset)
+  );
   z-index: 1000;
 `;
 
