@@ -3,16 +3,14 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import OrderMethod from "../pages/OrderMethod";
 import TouchOrder from "../pages/TouchOrder";
-import TouchCart from "../pages/TouchCart";
-import PhoneCart from "../pages/PhoneCart";
+import Cart from "../pages/Cart";
 import VoiceOrder from "../pages/VoiceOrder";
 import VoiceOneTwo from "../pages/VoiceOneTwo";
 import VoiceRecognize from "../pages/VoiceRecognize";
 import PhoneNumber from "../pages/PhoneNumber";
 import PhoneOrder from "../pages/PhoneOrder";
 import VoiceCart from "../pages/VoiceCart";
-import TouchPackagePage from "../pages/TouchPackage";
-import PhonePackagePage from "../pages/PhonePackage";
+import PackagePage from "../pages/Package";
 import PointCheckPage from "../pages/PointCheck";
 import OrderCompletePage from "../pages/OrderComplete";
 import PointPhone from "../pages/PointPhone";
@@ -27,10 +25,8 @@ export default function AppRouter() {
         <Route path="/" element={<Home />} />
         <Route path="/order-method" element={<OrderMethod />} />
         <Route path="/order/touch" element={<TouchOrder />} />
-        <Route path="/order/touch/cart" element={<TouchCart />} />
-        <Route path="/order/phone/cart" element={<PhoneCart />} />
-        <Route path="/order/touch/package" element={<TouchPackagePage />} />
-        <Route path="/order/phone/package" element={<PhonePackagePage />} />
+        <Route path="/order/cart" element={<Cart />} />
+        <Route path="/order/package" element={<PackagePage />} />
         <Route path="/order/point" element={<PointCheckPage />} />
         <Route path="/order/point/phone" element={<PointPhone />} />
         <Route path="/order/voice" element={<VoiceOrder />} />

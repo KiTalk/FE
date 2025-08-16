@@ -13,9 +13,9 @@ import {
   IconWrap,
   IconImage,
   CardLabel,
-} from "./PhonePackage.styles";
+} from "./Package.styles";
 
-function PhonePackagePage() {
+function PackagePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { totalPrice = 0, totalQty = 0 } = location.state || {};
@@ -32,7 +32,29 @@ function PhonePackagePage() {
       console.error(err);
     }
 
-    navigate("/order/complete");
+    // Check localStorage for order_spec.point
+    try {
+      const orderSpecStr = localStorage.getItem("order_spec");
+      if (orderSpecStr) {
+        const orderSpec = JSON.parse(orderSpecStr);
+        const point = orderSpec.point;
+
+        // If point is empty or doesn't exist, go to /order/point
+        // If point has enabled and phone properties, go to /order/complete
+        if (point && point.enabled && point.phone) {
+          navigate("/order/complete");
+        } else {
+          navigate("/order/point");
+        }
+      } else {
+        // No order_spec in localStorage, go to point page
+        navigate("/order/point");
+      }
+    } catch (err) {
+      console.error("Error checking order_spec:", err);
+      // Fallback to point page if there's an error
+      navigate("/order/point");
+    }
   }
 
   return (
@@ -58,4 +80,4 @@ function PhonePackagePage() {
   );
 }
 
-export default PhonePackagePage;
+export default PackagePage;

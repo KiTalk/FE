@@ -12,7 +12,7 @@ export const MENU_DATA = [
           {
             id: "americano-ice",
             name: "아이스 아메리카노",
-            price: 4000,
+            price: 2500,
             popular: true,
           },
           {
