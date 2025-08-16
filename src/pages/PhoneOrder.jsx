@@ -111,7 +111,7 @@ function TouchOrderContent() {
 
   /* 내부 동작 함수 선언식 */
   function handleCartClick() {
-    navigate("/order/phone/cart");
+    navigate("/order/cart");
   }
 
   function handleAddToCart(product, quantity) {
