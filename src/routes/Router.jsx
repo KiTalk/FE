@@ -9,6 +9,7 @@ import VoiceOrder from "../pages/VoiceOrder";
 import VoiceOneTwo from "../pages/VoiceOneTwo";
 import VoiceThreePlus from "../pages/VoiceThreePlus";
 import VoiceThreePlusRecording from "../pages/VoiceThreePlusRecording";
+import VoiceThreePlusDetails from "../pages/VoiceThreePlusDetails";
 import VoiceRecognize from "../pages/VoiceRecognize";
 import PhoneNumber from "../pages/PhoneNumber";
 import PhoneOrder from "../pages/PhoneOrder";
@@ -120,6 +121,14 @@ export default function AppRouter() {
           element={
             <PageTransition>
               <VoiceThreePlusRecording />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/order/voice/details"
+          element={
+            <PageTransition>
+              <VoiceThreePlusDetails />
             </PageTransition>
           }
         />

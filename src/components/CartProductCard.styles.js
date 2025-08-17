@@ -14,7 +14,15 @@ export const Card = styled.div`
 export const ImageArea = styled.div`
   width: 100%;
   height: 198px; /* 47.62% of 420 */
-  background: #f2f6fb;
+  background: ${(props) =>
+    props.$variant === "cold"
+      ? "#F2F6FB"
+      : props.$variant === "hot"
+      ? "#DBD1C9"
+      : "#f2f6fb"};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const PopularTag = styled.div`

@@ -31,9 +31,12 @@ function VoiceThreePlusRecording() {
   const [voiceDetected, setVoiceDetected] = useState(false); // eslint-disable-line no-unused-vars
   const [timeLeft, setTimeLeft] = useState(5);
   const [autoStopTriggered, setAutoStopTriggered] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [recognizedText, setRecognizedText] = useState("");
   const timerRef = useRef(null);
   const toggleRecordingRef = useRef(null);
   const isRecordingRef = useRef(false);
+  const transitionTimerRef = useRef(null);
 
   const language = useMemo(() => getSettings().defaultLanguage || "ko", []);
 
@@ -85,6 +88,27 @@ function VoiceThreePlusRecording() {
     setAutoStopTriggered(false);
   }, []);
 
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (transitionTimerRef.current) {
+        clearTimeout(transitionTimerRef.current);
+      }
+    };
+  }, []);
+
+  // 음성 인식이 완료되면 1초 후 자동으로 다음 페이지로 이동
+  useEffect(() => {
+    if (recognizedText && !isTransitioning) {
+      setIsTransitioning(true);
+      transitionTimerRef.current = setTimeout(() => {
+        navigate("/order/voice/details", {
+          state: { recognized: recognizedText },
+        });
+      }, 1000); // 1초 후 자동 전환
+    }
+  }, [recognizedText, isTransitioning, navigate]);
+
   return (
     <Page>
       <VoiceRecorder language={language} disableInterim={true}>
@@ -99,6 +123,11 @@ function VoiceThreePlusRecording() {
           // toggleRecording / isRecording을 ref에 저장
           toggleRecordingRef.current = toggleRecording;
           isRecordingRef.current = isRecording;
+
+          // recognized 값이 변경되면 state에 저장
+          if (recognized && recognized !== recognizedText) {
+            setRecognizedText(recognized);
+          }
 
           return (
             <>
@@ -118,7 +147,7 @@ function VoiceThreePlusRecording() {
               </GuideSection>
 
               {/* 녹음 중이거나 변환 중일 때: 음성 인식 영역 */}
-              {(isRecording || loading) && !recognized && (
+              {(isRecording || loading) && !recognizedText && (
                 <VoiceRecognitionArea>
                   <AudioSpectrumContainer>
                     <AudioSpectrum
@@ -140,22 +169,21 @@ function VoiceThreePlusRecording() {
               )}
 
               {/* 인식된 텍스트가 있을 때: 인식된 텍스트 표시 영역 */}
-              {recognized && (
+              {recognizedText && (
                 <RecognizedVoiceArea
-                  onClick={() => {
-                    // 인식 완료 후 다음 단계로 이동
-                    navigate("/order/voice/cart", { state: { recognized } });
+                  style={{
+                    opacity: isTransitioning ? 0.7 : 1,
+                    transition: "opacity 0.3s ease",
                   }}
-                  style={{ cursor: "pointer" }}
                 >
                   <RecognizedTextContainer>
-                    <RecognizedText>"{recognized}"</RecognizedText>
+                    <RecognizedText>"{recognizedText}"</RecognizedText>
                   </RecognizedTextContainer>
                 </RecognizedVoiceArea>
               )}
 
               {/* 녹음 중이 아니고 인식된 텍스트가 없을 때: 눌러서 말하기 버튼 */}
-              {!isRecording && !recognized && !loading && (
+              {!isRecording && !recognizedText && !loading && (
                 <SpeakButton
                   onClick={() => {
                     // 수동 시작 시 타이머 리셋 및 자동중지 플래그 초기화
