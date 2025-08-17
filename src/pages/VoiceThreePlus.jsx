@@ -27,7 +27,7 @@ function VoiceThreePlus() {
   }
 
   function handleStartVoice() {
-    // TODO: 음성 인식 시작 로직
+    navigate("/order/voice/3up/recording");
   }
 
   return (
