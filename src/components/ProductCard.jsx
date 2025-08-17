@@ -43,15 +43,22 @@ export default function ProductCard({
   const temperatureLabel = getTemperatureLabel(product?.id);
 
   const temperatureVariant =
-    temperatureLabel === "시원한" ? "cold" :
-    temperatureLabel === "뜨거운" ? "hot" : null;
+    temperatureLabel === "시원한"
+      ? "cold"
+      : temperatureLabel === "뜨거운"
+      ? "hot"
+      : null;
 
   function handleMinus() {
-    setQuantity(function (q) { return Math.max(0, q - 1); });
+    setQuantity(function (q) {
+      return Math.max(0, q - 1);
+    });
   }
 
   function handlePlus() {
-    setQuantity(function (q) { return q + 1; });
+    setQuantity(function (q) {
+      return q + 1;
+    });
   }
 
   function handleAdd() {
@@ -73,8 +80,8 @@ export default function ProductCard({
   }
 
   const displayedQty = mode === "cart" ? Number(cartQty ?? 0) : quantity;
-  const overlayCount  = mode === "cart" ? Number(cartQty ?? 0) : addedTotal;
-  const showOverlay   = overlayCount > 0;
+  const overlayCount = mode === "cart" ? Number(cartQty ?? 0) : addedTotal;
+  const showOverlay = overlayCount > 0;
   const addDisabled = mode !== "cart" && quantity <= 0;
 
   return (
@@ -101,7 +108,9 @@ export default function ProductCard({
           )}
         </NameRow>
 
-        <ProductPrice>{Number(product?.price ?? 0).toLocaleString()}원</ProductPrice>
+        <ProductPrice>
+          {Number(product?.price ?? 0).toLocaleString()}원
+        </ProductPrice>
 
         <QuantityRow>
           {mode === "cart" ? (
