@@ -26,7 +26,7 @@ function VoiceOrder() {
   }
 
   function handleThreePlus() {
-    // TODO: route to 3+ items voice flow
+    navigate("/order/voice/three-plus");
   }
 
   return (
