@@ -33,6 +33,7 @@ function VoiceThreePlusRecording() {
   const [autoStopTriggered, setAutoStopTriggered] = useState(false);
   const timerRef = useRef(null);
   const toggleRecordingRef = useRef(null);
+  const isRecordingRef = useRef(false);
 
   const language = useMemo(() => getSettings().defaultLanguage || "ko", []);
 
@@ -51,10 +52,16 @@ function VoiceThreePlusRecording() {
             toggleRecordingRef.current &&
             !autoStopTriggered
           ) {
-            // 5초가 되면 자동으로 녹음 중지 (중복 방지)
+            // 실제 '녹음 중'일 때만 자동 중지 수행
+            if (!isRecordingRef.current) {
+              console.warn(
+                "⏱️ 카운트다운 종료 시 녹음 상태가 아님 - 자동 중지 스킵"
+              );
+              return 0;
+            }
             setAutoStopTriggered(true);
             setTimeout(() => {
-              if (toggleRecordingRef.current) {
+              if (toggleRecordingRef.current && isRecordingRef.current) {
                 console.log("⏰ 5초 타이머 완료 - 자동 녹음 중지");
                 toggleRecordingRef.current();
               }
@@ -78,14 +85,6 @@ function VoiceThreePlusRecording() {
     setAutoStopTriggered(false);
   }, []);
 
-  // 녹음을 자동으로 시작하기 위한 상태
-  const [shouldStartRecording, setShouldStartRecording] = useState(false);
-
-  useEffect(() => {
-    // 컴포넌트가 마운트되면 녹음 시작 신호를 보냄
-    setShouldStartRecording(true);
-  }, []);
-
   return (
     <Page>
       <VoiceRecorder language={language} disableInterim={true}>
@@ -97,14 +96,9 @@ function VoiceThreePlusRecording() {
           recognized,
           toggleRecording,
         }) => {
-          // toggleRecording 함수를 ref에 저장
+          // toggleRecording / isRecording을 ref에 저장
           toggleRecordingRef.current = toggleRecording;
-
-          // 자동 녹음 시작
-          if (shouldStartRecording && !isRecording && !loading && !recognized) {
-            setShouldStartRecording(false);
-            setTimeout(() => toggleRecording(), 100);
-          }
+          isRecordingRef.current = isRecording;
 
           return (
             <>
@@ -164,6 +158,9 @@ function VoiceThreePlusRecording() {
               {!isRecording && !recognized && !loading && (
                 <SpeakButton
                   onClick={() => {
+                    // 수동 시작 시 타이머 리셋 및 자동중지 플래그 초기화
+                    setTimeLeft(5);
+                    setAutoStopTriggered(false);
                     toggleRecording();
                   }}
                 >
