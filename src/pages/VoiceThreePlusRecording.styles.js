@@ -14,15 +14,15 @@ export const GuideSection = styled.div`
   position: absolute;
   width: 905px;
   height: 202px;
-  left: 8.125rem;
-  top: 16.4375rem;
+  left: 130px;
+  top: 263px;
 `;
 
 export const ProfileIcon = styled.img`
   position: absolute;
-  width: 6.0625rem;
-  height: 6.0625rem;
-  left: -0.85rem;
+  width: 97px;
+  height: 97px;
+  left: 0;
   top: 0;
   background: #ffffff;
   border-radius: 50%;
@@ -142,29 +142,64 @@ export const FingerImage = styled.img`
   object-fit: contain;
 `;
 
-export const RecognizedTextContainer = styled.div`
+// 인식된 텍스트가 표시될 때의 음성 인식 영역 (음성 인식 완료 후)
+export const RecognizedVoiceArea = styled.div`
   position: absolute;
-  left: 30rem;
-  top: 43rem;
-  width: 50rem;
+  width: 747px;
+  height: 150px;
+  left: 583px;
+  top: 505px;
+  background: #ffffff;
+  border: 2px solid #223770;
+  border-radius: 30px 30px 0px 30px;
+  box-sizing: border-box;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+`;
+
+export const RecognizedTextContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const RecognizedText = styled.div`
-  background: white;
-  border: 2px solid #dcdcdc;
-  border-radius: 1.875rem;
-  padding: 1.5rem 2rem;
+  width: 646px;
+  height: 48px;
   font-family: "Pretendard";
   font-style: normal;
-  font-weight: 400;
-  font-size: 2rem;
-  line-height: 2.5rem;
-  letter-spacing: -0.03rem;
-  color: #375ab9;
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 48px;
+  display: flex;
+  align-items: center;
   text-align: center;
-  min-width: 20rem;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.015em;
+  color: #223770;
+  justify-content: center;
+`;
+
+// 음성 인식 영역 (녹음 중일 때 표시)
+export const VoiceRecognitionArea = styled.div`
+  position: absolute;
+  width: 747px;
+  height: 150px;
+  left: 583px;
+  top: 505px;
+  background: #ffffff;
+  border: 2px solid #223770;
+  border-radius: 30px 30px 0px 30px;
+  box-sizing: border-box;
+`;
+
+// 오디오 스펙트럼 컨테이너
+export const AudioSpectrumContainer = styled.div`
+  position: absolute;
+  width: 283px;
+  height: 98.31px;
+  left: 240px;
+  top: 26px;
 `;

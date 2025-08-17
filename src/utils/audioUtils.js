@@ -93,7 +93,32 @@ export class AudioRecorder {
   // 녹음 중지 및 오디오 파일 반환
   stopRecording() {
     return new Promise((resolve) => {
-      if (!this.mediaRecorder || !this.isRecording) {
+      if (!this.mediaRecorder) {
+        console.warn("⚠️ MediaRecorder가 초기화되지 않았습니다.");
+        resolve(null);
+        return;
+      }
+
+      if (!this.isRecording) {
+        console.warn("⚠️ 현재 녹음 중이 아닙니다.");
+
+        // 이미 수집된 청크가 있다면 파일로 생성 시도
+        if (this.audioChunks && this.audioChunks.length > 0) {
+          console.log("📦 기존 청크로 파일 생성 시도...");
+          const mimeType = this.actualMimeType || this.getSupportedMimeType();
+          const audioBlob = new Blob(this.audioChunks, { type: mimeType });
+
+          if (audioBlob.size > 0) {
+            const fileName = `recording-${Date.now()}.webm`;
+            const audioFile = new File([audioBlob], fileName, {
+              type: mimeType,
+            });
+            console.log(`📁 기존 청크로 파일 생성됨: ${audioFile.size} bytes`);
+            resolve(audioFile);
+            return;
+          }
+        }
+
         resolve(null);
         return;
       }

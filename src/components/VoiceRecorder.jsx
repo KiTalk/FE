@@ -3,7 +3,7 @@ import { AudioRecorder, getAudioDuration } from "../utils/audioUtils";
 import { addToHistory } from "../utils/historyUtils";
 import { sttService } from "../services/api";
 
-function VoiceRecorder({ language, children }) {
+function VoiceRecorder({ language, children, disableInterim = false }) {
   const recorderRef = useRef(null);
   const interimTimerRef = useRef(null);
   const snapshotInFlightRef = useRef(false);
@@ -13,7 +13,7 @@ function VoiceRecorder({ language, children }) {
   const [error, setError] = useState("");
   const [recognized, setRecognized] = useState("");
 
-  const MIN_DURATION_SEC = 1.0;
+  const MIN_DURATION_SEC = 0.5;
 
   function extractTextFromSttResponse(raw) {
     if (!raw) return "";
@@ -94,13 +94,26 @@ function VoiceRecorder({ language, children }) {
     } else {
       try {
         setLoading(true);
+        console.log("🛑 녹음 중지 시작...");
         const audioFile = await recorderRef.current.stopRecording();
         setIsRecording(false);
+
+        console.log("📁 오디오 파일 생성 결과:", audioFile);
+
         if (!audioFile) {
-          setError("오디오 파일 생성 실패");
+          console.error("❌ 오디오 파일이 null 또는 undefined입니다.");
+          setError("오디오 파일 생성 실패: 녹음 데이터가 없습니다.");
           setLoading(false);
           return;
         }
+
+        if (audioFile.size === 0) {
+          console.error("❌ 오디오 파일 크기가 0바이트입니다.");
+          setError("오디오 파일 생성 실패: 녹음 데이터가 비어있습니다.");
+          setLoading(false);
+          return;
+        }
+
         console.log("📁 오디오 파일 정보:");
         console.log(`  - 파일명: ${audioFile.name}`);
         console.log(`  - 크기: ${audioFile.size} bytes`);
@@ -118,13 +131,12 @@ function VoiceRecorder({ language, children }) {
 
         if (Number.isFinite(duration) && duration < MIN_DURATION_SEC) {
           console.warn(
-            `⚠️ 녹음 시간이 너무 짧습니다. 최소 ${MIN_DURATION_SEC}초 이상 녹음해주세요.`
+            `⚠️ 녹음 시간이 짧습니다 (${duration.toFixed(
+              2
+            )}초). 최소 ${MIN_DURATION_SEC}초 권장됩니다.`
           );
-          setError(
-            `녹음이 너무 짧습니다. 최소 ${MIN_DURATION_SEC}초 이상 말씀해주세요.`
-          );
-          setLoading(false);
-          return;
+          // 짧은 녹음도 허용하되 경고만 표시
+          console.log("📤 짧은 녹음이지만 STT 처리를 계속 진행합니다.");
         }
 
         console.log("🌐 STT API 호출 시작...");
@@ -193,7 +205,8 @@ function VoiceRecorder({ language, children }) {
   }, []);
 
   useEffect(() => {
-    if (isRecording) {
+    // disableInterim이 true면 중간 스냅샷을 비활성화
+    if (isRecording && !disableInterim) {
       if (interimTimerRef.current) clearInterval(interimTimerRef.current);
       interimTimerRef.current = setInterval(() => {
         sendInterimSnapshot();
@@ -208,7 +221,7 @@ function VoiceRecorder({ language, children }) {
         interimTimerRef.current = null;
       }
     };
-  }, [isRecording, sendInterimSnapshot]);
+  }, [isRecording, sendInterimSnapshot, disableInterim]);
 
   useEffect(() => {
     return () => {
