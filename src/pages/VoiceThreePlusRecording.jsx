@@ -11,8 +11,6 @@ import {
   SpeakButtonContent,
   MicIcon,
   SpeakButtonText,
-  FingerGuide,
-  FingerImage,
   RecognizedTextContainer,
   RecognizedText,
   RecognizedVoiceArea,
@@ -112,14 +110,7 @@ function VoiceThreePlusRecording() {
   return (
     <Page>
       <VoiceRecorder language={language} disableInterim={true}>
-        {({
-          isRecording,
-          loading,
-          error,
-          stream,
-          recognized,
-          toggleRecording,
-        }) => {
+        {({ isRecording, loading, stream, recognized, toggleRecording }) => {
           // toggleRecording / isRecording을 ref에 저장
           toggleRecordingRef.current = toggleRecording;
           isRecordingRef.current = isRecording;
@@ -197,21 +188,6 @@ function VoiceThreePlusRecording() {
                     <SpeakButtonText>눌러서 말하기</SpeakButtonText>
                   </SpeakButtonContent>
                 </SpeakButton>
-              )}
-
-              {/* 에러 메시지 */}
-              {error && (
-                <div
-                  style={{
-                    position: "absolute",
-                    left: 334,
-                    top: 820,
-                    color: "#c0392b",
-                    fontSize: 20,
-                  }}
-                >
-                  {error}
-                </div>
               )}
             </>
           );
