@@ -78,7 +78,24 @@ function CartContent(props) {
   }
 
   function handleContinue() {
-    navigate("/order/touch");
+    try {
+      const orderSpecStr = localStorage.getItem("order_spec");
+      if (orderSpecStr) {
+        const orderSpec = JSON.parse(orderSpecStr);
+        const point = orderSpec.point;
+
+        if (point && point.enabled && point.phone) {
+          navigate("/order/phone");
+        } else {
+          navigate("/order/touch");
+        }
+      } else {
+        navigate("/order/touch");
+      }
+    } catch (err) {
+      console.error("Error checking order_spec:", err);
+      navigate("/order/touch");
+    }
   }
 
   function handleCheckout() {

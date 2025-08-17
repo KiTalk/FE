@@ -9,22 +9,22 @@ export default function OrderHistory({ children }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 날짜 페이징
+  // 날짜 페이징 (가장 최신 날짜부터 시작)
   const MAX_DAYS = 5;
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(0); // 0이 가장 최신 날짜
 
   /* 내부 동작 함수 선언식 */
   function canPrev() {
-    return index < Math.min(MAX_DAYS, orders.length) - 1;
+    return index > 0; // index가 0보다 클 때(과거 날짜 보는 중) 이전 버튼 활성화
   }
   function canNext() {
-    return index > 0;
+    return index < Math.min(MAX_DAYS, orders.length) - 1; // 마지막 날짜가 아닐 때 다음 버튼 활성화
   }
   function handlePrev() {
-    if (canPrev()) setIndex((i) => i + 1);
+    if (canPrev()) setIndex((i) => i - 1); // index 감소 = 더 최신 날짜로
   }
   function handleNext() {
-    if (canNext()) setIndex((i) => i - 1);
+    if (canNext()) setIndex((i) => i + 1); // index 증가 = 더 과거 날짜로
   }
 
   // 체크/수량 상태 (체크리스트 UI가 필요할 때 사용)
