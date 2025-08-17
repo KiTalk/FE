@@ -91,9 +91,25 @@ function VoiceThreePlusDetails() {
     }
 
     setOrderItems((prev) => {
-      const newItems = prev.map((item) =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      );
+      const exists = prev.some((item) => item.id === itemId);
+      let newItems;
+      if (exists) {
+        newItems = prev.map((item) =>
+          item.id === itemId ? { ...item, quantity: newQuantity } : item
+        );
+      } else {
+        // 추가 상품 목록에서 원본 정보를 찾아 신규로 담기
+        const base =
+          additionalProducts.find((p) => p.id === itemId) ||
+          DUMMY_VOICE_ORDER_ITEMS.find((p) => p.id === itemId);
+        // 안전 장치: 정보가 없으면 최소 속성으로 추가
+        newItems = [
+          ...prev,
+          base
+            ? { ...base, quantity: newQuantity }
+            : { id: itemId, name: "상품", price: 0, quantity: newQuantity },
+        ];
+      }
       const totals = calculateTotals(newItems);
       setOrderSummary(totals);
       return newItems;
@@ -127,20 +143,14 @@ function VoiceThreePlusDetails() {
 
   // 페이지 로드 시 애니메이션 트리거
   useEffect(() => {
-    // 상단 섹션(GuideSection, SpeakButton) 먼저 나타나기
-    setTimeout(() => {
-      setShowTopSection(true);
-    }, 100);
-
-    // 주문 섹션 나타나기
-    setTimeout(() => {
-      setShowOrderSection(true);
-    }, 400);
-
-    // 상품들 순차적으로 나타나기
-    setTimeout(() => {
-      setAnimateProducts(true);
-    }, 900);
+    const t1 = setTimeout(() => setShowTopSection(true), 100);
+    const t2 = setTimeout(() => setShowOrderSection(true), 400);
+    const t3 = setTimeout(() => setAnimateProducts(true), 900);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, []);
 
   return (

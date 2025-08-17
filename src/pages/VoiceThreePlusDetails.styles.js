@@ -222,15 +222,15 @@ export const ProductCardContainer = styled.div`
     props.animate
       ? "translateY(0) scale(0.75)" /* 0.85 → 0.75로 더 작게 */
       : "translateY(20px) scale(0.68)"};
-  transition: opacity 0.4s ease ${(props) => props.delay}s,
-    transform 0.4s ease ${(props) => props.delay}s;
+  transition: opacity 0.4s ease ${(p) => Number(p.delay) || 0}s,
+    transform 0.4s ease ${(p) => Number(p.delay) || 0}s;
   transform-origin: top left;
 `;
 
 // 동적 스크롤 공간을 위한 컴포넌트
 export const ScrollSpacer = styled.div`
   flex-shrink: 0;
-  width: ${(props) => props.width}px;
+  width: ${(p) => Number(p.width) || 0}px;
   height: 1px; /* 최소 높이 */
 `;
 
