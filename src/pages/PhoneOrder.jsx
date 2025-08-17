@@ -531,9 +531,7 @@ function TouchOrderContent() {
                           {windowDays.map((_, dotIndex) => (
                             <PaginationDot
                               key={dotIndex}
-                              $active={
-                                dotIndex === windowDays.length - 1 - index
-                              }
+                              $active={dotIndex === index}
                             />
                           ))}
                         </PaginationDots>
