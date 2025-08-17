@@ -589,13 +589,24 @@ export const PageViewport = styled.div`
   overflow-x: hidden;
   box-sizing: border-box;
 
-  /* 네이티브 스크롤바 숨김 */
+  /* 네이티브 스크롤바 완전 숨김 */
   &::-webkit-scrollbar {
-    width: 0;
-    display: none;
+    width: 0px !important;
+    height: 0px !important;
+    display: none !important;
   }
-  scrollbar-width: none;
-  scrollbar-color: transparent transparent;
+  &::-webkit-scrollbar-track {
+    display: none !important;
+  }
+  &::-webkit-scrollbar-thumb {
+    display: none !important;
+  }
+  &::-webkit-scrollbar-corner {
+    display: none !important;
+  }
+  scrollbar-width: none !important;
+  scrollbar-color: transparent transparent !important;
+  -ms-overflow-style: none !important;
 `;
 
 export const PageScrollbar = styled.div`
