@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import PageTransition from "../components/PageTransition";
 import Home from "../pages/Home";
 import OrderMethod from "../pages/OrderMethod";
@@ -20,174 +25,63 @@ import PointCheckPage from "../pages/PointCheck";
 import OrderCompletePage from "../pages/OrderComplete";
 import PointPhone from "../pages/PointPhone";
 
-export default function AppRouter() {
+function AnimatedRoutes() {
+  const location = useLocation();
   return (
-    <Router>
-      <Routes>
+    <PageTransition stableKey={false}>
+      <Routes location={location}>
         {/* 메인 홈페이지 */}
-        <Route
-          path="/"
-          element={
-            <PageTransition>
-              <Home />
-            </PageTransition>
-          }
-        />
+        <Route path="/" element={<Home />} />
 
         {/* 주문 방식 선택 */}
-        <Route
-          path="/order-method"
-          element={
-            <PageTransition>
-              <OrderMethod />
-            </PageTransition>
-          }
-        />
+        <Route path="/order-method" element={<OrderMethod />} />
 
         {/* 터치 주문 */}
-        <Route
-          path="/order/touch"
-          element={
-            <PageTransition>
-              <TouchOrder />
-            </PageTransition>
-          }
-        />
+        <Route path="/order/touch" element={<TouchOrder />} />
 
         {/* 장바구니 */}
-        <Route
-          path="/order/cart"
-          element={
-            <PageTransition>
-              <Cart />
-            </PageTransition>
-          }
-        />
+        <Route path="/order/cart" element={<Cart />} />
 
         {/* 포장/매장 선택 */}
-        <Route
-          path="/order/package"
-          element={
-            <PageTransition>
-              <PackagePage />
-            </PageTransition>
-          }
-        />
+        <Route path="/order/package" element={<PackagePage />} />
 
         {/* 포인트 확인 */}
-        <Route
-          path="/order/point"
-          element={
-            <PageTransition>
-              <PointCheckPage />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/order/point/phone"
-          element={
-            <PageTransition>
-              <PointPhone />
-            </PageTransition>
-          }
-        />
+        <Route path="/order/point" element={<PointCheckPage />} />
+        <Route path="/order/point/phone" element={<PointPhone />} />
 
         {/* 음성 주문 */}
-        <Route
-          path="/order/voice"
-          element={
-            <PageTransition>
-              <VoiceOrder />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/order/voice/one-two"
-          element={
-            <PageTransition>
-              <VoiceOneTwo />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/order/voice/three-plus"
-          element={
-            <PageTransition>
-              <VoiceThreePlus />
-            </PageTransition>
-          }
-        />
+        <Route path="/order/voice" element={<VoiceOrder />} />
+        <Route path="/order/voice/one-two" element={<VoiceOneTwo />} />
+        <Route path="/order/voice/three-plus" element={<VoiceThreePlus />} />
         <Route
           path="/order/voice/3up/recording"
-          element={
-            <PageTransition>
-              <VoiceThreePlusRecording />
-            </PageTransition>
-          }
+          element={<VoiceThreePlusRecording />}
         />
         <Route
           path="/order/voice/details"
-          element={
-            <PageTransition>
-              <VoiceThreePlusDetails />
-            </PageTransition>
-          }
+          element={<VoiceThreePlusDetails />}
         />
-        <Route
-          path="/order/voice/recognize"
-          element={
-            <PageTransition>
-              <VoiceRecognize />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/order/voice/cart"
-          element={
-            <PageTransition>
-              <VoiceCart />
-            </PageTransition>
-          }
-        />
+        <Route path="/order/voice/recognize" element={<VoiceRecognize />} />
+        <Route path="/order/voice/cart" element={<VoiceCart />} />
 
         {/* 색깔 주문 */}
-        <Route
-        path="/order/color"
-        element={
-          <PageTransition>
-            <ColorOrder />
-          </PageTransition>
-        }
-        />
+        <Route path="/order/color" element={<ColorOrder />} />
 
         {/* 전화번호 주문 */}
-        <Route
-          path="/order/phone/number"
-          element={
-            <PageTransition>
-              <PhoneNumber />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/order/phone"
-          element={
-            <PageTransition>
-              <PhoneOrder />
-            </PageTransition>
-          }
-        />
+        <Route path="/order/phone/number" element={<PhoneNumber />} />
+        <Route path="/order/phone" element={<PhoneOrder />} />
 
         {/* 주문 완료 */}
-        <Route
-          path="/order/complete"
-          element={
-            <PageTransition>
-              <OrderCompletePage />
-            </PageTransition>
-          }
-        />
+        <Route path="/order/complete" element={<OrderCompletePage />} />
       </Routes>
+    </PageTransition>
+  );
+}
+
+export default function AppRouter() {
+  return (
+    <Router>
+      <AnimatedRoutes />
     </Router>
   );
 }
