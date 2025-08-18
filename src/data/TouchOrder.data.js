@@ -21,6 +21,12 @@ export const MENU_DATA = [
             price: 4000,
             popular: true,
           },
+          {
+            id: "americano-decaf",
+            name: "디카페인 아메리카노",
+            price: 4500,
+            popular: false,
+          },
         ],
       },
       {

@@ -30,8 +30,11 @@ export const ImageArea = styled.div`
   width: 100%;
   height: 12.5rem;
   background: ${(props) =>
-    props.$variant === "cold" ? "#F2F6FB" :
-    props.$variant === "hot" ? "#DBD1C9" : "#f2f6fb"};
+    props.$variant === "cold"
+      ? "#F2F6FB"
+      : props.$variant === "hot"
+      ? "#DBD1C9"
+      : "#f2f6fb"};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -257,7 +260,7 @@ export const AddButton = styled.button`
     color: #ffffff;
   }
   &:active {
-    background: #1b2d66;
+    background: #223770;
     color: #ffffff;
     box-shadow: none;
   }
@@ -272,8 +275,8 @@ export const AddButton = styled.button`
 
   &&:disabled,
   &&[aria-disabled="true"] {
-    background: #d9d9d9;
-    color: #8b8b8b;
+    background: #c0c0c0;
+    color: #ffffff;
     cursor: not-allowed;
     pointer-events: none;
   }
@@ -282,8 +285,8 @@ export const AddButton = styled.button`
     p.$disabled &&
     css`
       && {
-        background: #d9d9d9;
-        color: #8b8b8b;
+        background: #c0c0c0;
+        color: #ffffff;
         cursor: not-allowed;
         pointer-events: none;
       }

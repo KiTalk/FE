@@ -176,6 +176,6 @@ export const SectionTitle = styled.h3`
 
 export const ProductRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 381px);
-  gap: 70px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 38px;
 `;
