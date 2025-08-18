@@ -71,7 +71,7 @@ export const AddedOverlay = styled.div`
   z-index: 2;
   opacity: ${(p) => (p.$show ? 1 : 0)};
   transform: translateY(${(p) => (p.$show ? "0" : "-6px")});
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition: transform 180ms ease;
 `;
 
 export const NameRow = styled.div`

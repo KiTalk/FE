@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ProductCard as ProductCardBox,
   PopularTag,
@@ -31,6 +31,14 @@ export default function ProductCard({
 }) {
   const [quantity, setQuantity] = useState(0);
   const [addedTotal, setAddedTotal] = useState(0);
+
+  // 마운트 시 localStorage에서 불러오기
+  useEffect(() => {
+    const saved = localStorage.getItem(`added_total_${product.id}`);
+    if (saved) {
+      setAddedTotal(Number(saved));
+    }
+  }, [product.id]);
 
   function getTemperatureLabel(id) {
     if (!id) return null;
@@ -65,6 +73,10 @@ export default function ProductCard({
     if (quantity <= 0) return;
     const nextTotal = addedTotal + quantity;
     setAddedTotal(nextTotal);
+
+    // ★ localStorage에 저장
+    localStorage.setItem(`added_total_${product.id}`, String(nextTotal));
+
     if (typeof onAdd === "function") {
       onAdd({ product, quantity, total: nextTotal });
     }
