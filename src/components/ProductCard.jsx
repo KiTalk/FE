@@ -3,6 +3,7 @@ import {
   ProductCard as ProductCardBox,
   PopularTag,
   ImageArea,
+  ProductImage,   // 추가
   InfoArea,
   ProductName,
   ProductPrice,
@@ -14,7 +15,8 @@ import {
   TemperatureBadge,
   AddedOverlay,
 } from "./Product.styles";
-import { getStorageKey, normalizeId } from "./utils/storage";
+import { getStorageKey, normalizeId } from "../utils/storage";
+import americanoIceImg from "../assets/images/americano-ice.png"; // ✅ 이미지 import
 
 export default function ProductCard({
   product,
@@ -112,7 +114,12 @@ export default function ProductCard({
   return (
     <ProductCardBox>
       {tagLabel ? <PopularTag>{tagLabel}</PopularTag> : (product?.popular && <PopularTag>인기</PopularTag>)}
-      <ImageArea $variant={temperatureVariant} />
+      <ImageArea $variant={temperatureVariant}>
+        {/* ✅ americano-ice 전용 이미지 */}
+        {product?.id === "americano-ice" && (
+          <ProductImage src={americanoIceImg} alt={product?.name || "아메리카노 아이스"} />
+        )}
+      </ImageArea>
       <InfoArea>
         <AddedOverlay $show={showOverlay} aria-live="polite">
           {overlayCount}개 담김

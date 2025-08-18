@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import voiceImg from "../assets/images/voice.png";
 import fingerImg from "../assets/images/finger.png";
 import phoneImg from "../assets/images/phone.png";
+import colorImg from "../assets/images/drink1.png";
 import {
   Container,
   Title,
   Subtitle,
-  LargeButton,
+  Button,
   ButtonGroup,
-  SmallButton,
   TextGroup,
   ItemName,
   ItemDesc,
@@ -17,63 +17,59 @@ import {
   BottomAccentBar,
 } from "./OrderMethod.styles";
 
-/** 컴포넌트 함수 선언식 */
 function OrderMethod() {
   const navigate = useNavigate();
 
-  /** 내부 동작 함수(선언식): 공통 선택 처리 */
   function handleSelect(path) {
     navigate(path);
   }
 
-  /** 내부 동작 함수(선언식): 각 버튼 전용 핸들러 */
-  function handleVoiceClick() {
-    handleSelect("/order/voice");
-  }
-  function handleTouchClick() {
-    handleSelect("/order/touch");
-  }
-  function handlePhoneClick() {
-    handleSelect("/order/phone/number");
-  }
-
   return (
-    <Container>
-      <Title>주문 방법 선택</Title>
-      <Subtitle>아래 방법 중 선택해 주세요</Subtitle>
+  <Container>
+    <Title>주문 방법 선택</Title>
+    <Subtitle>아래 방법 중 선택해 주세요</Subtitle>
 
-      {/* Large Button - 텍스트 왼쪽, 이미지 오른쪽 */}
-      <LargeButton type="button" onClick={handleVoiceClick}>
-        <Icon src={voiceImg} alt="음성주문 아이콘" />
+    {/* 윗줄 : 음성 주문 + 색깔 주문 */}
+    <ButtonGroup>
+      <Button type="button" onClick={() => handleSelect("/order/voice")}>
+        <Icon src={voiceImg} alt="음성 주문 아이콘" />
         <TextGroup>
-          <ItemName large>음성주문</ItemName>
-          <ItemDesc large>간편하게 말로 주문</ItemDesc>
+          <ItemName>음성 주문</ItemName>
+          <ItemDesc>간편하게 말로 주문</ItemDesc>
         </TextGroup>
-      </LargeButton>
+      </Button>
 
-      {/* Small Buttons - 텍스트 왼쪽, 이미지 오른쪽 / 높이 동일 */}
-      <ButtonGroup>
-        <SmallButton type="button" onClick={handleTouchClick}>
-          <Icon src={fingerImg} alt="손가락 주문 아이콘" />
-          <TextGroup>
-            <ItemName>손가락 주문</ItemName>
-            <ItemDesc>화면을 눌러 간편하게 주문</ItemDesc>
-          </TextGroup>
-        </SmallButton>
+      <Button type="button" onClick={() => handleSelect("/order/color")}>
+        <Icon src={colorImg} alt="색깔 주문 아이콘" />
+        <TextGroup>
+          <ItemName>색깔 주문</ItemName>
+          <ItemDesc>색으로 골라 빠르게 주문</ItemDesc>
+        </TextGroup>
+      </Button>
+    </ButtonGroup>
 
-        <SmallButton type="button" onClick={handlePhoneClick}>
-          <Icon src={phoneImg} alt="전화번호 간편주문 아이콘" />
-          <TextGroup>
-            <ItemName>전화번호 간편주문</ItemName>
-            <ItemDesc>간편하게 말로 주문</ItemDesc>
-          </TextGroup>
-        </SmallButton>
-      </ButtonGroup>
+    {/* 아랫줄 : 손가락 주문 + 전화번호 간편주문 */}
+    <ButtonGroup>
+      <Button type="button" onClick={() => handleSelect("/order/touch")}>
+        <Icon src={fingerImg} alt="손가락 주문 아이콘" />
+        <TextGroup>
+          <ItemName>손가락 주문</ItemName>
+          <ItemDesc>화면을 눌러 간편하게 주문</ItemDesc>
+        </TextGroup>
+      </Button>
 
-      {/* 하단 둥근 직사각형 액센트 */}
-      <BottomAccentBar aria-hidden="true" />
-    </Container>
-  );
+      <Button type="button" onClick={() => handleSelect("/order/phone/number")}>
+        <Icon src={phoneImg} alt="전화번호 간편주문 아이콘" />
+        <TextGroup>
+          <ItemName>전화번호 간편주문</ItemName>
+          <ItemDesc>번호로 빠르게 주문</ItemDesc>
+        </TextGroup>
+      </Button>
+    </ButtonGroup>
+
+    <BottomAccentBar aria-hidden="true" />
+  </Container>
+);
 }
 
 export default OrderMethod;

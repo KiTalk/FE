@@ -10,7 +10,7 @@ import {
   QtyButton,
   QtyValue,
 } from "./CartProductCard.styles";
-import { getStorageKey, normalizeId } from "./utils/storage";
+import { getStorageKey, normalizeId } from "../utils/storage";
 
 /**
  * props:
