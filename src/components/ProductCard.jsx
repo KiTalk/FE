@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   ProductCard as ProductCardBox,
   PopularTag,
@@ -14,11 +14,7 @@ import {
   TemperatureBadge,
   AddedOverlay,
 } from "./Product.styles";
-
-/* ★ 변경사항
-   - tagLabel prop 추가: 좌측 상단 뱃지 텍스트를 외부에서 지정(예: '1위', '2위', '3위')
-   - 기본 동작: tagLabel이 있으면 '인기' 대신 tagLabel을 표시, 없으면 기존 popular=true일 때 '인기' 표시
-*/
+import { getStorageKey, normalizeId } from "./utils/storage";
 
 export default function ProductCard({
   product,
@@ -27,10 +23,18 @@ export default function ProductCard({
   cartQty = 0,
   onIncrease,
   onDecrease,
-  tagLabel, // ★ 추가
+  tagLabel,
 }) {
+  const LS = typeof window !== "undefined" ? window.localStorage : null;
+  const normId = normalizeId(product?.id);
+
   const [quantity, setQuantity] = useState(0);
-  const [addedTotal, setAddedTotal] = useState(0);
+  const [addedTotal, setAddedTotal] = useState(() => {
+    if (!normId || !LS) return 0;
+    const raw = LS.getItem(getStorageKey(normId));
+    const n = raw != null ? Number(raw) : 0;
+    return Number.isFinite(n) ? n : 0;
+  });
 
   function getTemperatureLabel(id) {
     if (!id) return null;
@@ -41,77 +45,83 @@ export default function ProductCard({
   }
 
   const temperatureLabel = getTemperatureLabel(product?.id);
-
   const temperatureVariant =
-    temperatureLabel === "시원한"
-      ? "cold"
-      : temperatureLabel === "뜨거운"
-      ? "hot"
-      : null;
+    temperatureLabel === "시원한" ? "cold" : temperatureLabel === "뜨거운" ? "hot" : null;
 
-  function handleMinus() {
-    setQuantity(function (q) {
-      return Math.max(0, q - 1);
-    });
-  }
-
-  function handlePlus() {
-    setQuantity(function (q) {
-      return q + 1;
-    });
-  }
+  function handleMinus() { setQuantity((q) => Math.max(0, q - 1)); }
+  function handlePlus() { setQuantity((q) => q + 1); }
 
   function handleAdd() {
     if (quantity <= 0) return;
     const nextTotal = addedTotal + quantity;
     setAddedTotal(nextTotal);
-    if (typeof onAdd === "function") {
-      onAdd({ product, quantity, total: nextTotal });
-    }
+    if (normId && LS) LS.setItem(getStorageKey(normId), String(nextTotal));
+    if (typeof onAdd === "function") onAdd({ product, quantity, total: nextTotal });
     setQuantity(0);
   }
 
-  function handleCartMinus() {
-    if (typeof onDecrease === "function") onDecrease(product.id);
-  }
+  function handleCartMinus() { if (typeof onDecrease === "function") onDecrease(product?.id); }
+  function handleCartPlus() { if (typeof onIncrease === "function") onIncrease(product?.id); }
 
-  function handleCartPlus() {
-    if (typeof onIncrease === "function") onIncrease(product.id);
-  }
+  useLayoutEffect(() => {
+    if (!normId) { setAddedTotal(0); return; }
+    const key = getStorageKey(normId);
+
+    if (mode === "cart") {
+      const q = Number(cartQty ?? 0);
+      setAddedTotal(q);
+      if (!LS) return;
+      if (q > 0) LS.setItem(key, String(q));
+      else LS.removeItem(key);
+    } else {
+      if (!LS) { setAddedTotal(0); return; }
+      const raw = LS.getItem(key);
+      const n = raw != null ? Number(raw) : 0;
+      setAddedTotal(Number.isFinite(n) ? n : 0);
+    }
+  }, [mode, cartQty, normId]);
+
+  useEffect(() => {
+    if (mode !== "order" || !normId) return;
+    const key = getStorageKey(normId);
+
+    const sync = () => {
+      if (!LS) { setAddedTotal(0); return; }
+      const raw = LS.getItem(key);
+      const n = raw != null ? Number(raw) : 0;
+      setAddedTotal(Number.isFinite(n) ? n : 0);
+    };
+
+    sync();
+    const onFocus = () => sync();
+    const onVis = () => { if (!document.hidden) sync(); };
+
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [mode, normId]);
 
   const displayedQty = mode === "cart" ? Number(cartQty ?? 0) : quantity;
-  const overlayCount = mode === "cart" ? Number(cartQty ?? 0) : addedTotal;
+  const overlayCount = addedTotal;
   const showOverlay = overlayCount > 0;
   const addDisabled = mode !== "cart" && quantity <= 0;
 
   return (
     <ProductCardBox>
-      {/* ★ 랭킹 뱃지 우선 표시, 없으면 기존 인기 태그 표시 */}
-      {tagLabel ? (
-        <PopularTag>{tagLabel}</PopularTag>
-      ) : (
-        product.popular && <PopularTag>인기</PopularTag>
-      )}
-
+      {tagLabel ? <PopularTag>{tagLabel}</PopularTag> : (product?.popular && <PopularTag>인기</PopularTag>)}
       <ImageArea $variant={temperatureVariant} />
       <InfoArea>
         <AddedOverlay $show={showOverlay} aria-live="polite">
           {overlayCount}개 담김
         </AddedOverlay>
-
         <NameRow>
-          <ProductName>{product.name}</ProductName>
-          {temperatureLabel && (
-            <TemperatureBadge $variant={temperatureVariant}>
-              {temperatureLabel}
-            </TemperatureBadge>
-          )}
+          <ProductName>{product?.name}</ProductName>
+          {temperatureLabel && <TemperatureBadge $variant={temperatureVariant}>{temperatureLabel}</TemperatureBadge>}
         </NameRow>
-
-        <ProductPrice>
-          {Number(product?.price ?? 0).toLocaleString()}원
-        </ProductPrice>
-
+        <ProductPrice>{Number(product?.price ?? 0).toLocaleString()}원</ProductPrice>
         <QuantityRow>
           {mode === "cart" ? (
             <>
@@ -128,14 +138,8 @@ export default function ProductCard({
           )}
         </QuantityRow>
       </InfoArea>
-
       {mode !== "cart" && (
-        <AddButton
-          onClick={handleAdd}
-          disabled={addDisabled}
-          aria-disabled={addDisabled}
-          $disabled={addDisabled}
-        >
+        <AddButton onClick={handleAdd} disabled={addDisabled} aria-disabled={addDisabled} $disabled={addDisabled}>
           담기
         </AddButton>
       )}

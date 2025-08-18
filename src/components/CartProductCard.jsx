@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   Card,
   ImageArea,
@@ -10,63 +10,49 @@ import {
   QtyButton,
   QtyValue,
 } from "./CartProductCard.styles";
+import { getStorageKey, normalizeId } from "./utils/storage";
 
 /**
- * CartProductCard
- * - Fixed 381 x 420 card for Cart page
- * - No "담기" button (cart-only controls)
  * props:
- *  - product: { id, name, price, popular, temp }
- *  - qty: number
- *  - onIncrease(id)
- *  - onDecrease(id)
+ *  - product: { id, name, price, popular, ... }
+ *  - qty: 현재 장바구니 수량
+ *  - onIncrease(id), onDecrease(id)
+ *  - tagLabel?: 좌측 상단 배지 텍스트(선택)
  */
 export default function CartProductCard({
   product,
   qty = 0,
   onIncrease,
   onDecrease,
+  tagLabel,
 }) {
-  // ProductCard.jsx와 동일한 온도 라벨 생성
-  function getTemperatureLabel(id) {
-    if (!id) return null;
-    const lowered = String(id).toLowerCase();
-    if (lowered.includes("ice")) return "시원한";
-    if (lowered.includes("hot")) return "뜨거운";
-    return null;
-  }
+  const LS = typeof window !== "undefined" ? window.localStorage : null;
+  const normId = useMemo(() => normalizeId(product?.id), [product?.id]);
 
-  const temperatureLabel = getTemperatureLabel(product?.id);
-  const temperatureVariant =
-    temperatureLabel === "시원한"
-      ? "cold"
-      : temperatureLabel === "뜨거운"
-      ? "hot"
-      : null;
-  function handleMinus() {
-    if (typeof onDecrease === "function" && product?.id) {
-      onDecrease(product.id);
-    }
-  }
-  function handlePlus() {
-    if (typeof onIncrease === "function" && product?.id) {
-      onIncrease(product.id);
-    }
-  }
+  // qty 변경 시 localStorage('added_total_{normId}') 동기화 (0이면 삭제)
+  useEffect(() => {
+    if (!LS || !normId) return;
+    const key = getStorageKey(normId);
+    const n = Number(qty ?? 0);
+    if (n > 0) LS.setItem(key, String(n));
+    else LS.removeItem(key);
+  }, [LS, normId, qty]);
+
+  const handleMinus = () => { if (typeof onDecrease === "function" && product?.id != null) onDecrease(product.id); };
+  const handlePlus = () => { if (typeof onIncrease === "function" && product?.id != null) onIncrease(product.id); };
+
+  const isPopular = Boolean(product?.popular);
+  const priceText = Number(product?.price ?? 0).toLocaleString();
 
   return (
-    <Card role="group" aria-label={`${product?.name} 카드`}>
-      {product?.popular && <PopularTag>인기</PopularTag>}
-      <ImageArea $variant={temperatureVariant} />
+    <Card>
+      {tagLabel ? <PopularTag>{tagLabel}</PopularTag> : (isPopular && <PopularTag>인기</PopularTag>)}
+      <ImageArea />
       <InfoArea>
         <Name>{product?.name}</Name>
-        <Price>{Number(product?.price ?? 0).toLocaleString()}원</Price>
+        <Price>{priceText}원</Price>
         <QtyRow>
-          <QtyButton
-            aria-label="수량 감소"
-            $type="minus"
-            onClick={handleMinus}
-          />
+          <QtyButton aria-label="수량 감소" $type="minus" onClick={handleMinus} />
           <QtyValue aria-live="polite">{Number(qty ?? 0)}</QtyValue>
           <QtyButton aria-label="수량 증가" $type="plus" onClick={handlePlus} />
         </QtyRow>

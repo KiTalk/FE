@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // ✅ useEffect 추가
 import { useNavigate } from "react-router-dom";
 import {
   Page,
@@ -28,6 +28,19 @@ import ProductCard from "../components/ProductCard";
 import CartProvider from "../components/CartProvider.jsx";
 import { useCart } from "../components/CartContext";
 
+/* ✅ 최소 유틸: added_total_* 키 전체 삭제 */
+function clearAllAddedTotals() {
+  if (typeof window === "undefined" || !window.localStorage) return;
+  const ls = window.localStorage;
+  // 역순 반복: 삭제 중 length 변동 대응
+  for (let i = ls.length - 1; i >= 0; i--) {
+    const key = ls.key(i);
+    if (key && key.startsWith("added_total_")) {
+      ls.removeItem(key);
+    }
+  }
+}
+
 export default function TouchOrderPage() {
   return (
     <CartProvider>
@@ -40,6 +53,13 @@ function TouchOrderContent() {
   const navigate = useNavigate();
   const [activeTabId, setActiveTabId] = useState("all");
   const { addItem, totalQty } = useCart();
+
+  /* ✅ 중앙 정리: 카트가 비어 있으면 과거 added_total_*를 싹 지움 */
+  useEffect(() => {
+    if (Number(totalQty ?? 0) === 0) {
+      clearAllAddedTotals();
+    }
+  }, [totalQty]);
 
   /* 내부 동작 함수 선언식 */
   function handleCartClick() {
