@@ -57,46 +57,6 @@ export const Subtitle = styled.p`
   z-index: 1;
 `;
 
-export const LargeButton = styled.button`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.75rem; /* 텍스트와 아이콘 간격 */
-  background: #fff;
-  border: none;
-  cursor: pointer;
-  text-align: center;
-  transition: box-shadow 0.18s;
-  position: relative;
-  z-index: 1;
-  min-height: var(--ButtonHeight);
-
-  width: 91%;
-  min-width: 756px;
-  max-width: 1148px;
-  padding: 4.875rem 4.1875rem;
-  padding-left: 22rem;
-  border-radius: 2.25rem;
-  box-shadow: 0 0.25rem 1.25rem rgba(23, 78, 149, 0.11);
-  margin-bottom: 2.4375rem;
-
-  &:hover {
-    box-shadow: 0 0.75rem 3rem rgba(23, 78, 149, 0.18);
-  }
-
-  &:focus {
-    outline: none;
-  }
-
-  @media (max-width: 900px) {
-    width: 100%;
-    min-width: 0;
-    max-width: 100vw;
-    padding-left: 2.5rem; /* 모바일에서 왼쪽 여백 조정 */
-  }
-`;
-
 export const ButtonGroup = styled.div`
   display: flex;
   gap: 1.75rem;
@@ -115,7 +75,7 @@ export const ButtonGroup = styled.div`
   }
 `;
 
-export const SmallButton = styled.button`
+export const Button = styled.button`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -135,7 +95,7 @@ export const SmallButton = styled.button`
   padding: 3.15rem 2.45rem;
   padding-left: 2.5rem;
   border-radius: 1.75rem;
-  box-shadow: 0 0.125rem 0.75rem rgba(23, 78, 149, 0.07);
+  box-shadow: 3px 7px 10px 0 rgba(0, 0, 0, 0.25);
 
   &:hover {
     box-shadow: 0 0.5rem 2rem rgba(23, 78, 149, 0.16);
