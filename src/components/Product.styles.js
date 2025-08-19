@@ -4,8 +4,27 @@ export const ProductCard = styled.div`
   position: relative;
   width: 381px;
   height: 507px;
-  border: 1px solid #adadad;
+
+  /**
+   * ✅ 컬러 모드일 때만 테두리 색상 로직 활성화
+   *  - id에 'americano' 포함 → green
+   *  - id에 'latte' 포함 → purple
+   *  - 그 외 → #adadad
+   *  - 안전하게 소문자 변환 및 null 방어
+   */
+border: ${({ currentMode, productId }) => {
+  if (currentMode === "color") {
+    const id = String(productId || "").toLowerCase();
+    if (id.includes("americano")) return "7px solid #4D9E17"; // ✅ 굵기 7px
+    if (id.includes("latte")) return "7px solid #9F1FDA";   // ✅ 굵기 7px
+    return "7px solid #adadad"; // color 모드지만 americano/latte 아닌 경우
+  }
+  // 기본 모드
+  return "1px solid #adadad";
+}};
+
   border-radius: 20px;
+  box-sizing: border-box;
   overflow: hidden;
   background: #ffffff;
 `;
@@ -109,6 +128,7 @@ export const TemperatureBadge = styled.span`
   color: #0b1b2b;
   background: #e7eef7;
   border: 3px solid #c8d6ea;
+
   ${(props) =>
     props.$variant === "cold" &&
     css`
@@ -116,6 +136,7 @@ export const TemperatureBadge = styled.span`
       background: transparent;
       border-color: #3191ff;
     `}
+
   ${(props) =>
     props.$variant === "hot" &&
     css`
