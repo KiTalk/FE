@@ -7,6 +7,14 @@ export const API_ENDPOINTS = {
   HEALTH: "/health",
   LANGUAGES: "/languages",
   ORDER_COMPLETE: "/order/complete",
+  // 주문 처리 시스템
+  LOGIC_START: "/logic/start",
+  LOGIC_ORDER: (sessionId) => `/logic/order/${sessionId}`,
+  LOGIC_PACKAGING: (sessionId) => `/logic/packaging/${sessionId}`,
+  LOGIC_SESSION: (sessionId) => `/logic/session/${sessionId}`,
+  ORDERS_PATCH_UPDATE: (sessionId) => `/orders/${sessionId}/patch-update`,
+  ORDERS_ADD: (sessionId) => `/orders/${sessionId}/add`,
+  ORDERS_REMOVE: (sessionId) => `/orders/${sessionId}/remove`,
 };
 
 // 지원 언어 목록
