@@ -11,6 +11,7 @@ import VoiceThreePlus from "../pages/VoiceThreePlus";
 import VoiceThreePlusRecording from "../pages/VoiceThreePlusRecording";
 import VoiceThreePlusDetails from "../pages/VoiceThreePlusDetails";
 import VoiceRecognize from "../pages/VoiceRecognize";
+import ColorIntro from "../pages/ColorIntro";
 import ColorOrder from "../pages/ColorOrder";
 import PhoneNumber from "../pages/PhoneNumber";
 import PhoneOrder from "../pages/PhoneOrder";
@@ -151,6 +152,14 @@ export default function AppRouter() {
         />
 
         {/* 색깔 주문 */}
+        <Route
+        path="/order/color/intro"
+        element={
+          <PageTransition>
+            <ColorIntro />
+          </PageTransition>
+        }
+        />
         <Route
         path="/order/color"
         element={

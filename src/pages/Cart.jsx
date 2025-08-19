@@ -5,8 +5,8 @@ import {
   HeaderContainer,
   HeaderTitle,
   HeaderSubtitle,
-  HelpButton,
-  HelpIcon,
+  CancelButton,
+  CancelIcon,
   CardsViewport,
   CardsScrollArea,
   CustomScrollbar,
@@ -27,8 +27,9 @@ import {
 import CartProvider from "../components/CartProvider.jsx";
 import { useCart } from "../components/CartContext";
 import CartProductCard from "../components/CartProductCard";
-import helpImage from "../assets/images/help.png";
+import CancelImage from "../assets/images/cancel.png";
 import { useNavigate } from "react-router-dom";
+import { getStorageKey, normalizeId } from "../utils/storage"; // ✅ 추가
 
 export default function CartPage(props) {
   return (
@@ -77,21 +78,58 @@ function CartContent(props) {
     return Number.isFinite(n) ? n.toLocaleString() : "0";
   }
 
+  // ✅ 전체 취소: localStorage의 각 상품 수량을 "0"으로, 컨텍스트 수량도 0으로
+  function handleCancel() {
+    try {
+      const LS = window.localStorage;
+
+      // 1) localStorage 'added_total_{id}'를 모두 "0"으로 설정
+      items.forEach((it) => {
+        const normId = normalizeId(it?.id);
+        if (!normId) return;
+        const key = getStorageKey(normId);
+        LS.setItem(key, "0"); // 요구사항: 삭제가 아니라 0으로 설정
+      });
+
+      // 2) 화면상의 장바구니 수량도 0이 되도록 감소 호출
+      items.forEach((it) => {
+        const count = Number(it?.qty ?? 0);
+        for (let i = 0; i < count; i++) {
+          decrease(it.id); // 항목 수량만큼 감소
+        }
+      });
+
+      // 3) 기존 onCancelClick prop이 있으면 추가로 호출(기능 유지)
+      if (typeof props.onCancelClick === "function") {
+        props.onCancelClick();
+      }
+    } catch (err) {
+      console.error("Cancel error:", err);
+    }
+  }
+
   function handleContinue() {
     try {
-      const orderSpecStr = localStorage.getItem("order_spec");
-      if (orderSpecStr) {
-        const orderSpec = JSON.parse(orderSpecStr);
-        const point = orderSpec.point;
-
-        if (point && point.enabled && point.phone) {
-          navigate("/order/phone");
-        } else {
-          navigate("/order/touch");
-        }
-      } else {
-        navigate("/order/touch");
+      const raw = localStorage.getItem("order_spec");
+      if (!raw) {
+        return navigate("/order/touch"); // 기본은 터치 주문
       }
+
+      const orderSpec = JSON.parse(raw) ?? {};
+      const { point, mode } = orderSpec;
+
+      // ✅ 1순위: mode가 color일 때
+      if (mode === "color") {
+        return navigate("/order/color");
+      }
+
+      // ✅ 2순위: 전화번호 간편주문 조건 충족
+      if (point?.enabled && point?.phone) {
+        return navigate("/order/phone");
+      }
+
+      // ✅ 기본은 터치 주문
+      navigate("/order/touch");
     } catch (err) {
       console.error("Error checking order_spec:", err);
       navigate("/order/touch");
@@ -103,8 +141,6 @@ function CartContent(props) {
       alert("장바구니가 비어있습니다.");
       return;
     }
-
-    // 다음 페이지로 이동 (포장유무, 적립유무 선택 페이지)
     navigate("/order/package", {
       state: { totalPrice, totalQty },
     });
@@ -116,7 +152,6 @@ function CartContent(props) {
     const thumb = document.getElementById("cards-thumb");
     if (!viewport || !thumb) return;
 
-    // 이벤트 리스너를 위한 참조 보관
     let pointerMoveHandler = null;
     let pointerUpHandler = null;
 
@@ -146,7 +181,7 @@ function CartContent(props) {
 
     function onPointerDown(e) {
       isDragging = true;
-      e.preventDefault(); // 기본 드래그 동작 방지
+      e.preventDefault();
       startX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
       const matrix = new DOMMatrixReadOnly(getComputedStyle(thumb).transform);
       startLeft = matrix.m41 || 0;
@@ -191,7 +226,6 @@ function CartContent(props) {
       viewport.removeEventListener("scroll", updateThumb);
       thumb.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("resize", updateThumb);
-      // 드래그 중 컴포넌트가 언마운트되는 경우를 위한 정리
       if (pointerMoveHandler) {
         document.removeEventListener("pointermove", pointerMoveHandler);
       }
@@ -206,10 +240,11 @@ function CartContent(props) {
       <HeaderContainer>
         <HeaderTitle>장바구니</HeaderTitle>
         <HeaderSubtitle>주문하신 음료들이 여기에 담겨있습니다.</HeaderSubtitle>
-        <HelpButton type="button" onClick={props.onHelpClick}>
-          <HelpIcon src={helpImage} alt="도움요청" />
-          도움 요청
-        </HelpButton>
+        <CancelButton type="button" onClick={handleCancel}>
+          {/* ✅ 취소 시 수량 0으로 초기화 */}
+          <CancelIcon src={CancelImage} alt="전체취소" />
+          전체 취소
+        </CancelButton>
       </HeaderContainer>
 
       <CardsViewport id="cards-viewport" style={{ outline: "none" }}>
@@ -227,6 +262,7 @@ function CartContent(props) {
           })}
         </CardsScrollArea>
       </CardsViewport>
+
       <CustomScrollbar
         role="scrollbar"
         aria-controls="cards-viewport"
@@ -236,11 +272,7 @@ function CartContent(props) {
         aria-valuenow="0"
       >
         <CustomTrack />
-        <CustomThumb
-          id="cards-thumb"
-          tabIndex="0"
-          aria-label="장바구니 스크롤"
-        />
+        <CustomThumb id="cards-thumb" tabIndex="0" aria-label="장바구니 스크롤" />
       </CustomScrollbar>
 
       <FooterBar>

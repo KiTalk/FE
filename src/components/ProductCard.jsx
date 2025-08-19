@@ -3,7 +3,7 @@ import {
   ProductCard as ProductCardBox,
   PopularTag,
   ImageArea,
-  ProductImage,   // 추가
+  ProductImage,  
   InfoArea,
   ProductName,
   ProductPrice,
@@ -26,6 +26,8 @@ export default function ProductCard({
   onIncrease,
   onDecrease,
   tagLabel,
+  currentMode,
+  productId,
 }) {
   const LS = typeof window !== "undefined" ? window.localStorage : null;
   const normId = normalizeId(product?.id);
@@ -112,7 +114,7 @@ export default function ProductCard({
   const addDisabled = mode !== "cart" && quantity <= 0;
 
   return (
-    <ProductCardBox>
+    <ProductCardBox currentMode={currentMode} productId={productId}>
       {tagLabel ? <PopularTag>{tagLabel}</PopularTag> : (product?.popular && <PopularTag>인기</PopularTag>)}
       <ImageArea $variant={temperatureVariant}>
         {/* ✅ americano-ice 전용 이미지 */}
