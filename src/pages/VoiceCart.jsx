@@ -25,6 +25,7 @@ function VoiceCart() {
   const recognizedText = useMemo(() => state.recognized, [state]);
   const [quantity, setQuantity] = useState(1);
   const language = useMemo(() => getSettings().defaultLanguage || "ko", []);
+  const [recognizedLive, setRecognizedLive] = useState("");
 
   function handleMinus() {
     setQuantity((q) => Math.max(1, q - 1));
@@ -80,8 +81,13 @@ function VoiceCart() {
 
   return (
     <Page>
-      <VoiceRecorder language={language}>
-        {({ isRecording, loading, stream, recognized, toggleRecording }) => (
+      <VoiceRecorder
+        language={language}
+        onRecognized={(text) => {
+          if (text && text !== recognizedLive) setRecognizedLive(text);
+        }}
+      >
+        {({ isRecording, loading, stream, toggleRecording }) => (
           <>
             <HeadingRow>
               <HeadingPrimary>{recognizedText}</HeadingPrimary>
@@ -122,7 +128,7 @@ function VoiceCart() {
             {(isRecording || loading) && (
               <>
                 <RecognizingText>
-                  {recognized ? `“${recognized}”` : "인식중.."}
+                  {recognizedLive ? `“${recognizedLive}”` : "인식중.."}
                 </RecognizingText>
                 <AudioSpectrum
                   stream={stream}

@@ -141,4 +141,65 @@ export const sttService = {
   },
 };
 
+// 주문 처리 시스템 API
+export const orderService = {
+  // 세션 시작
+  startSession: async () => {
+    const response = await apiClient.post(API_ENDPOINTS.LOGIC_START, {});
+    return response.data;
+  },
+
+  // 주문 처리 (자연어 텍스트)
+  submitOrder: async (sessionId, menuText) => {
+    const response = await apiClient.post(
+      API_ENDPOINTS.LOGIC_ORDER(sessionId),
+      { menu_item: menuText }
+    );
+    return response.data;
+  },
+
+  // 포장 방식 선택
+  selectPackaging: async (sessionId, packagingType) => {
+    const response = await apiClient.post(
+      API_ENDPOINTS.LOGIC_PACKAGING(sessionId),
+      { packaging_type: packagingType }
+    );
+    return response.data;
+  },
+
+  // 세션 조회
+  getSession: async (sessionId) => {
+    const response = await apiClient.get(
+      API_ENDPOINTS.LOGIC_SESSION(sessionId)
+    );
+    return response.data;
+  },
+
+  // 주문 수정
+  patchUpdate: async (sessionId, orders) => {
+    const response = await apiClient.put(
+      API_ENDPOINTS.ORDERS_PATCH_UPDATE(sessionId),
+      { orders }
+    );
+    return response.data;
+  },
+
+  // 주문 추가
+  addOrder: async (sessionId, orderText) => {
+    const response = await apiClient.post(API_ENDPOINTS.ORDERS_ADD(sessionId), {
+      order_text: orderText,
+    });
+    return response.data;
+  },
+
+  // 주문 삭제
+  removeOrder: async (sessionId, menuItem) => {
+    const response = await apiClient.delete(
+      API_ENDPOINTS.ORDERS_REMOVE(sessionId),
+      { data: { menu_item: menuItem } }
+    );
+    return response.data;
+  },
+};
+
 export default apiClient;

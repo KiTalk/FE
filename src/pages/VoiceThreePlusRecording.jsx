@@ -109,16 +109,22 @@ function VoiceThreePlusRecording() {
 
   return (
     <Page>
-      <VoiceRecorder language={language} disableInterim={true}>
-        {({ isRecording, loading, stream, recognized, toggleRecording }) => {
+      <VoiceRecorder
+        language={language}
+        disableInterim={true}
+        onRecognized={(text) => {
+          // setState during parent render를 피하기 위해 콜백에서만 상태 변경
+          if (text && text !== recognizedText) {
+            setRecognizedText(text);
+          }
+        }}
+      >
+        {({ isRecording, loading, stream, toggleRecording }) => {
           // toggleRecording / isRecording을 ref에 저장
           toggleRecordingRef.current = toggleRecording;
           isRecordingRef.current = isRecording;
 
-          // recognized 값이 변경되면 state에 저장
-          if (recognized && recognized !== recognizedText) {
-            setRecognizedText(recognized);
-          }
+          // 상태 업데이트는 onRecognized 콜백에서 처리
 
           return (
             <>

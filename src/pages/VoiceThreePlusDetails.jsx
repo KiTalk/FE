@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Page,
   GuideSection,
@@ -34,17 +34,18 @@ import CartProductCard from "../components/CartProductCard";
 import mikeIcon from "../assets/images/mike-solid.png";
 import hand from "../assets/images/hand.png";
 import profile from "../assets/images/profile.png";
-import {
-  DUMMY_VOICE_ORDER_ITEMS,
-  DUMMY_ORDER_SUMMARY,
-  DUMMY_ADDITIONAL_PRODUCTS,
-} from "../data/VoiceOrderDummy.data";
+import { orderService } from "../services/api";
 
 function VoiceThreePlusDetails() {
   const navigate = useNavigate();
-  const [orderItems, setOrderItems] = useState(DUMMY_VOICE_ORDER_ITEMS);
-  const [additionalProducts] = useState(DUMMY_ADDITIONAL_PRODUCTS);
-  const [orderSummary, setOrderSummary] = useState(DUMMY_ORDER_SUMMARY);
+  const { state } = useLocation();
+  const recognizedText = state?.recognized || "";
+  const [orderItems, setOrderItems] = useState([]);
+  const [additionalProducts] = useState([]);
+  const [orderSummary, setOrderSummary] = useState({
+    totalQuantity: 0,
+    totalPrice: 0,
+  });
   const [showOrderSection, setShowOrderSection] = useState(false);
   const [animateProducts, setAnimateProducts] = useState(false);
   const [showTopSection, setShowTopSection] = useState(false);
@@ -98,11 +99,8 @@ function VoiceThreePlusDetails() {
           item.id === itemId ? { ...item, quantity: newQuantity } : item
         );
       } else {
-        // 추가 상품 목록에서 원본 정보를 찾아 신규로 담기
-        const base =
-          additionalProducts.find((p) => p.id === itemId) ||
-          DUMMY_VOICE_ORDER_ITEMS.find((p) => p.id === itemId);
         // 안전 장치: 정보가 없으면 최소 속성으로 추가
+        const base = additionalProducts.find((p) => p.id === itemId);
         newItems = [
           ...prev,
           base
@@ -140,6 +138,49 @@ function VoiceThreePlusDetails() {
 
     return Math.max(400, dynamicSpace); // 최소 400px 보장
   }
+
+  // 백엔드 주문 불러오기: 세션 시작 → 주문 전송 → 주문 목록/합계 반영
+  useEffect(() => {
+    let aborted = false;
+    async function fetchOrders() {
+      if (!recognizedText) return;
+      try {
+        const start = await orderService.startSession();
+        if (aborted) return;
+        const sid = start?.session_id || "";
+        const ordered = await orderService.submitOrder(sid, recognizedText);
+        console.log("🧾 주문 응답 orders:", ordered?.orders);
+        if (aborted) return;
+        const mapped = Array.isArray(ordered?.orders)
+          ? ordered.orders.map((o) => ({
+              id: o.menu_item,
+              name: o.menu_item,
+              price: Number(o.price || 0),
+              quantity: Number(o.quantity || 0),
+            }))
+          : [];
+        setOrderItems(mapped);
+        const totalQuantity =
+          Number(ordered?.total_items ?? 0) ||
+          mapped.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
+        const totalPrice =
+          Number(ordered?.total_price ?? 0) ||
+          mapped.reduce(
+            (s, it) => s + (Number(it.price) || 0) * (Number(it.quantity) || 0),
+            0
+          );
+        setOrderSummary({ totalQuantity, totalPrice });
+      } catch (e) {
+        if (!aborted) {
+          console.error("주문 불러오기 실패:", e?.message || e);
+        }
+      }
+    }
+    fetchOrders();
+    return () => {
+      aborted = true;
+    };
+  }, [recognizedText]);
 
   // 페이지 로드 시 애니메이션 트리거
   useEffect(() => {
@@ -216,8 +257,8 @@ function VoiceThreePlusDetails() {
           {orderItems.map((item, index) => (
             <ProductCardContainer
               key={item.id}
-              animate={animateProducts}
-              delay={index * 0.2}
+              $animate={animateProducts}
+              $delay={index * 0.2}
             >
               <CartProductCard
                 product={item}
@@ -242,8 +283,8 @@ function VoiceThreePlusDetails() {
             return (
               <ProductCardContainer
                 key={product.id}
-                animate={animateProducts}
-                delay={(orderItems.length + index) * 0.2}
+                $animate={animateProducts}
+                $delay={(orderItems.length + index) * 0.2}
               >
                 <CartProductCard
                   product={product}
