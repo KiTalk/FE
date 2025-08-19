@@ -79,7 +79,7 @@ function VoiceRecorder({
     } finally {
       snapshotInFlightRef.current = false;
     }
-  }, [language]);
+  }, [language, onRecognized]);
 
   async function toggleRecording() {
     setError("");
