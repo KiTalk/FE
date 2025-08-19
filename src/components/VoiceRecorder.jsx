@@ -3,7 +3,12 @@ import { AudioRecorder, getAudioDuration } from "../utils/audioUtils";
 import { addToHistory } from "../utils/historyUtils";
 import { sttService } from "../services/api";
 
-function VoiceRecorder({ language, children, disableInterim = false }) {
+function VoiceRecorder({
+  language,
+  children,
+  disableInterim = false,
+  onRecognized,
+}) {
   const recorderRef = useRef(null);
   const interimTimerRef = useRef(null);
   const snapshotInFlightRef = useRef(false);
@@ -61,13 +66,20 @@ function VoiceRecorder({ language, children, disableInterim = false }) {
       const text = extractTextFromSttResponse(data);
       if (text) {
         setRecognized(text);
+        if (typeof onRecognized === "function") {
+          try {
+            onRecognized(text);
+          } catch {
+            /* no-op */
+          }
+        }
       }
     } catch {
       // ignore interim errors
     } finally {
       snapshotInFlightRef.current = false;
     }
-  }, [language]);
+  }, [language, onRecognized]);
 
   async function toggleRecording() {
     setError("");
@@ -147,6 +159,13 @@ function VoiceRecorder({ language, children, disableInterim = false }) {
         console.log("✅ 추출된 텍스트:", text);
 
         setRecognized(text);
+        if (text && typeof onRecognized === "function") {
+          try {
+            onRecognized(text);
+          } catch {
+            /* no-op */
+          }
+        }
         if (text) {
           addToHistory(
             {

@@ -217,13 +217,13 @@ export const ProductsArea = styled.div`
 export const ProductCardContainer = styled.div`
   flex-shrink: 0;
   margin-right: -65px;
-  opacity: ${(props) => (props.animate ? 1 : 0)};
+  opacity: ${(props) => (props.$animate ? 1 : 0)};
   transform: ${(props) =>
-    props.animate
+    props.$animate
       ? "translateY(0) scale(0.75)" /* 0.85 → 0.75로 더 작게 */
       : "translateY(20px) scale(0.68)"};
-  transition: opacity 0.4s ease ${(p) => Number(p.delay) || 0}s,
-    transform 0.4s ease ${(p) => Number(p.delay) || 0}s;
+  transition: opacity 0.4s ease ${(p) => Number(p.$delay) || 0}s,
+    transform 0.4s ease ${(p) => Number(p.$delay) || 0}s;
   transform-origin: top left;
 `;
 
