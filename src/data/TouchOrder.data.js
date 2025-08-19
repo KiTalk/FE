@@ -1,4 +1,3 @@
-// src/data/TouchOrderGrouped.data.js
 
 export const MENU_DATA = [
   {
