@@ -32,18 +32,7 @@ import ProductCard from "../components/ProductCard";
 /* Context */
 import CartProvider from "../components/CartProvider.jsx";
 import { useCart } from "../components/CartContext";
-
-/* ✅ 로컬 스토리지 유틸: added_total_* 키 전체 삭제 */
-function clearAllAddedTotals() {
-  if (typeof window === "undefined" || !window.localStorage) return;
-  const ls = window.localStorage;
-  for (let i = ls.length - 1; i >= 0; i--) {
-    const key = ls.key(i);
-    if (key && key.startsWith("added_total_")) {
-      ls.removeItem(key);
-    }
-  }
-}
+import { clearAllAddedTotals } from "../utils/storage";
 
 export default function ColorOrderPage() {
   return (
@@ -63,7 +52,7 @@ function ColorOrderContent() {
 
   /* ✅ 카트가 비면 과거 added_total_* 싹 정리 */
   useEffect(() => {
-    setMode("color"); 
+    setMode("color");
     if (Number(totalQty ?? 0) === 0) {
       clearAllAddedTotals();
     }

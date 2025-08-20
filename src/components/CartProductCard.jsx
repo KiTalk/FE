@@ -52,24 +52,34 @@ export default function CartProductCard({
   }, [LS, normId, qty]);
 
   const handleMinus = () => {
-    if (typeof onDecrease === "function" && product?.id != null) onDecrease(product.id);
+    if (typeof onDecrease === "function" && product?.id != null)
+      onDecrease(product.id);
   };
   const handlePlus = () => {
-    if (typeof onIncrease === "function" && product?.id != null) onIncrease(product.id);
+    if (typeof onIncrease === "function" && product?.id != null)
+      onIncrease(product.id);
   };
 
   const isPopular = Boolean(product?.popular);
   const priceText = Number(product?.price ?? 0).toLocaleString();
 
   return (
-    <Card currentMode={currentMode} productId={product?.id}>
-      {tagLabel ? <PopularTag>{tagLabel}</PopularTag> : (isPopular && <PopularTag>인기</PopularTag>)}
+    <Card $currentMode={currentMode} $productId={product?.id}>
+      {tagLabel ? (
+        <PopularTag>{tagLabel}</PopularTag>
+      ) : (
+        isPopular && <PopularTag>인기</PopularTag>
+      )}
       <ImageArea />
       <InfoArea>
         <Name>{product?.name}</Name>
         <Price>{priceText}원</Price>
         <QtyRow>
-          <QtyButton aria-label="수량 감소" $type="minus" onClick={handleMinus} />
+          <QtyButton
+            aria-label="수량 감소"
+            $type="minus"
+            onClick={handleMinus}
+          />
           <QtyValue aria-live="polite">{Number(qty ?? 0)}</QtyValue>
           <QtyButton aria-label="수량 증가" $type="plus" onClick={handlePlus} />
         </QtyRow>

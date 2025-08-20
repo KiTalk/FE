@@ -12,16 +12,16 @@ export const ProductCard = styled.div`
    *  - 그 외 → #adadad
    *  - 안전하게 소문자 변환 및 null 방어
    */
-border: ${({ currentMode, productId }) => {
-  if (currentMode === "color") {
-    const id = String(productId || "").toLowerCase();
-    if (id.includes("americano")) return "7px solid #4D9E17"; // ✅ 굵기 7px
-    if (id.includes("latte")) return "7px solid #9F1FDA";   // ✅ 굵기 7px
-    return "7px solid #adadad"; // color 모드지만 americano/latte 아닌 경우
-  }
-  // 기본 모드
-  return "1px solid #adadad";
-}};
+  border: ${({ currentMode, productId }) => {
+    if (currentMode === "color") {
+      const id = String(productId || "").toLowerCase();
+      if (id.includes("americano")) return "7px solid #4D9E17"; // ✅ 굵기 7px
+      if (id.includes("latte")) return "7px solid #9F1FDA"; // ✅ 굵기 7px
+      return "7px solid #adadad"; // color 모드지만 americano/latte 아닌 경우
+    }
+    // 기본 모드
+    return "1px solid #adadad";
+  }};
 
   border-radius: 20px;
   box-sizing: border-box;
@@ -111,6 +111,7 @@ export const ProductName = styled.div`
   font-weight: 700;
   line-height: 1.875rem;
   letter-spacing: -0.03rem;
+  white-space: nowrap;
 `;
 
 export const TemperatureBadge = styled.span`
