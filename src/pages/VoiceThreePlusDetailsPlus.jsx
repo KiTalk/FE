@@ -284,8 +284,12 @@ function VoiceThreePlusDetailsPlus() {
 
           console.log("🔍 추가 주문 요청 시작:", voiceRecognizedText);
           // 기존 세션에 추가 주문 요청 (응답 대기 안 함)
-          orderService.addOrder(sessionId, voiceRecognizedText);
-          console.log("📤 추가 주문 요청 전송됨");
+          orderService
+            .addOrder(sessionId, voiceRecognizedText)
+            .then(() => console.log("📤 추가 주문 요청 전송됨"))
+            .catch((e) =>
+              console.warn("⚠️ 추가 주문 요청 전송 실패(무시):", e)
+            );
 
           // 즉시 VoiceThreePlusConfirmOrder로 이동
           navigate("/order/voice/details/plus/confirm", {

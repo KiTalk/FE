@@ -65,7 +65,7 @@ export const syncUtils = {
   },
 
   // 주문 내역 강제 동기화
-  forcSync: async (sessionId) => {
+  forceSync: async (sessionId) => {
     if (!sessionId) return false;
 
     const storedOrders = orderStorage.getOrders(sessionId);
@@ -88,6 +88,14 @@ export const syncUtils = {
       console.error("❌ 강제 동기화 실패:", error);
       return false;
     }
+  },
+
+  // @deprecated 하위 호환을 위한 alias (오타 수정: forcSync → forceSync)
+  forcSync: function (sessionId) {
+    console.warn(
+      "⚠️ 'forcSync'는 deprecated입니다. 'forceSync'를 사용해주세요."
+    );
+    return this.forceSync(sessionId);
   },
 
   // 특정 상품 수량 즉시 동기화
