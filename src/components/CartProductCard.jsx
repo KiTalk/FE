@@ -29,6 +29,19 @@ export default function CartProductCard({
   const LS = typeof window !== "undefined" ? window.localStorage : null;
   const normId = useMemo(() => normalizeId(product?.id), [product?.id]);
 
+  // ✅ 현재 모드 읽기 (order_spec.mode)
+  const currentMode = useMemo(() => {
+    try {
+      if (!LS) return null;
+      const raw = LS.getItem("order_spec");
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed?.mode ?? null;
+    } catch {
+      return null;
+    }
+  }, [LS]);
+
   // qty 변경 시 localStorage('added_total_{normId}') 동기화 (0이면 삭제)
   useEffect(() => {
     if (!LS || !normId) return;
@@ -38,14 +51,18 @@ export default function CartProductCard({
     else LS.removeItem(key);
   }, [LS, normId, qty]);
 
-  const handleMinus = () => { if (typeof onDecrease === "function" && product?.id != null) onDecrease(product.id); };
-  const handlePlus = () => { if (typeof onIncrease === "function" && product?.id != null) onIncrease(product.id); };
+  const handleMinus = () => {
+    if (typeof onDecrease === "function" && product?.id != null) onDecrease(product.id);
+  };
+  const handlePlus = () => {
+    if (typeof onIncrease === "function" && product?.id != null) onIncrease(product.id);
+  };
 
   const isPopular = Boolean(product?.popular);
   const priceText = Number(product?.price ?? 0).toLocaleString();
 
   return (
-    <Card>
+    <Card currentMode={currentMode} productId={product?.id}>
       {tagLabel ? <PopularTag>{tagLabel}</PopularTag> : (isPopular && <PopularTag>인기</PopularTag>)}
       <ImageArea />
       <InfoArea>

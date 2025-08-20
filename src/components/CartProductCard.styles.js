@@ -5,7 +5,19 @@ export const Card = styled.div`
   width: 381px;
   height: 420px;
   background: #ffffff;
-  border: 1px solid #adadad;
+
+  /* ✅ Product.styles.js와 동일 규칙: mode === "color"일 때만 색 테두리 */
+  border: ${({ currentMode, productId }) => {
+    if (currentMode === "color") {
+      const id = String(productId || "").toLowerCase();
+      if (id.includes("americano")) return "7px solid #4D9E17"; // green
+      if (id.includes("latte")) return "7px solid #9F1FDA";     // purple
+      return "7px solid #adadad"; // color 모드지만 두 키워드 아님
+    }
+    // 기본 테두리
+    return "1px solid #adadad";
+  }};
+
   border-radius: 20px;
   overflow: hidden;
   flex: 0 0 auto;

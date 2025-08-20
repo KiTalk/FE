@@ -16,6 +16,7 @@ import VoiceThreePlus from "../pages/VoiceThreePlus";
 import VoiceThreePlusRecording from "../pages/VoiceThreePlusRecording";
 import VoiceThreePlusDetails from "../pages/VoiceThreePlusDetails";
 import VoiceRecognize from "../pages/VoiceRecognize";
+import ColorIntro from "../pages/ColorIntro";
 import ColorOrder from "../pages/ColorOrder";
 import PhoneNumber from "../pages/PhoneNumber";
 import PhoneOrder from "../pages/PhoneOrder";
@@ -65,7 +66,22 @@ function AnimatedRoutes() {
         <Route path="/order/voice/cart" element={<VoiceCart />} />
 
         {/* 색깔 주문 */}
-        <Route path="/order/color" element={<ColorOrder />} />
+        <Route
+        path="/order/color/intro"
+        element={
+          <PageTransition>
+            <ColorIntro />
+          </PageTransition>
+        }
+        />
+        <Route
+        path="/order/color"
+        element={
+          <PageTransition>
+            <ColorOrder />
+          </PageTransition>
+        }
+        />
 
         {/* 전화번호 주문 */}
         <Route path="/order/phone/number" element={<PhoneNumber />} />

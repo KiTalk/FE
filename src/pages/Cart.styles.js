@@ -65,7 +65,7 @@ export const HeaderSubtitle = styled.p`
   color: #272727;
 `;
 
-export const HelpButton = styled.button`
+export const CancelButton = styled.button`
   position: absolute;
   left: 67.12rem;
   top: 3.19rem;
@@ -88,7 +88,7 @@ export const HelpButton = styled.button`
   cursor: pointer;
 `;
 
-export const HelpIcon = styled.img`
+export const CancelIcon = styled.img`
   width: 3.6875rem;
   height: 3.6875rem;
   object-fit: contain;
