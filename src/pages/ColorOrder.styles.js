@@ -51,7 +51,6 @@ export const CartWidget = styled.button`
   background: #ffffff;
   box-shadow: 3px 7px 10px rgba(0, 0, 0, 0.25);
   border-radius: 0.625rem;
-  position: relative;
 `;
 
 export const CartIcon = styled.img`
@@ -137,13 +136,6 @@ export const CartTextWrap = styled.div`
   display: inline-block;
 `;
 
-export const CartRight = styled.div`
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
 // Sections
 export const Section = styled.section`
   position: relative;
@@ -175,6 +167,6 @@ export const SectionTitle = styled.h3`
 
 export const ProductRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 381px);
-  gap: 70px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 38px;
 `;
