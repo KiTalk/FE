@@ -33,8 +33,7 @@ import {
   RecognizedText,
   VoiceRecognitionArea,
   AudioSpectrumContainer,
-} from "./VoiceThreePlusDetails.styles";
-import BackButton from "../components/BackButton";
+} from "./VoiceThreePlusConfirmOrder.styles";
 import CartProductCard from "../components/CartProductCard";
 import VoiceRecorder from "../components/VoiceRecorder";
 import AudioSpectrum from "../components/AudioSpectrum";
@@ -46,10 +45,11 @@ import { getSettings } from "../utils/settingsUtils";
 import { orderStorage } from "../utils/storage";
 import { useOrderSync } from "../utils/orderSync";
 
-function VoiceThreePlusDetails() {
+function VoiceThreePlusConfirmOrder() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const recognizedText = state?.recognized || "";
+  const sessionId =
+    state?.sessionId || sessionStorage.getItem("currentSessionId") || "";
   const [orderItems, setOrderItems] = useState([]);
   const [additionalProducts] = useState([]);
   const [orderSummary, setOrderSummary] = useState({
@@ -59,7 +59,6 @@ function VoiceThreePlusDetails() {
   const [showOrderSection, setShowOrderSection] = useState(false);
   const [animateProducts, setAnimateProducts] = useState(false);
   const [showTopSection, setShowTopSection] = useState(false);
-  const [sessionId, setSessionId] = useState("");
 
   // 음성 인식 관련 상태
   const [voiceDetected, setVoiceDetected] = useState(false); // eslint-disable-line no-unused-vars
@@ -76,7 +75,6 @@ function VoiceThreePlusDetails() {
 
   // 간단한 주문 동기화 훅 (음성 인식 완료 시에만 사용)
   const { syncNow } = useOrderSync(sessionId);
-
   // handleBack 함수는 현재 사용되지 않음 (뒤로가기 버튼 제거됨)
   // function handleBack() {
   //   navigate(-1);
@@ -91,7 +89,6 @@ function VoiceThreePlusDetails() {
       toggleRecordingRef.current();
     }
   }
-
   function handleCancelAll() {
     // 전체 취소
     setOrderItems([]);
@@ -177,58 +174,68 @@ function VoiceThreePlusDetails() {
     return Math.max(400, dynamicSpace); // 최소 400px 보장
   }
 
-  // 백엔드 주문 불러오기: 세션 시작 → 주문 전송 → 주문 목록/합계 반영
+  // 페이지 로드 시 업데이트된 주문 내역 불러오기 (백엔드 응답 대기)
   useEffect(() => {
     let aborted = false;
-    async function fetchOrders() {
-      if (!recognizedText) return;
+    async function fetchUpdatedOrders() {
+      if (!sessionId) return;
       try {
-        const start = await orderService.startSession();
-        if (aborted) return;
-        const sid = start?.session_id || "";
-        setSessionId(sid);
-        // 세션 ID를 저장하여 다음 페이지에서 사용할 수 있도록 함
-        sessionStorage.setItem("currentSessionId", sid);
-        const ordered = await orderService.submitOrder(sid, recognizedText);
-        console.log("🧾 주문 응답 orders:", ordered?.orders);
-        if (aborted) return;
-        const mapped = Array.isArray(ordered?.orders)
-          ? ordered.orders.map((o) => ({
-              id: o.menu_item,
-              name: o.menu_item,
-              original: o.original,
-              price: Number(o.price || 0),
-              quantity: Number(o.quantity || 0),
-              popular: Boolean(o.popular),
-              temp: o.temp,
-            }))
-          : [];
-        setOrderItems(mapped);
+        console.log("📋 업데이트된 주문 내역 조회 대기 중:", sessionId);
 
-        // localStorage에 주문 내역 저장
-        orderStorage.saveOrders(sid, mapped);
+        // 백엔드 응답을 기다리기 위해 잠시 대기
+        let retryCount = 0;
+        const maxRetries = 10; // 최대 10번 재시도 (10초)
 
-        const totalQuantity =
-          Number(ordered?.total_items ?? 0) ||
-          mapped.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
-        const totalPrice =
-          Number(ordered?.total_price ?? 0) ||
-          mapped.reduce(
-            (s, it) => s + (Number(it.price) || 0) * (Number(it.quantity) || 0),
-            0
-          );
-        setOrderSummary({ totalQuantity, totalPrice });
+        while (retryCount < maxRetries && !aborted) {
+          try {
+            const sessionData = await orderService.getSession(sessionId);
+            console.log("🧾 세션 주문 내역:", sessionData);
+
+            if (sessionData?.orders && sessionData.orders.length > 0) {
+              // 주문 데이터가 있으면 처리
+              const mapped = Array.isArray(sessionData.orders)
+                ? sessionData.orders.map((o) => ({
+                    id: o.menu_item,
+                    name: o.menu_item,
+                    original: o.original,
+                    price: Number(o.price || 0),
+                    quantity: Number(o.quantity || 0),
+                    popular: Boolean(o.popular),
+                    temp: o.temp,
+                  }))
+                : [];
+              setOrderItems(mapped);
+
+              // localStorage에 주문 내역 저장
+              orderStorage.saveOrders(sessionId, mapped);
+
+              const totalQuantity = Number(sessionData.total_items ?? 0);
+              const totalPrice = Number(sessionData.total_price ?? 0);
+              setOrderSummary({ totalQuantity, totalPrice });
+              break; // 성공하면 루프 종료
+            }
+          } catch (error) {
+            console.log("재시도 중...", retryCount + 1, error.message);
+          }
+
+          retryCount++;
+          await new Promise((resolve) => setTimeout(resolve, 1000)); // 1초 대기
+        }
+
+        if (retryCount >= maxRetries) {
+          console.warn("⚠️ 최대 재시도 횟수 초과");
+        }
       } catch (e) {
         if (!aborted) {
-          console.error("주문 불러오기 실패:", e?.message || e);
+          console.error("주문 내역 불러오기 실패:", e?.message || e);
         }
       }
     }
-    fetchOrders();
+    fetchUpdatedOrders();
     return () => {
       aborted = true;
     };
-  }, [recognizedText]);
+  }, [sessionId]);
 
   // 3초 타이머 관리
   useEffect(() => {
@@ -289,11 +296,10 @@ function VoiceThreePlusDetails() {
       setIsTransitioning(true);
       transitionTimerRef.current = setTimeout(async () => {
         try {
-          // 1단계: confirm API 호출 전에 변경사항 동기화
-          console.log("🔄 confirm API 호출 전 동기화 중...");
+          // 최종 주문 완료 전 동기화
+          console.log("🔄 최종 주문 완료 전 동기화 중...");
           await syncNow(); // 동기화
 
-          // 2단계: confirm API 호출
           console.log("🔍 확인 응답 분석 중:", voiceRecognizedText);
           const confirmResult = await orderService.confirmResponse(
             voiceRecognizedText
@@ -301,13 +307,16 @@ function VoiceThreePlusDetails() {
           console.log("📋 확인 응답 결과:", confirmResult);
 
           if (confirmResult.confirmed) {
-            console.log("✅ 긍정 응답 - /order/voice/details/plus로 이동");
+            console.log("✅ 긍정 응답 - /order/package로 이동");
+
+            // 긍정 응답 시 주문 완료 페이지로 이동
+            navigate("/order/package");
+          } else {
+            console.log("❌ 부정 응답 - /order/voice/details/plus로 이동");
+            // 부정 응답 시 추가 주문 페이지로 이동
             navigate("/order/voice/details/plus", {
               state: { sessionId: sessionId },
             });
-          } else {
-            console.log("❌ 부정 응답 - /order/package로 이동");
-            navigate("/order/package");
           }
         } catch (error) {
           console.error("❌ 확인 응답 처리 실패:", error);
@@ -317,7 +326,6 @@ function VoiceThreePlusDetails() {
       }, 1000); // 1초 후 자동 전환
     }
   }, [voiceRecognizedText, isTransitioning, navigate, sessionId, syncNow]);
-
   // 페이지 로드 시 애니메이션 트리거
   useEffect(() => {
     const t1 = setTimeout(() => setShowTopSection(true), 100);
@@ -363,7 +371,7 @@ function VoiceThreePlusDetails() {
               >
                 <ProfileIcon src={profile} alt="프로필" />
                 <MessageBubble>
-                  <MainTitle>다른 음료도 주문하시겠어요?</MainTitle>
+                  <MainTitle>추가 되었습니다 이대로 주문할까요?</MainTitle>
                   <ExampleText>예시) "응", "아니"</ExampleText>
                 </MessageBubble>
               </GuideSection>
@@ -551,4 +559,4 @@ function VoiceThreePlusDetails() {
   );
 }
 
-export default VoiceThreePlusDetails;
+export default VoiceThreePlusConfirmOrder;

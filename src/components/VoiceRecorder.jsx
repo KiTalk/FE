@@ -7,6 +7,7 @@ function VoiceRecorder({
   language,
   children,
   disableInterim = false,
+  autoStart = true,
   onRecognized,
 }) {
   const recorderRef = useRef(null);
@@ -208,7 +209,7 @@ function VoiceRecorder({
           }
           recorderRef.current = recorder;
         }
-        if (!isCancelled) {
+        if (!isCancelled && autoStart) {
           recorderRef.current.startRecording();
           setIsRecording(true);
         }
@@ -221,7 +222,7 @@ function VoiceRecorder({
     return () => {
       isCancelled = true;
     };
-  }, []);
+  }, [autoStart]);
 
   useEffect(() => {
     // disableInterim이 true면 중간 스냅샷을 비활성화

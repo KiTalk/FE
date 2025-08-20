@@ -200,6 +200,14 @@ export const orderService = {
     );
     return response.data;
   },
+
+  // 확인 응답 처리
+  confirmResponse: async (menuItem) => {
+    const response = await apiClient.post(API_ENDPOINTS.LOGIC_CONFIRM, {
+      menu_item: menuItem,
+    });
+    return response.data;
+  },
 };
 
 export default apiClient;

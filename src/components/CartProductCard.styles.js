@@ -2,8 +2,8 @@ import styled, { css } from "styled-components";
 
 export const Card = styled.div`
   position: relative;
-  width: 381px;
-  height: 420px;
+  width: 23.8125rem;
+  height: 26.25rem;
   background: #ffffff;
 
   /* ✅ Product.styles.js와 동일 규칙: mode === "color"일 때만 색 테두리 */
@@ -25,7 +25,7 @@ export const Card = styled.div`
 
 export const ImageArea = styled.div`
   width: 100%;
-  height: 198px; /* 47.62% of 420 */
+  height: 12.375rem; /* 47.62% of 26.25rem */
   background: ${(props) =>
     props.$variant === "cold"
       ? "#F2F6FB"
@@ -41,61 +41,61 @@ export const PopularTag = styled.div`
   position: absolute;
   left: 0;
   top: 0;
-  width: 93px;
-  height: 61px;
-  border-radius: 0 0 20px 0;
+  width: 5.8125rem;
+  height: 3.8125rem;
+  border-radius: 0 0 1.25rem 0;
   background: #223770;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 28px;
+  font-size: 1.75rem;
 `;
 
 export const InfoArea = styled.div`
   position: relative;
-  height: calc(420px - 198px);
+  height: calc(26.25rem - 12.375rem);
   background: #ffffff;
 `;
 
 export const Name = styled.h3`
   position: absolute;
-  left: 29px;
-  top: 35px;
+  left: 1.8125rem;
+  top: 2.1875rem;
   margin: 0;
   color: #272727;
   font-weight: 600;
-  font-size: 32px;
-  line-height: 30px;
+  font-size: 2rem;
+  line-height: 1.875rem;
   letter-spacing: -0.015em;
 `;
 
 export const Price = styled.div`
   position: absolute;
-  left: 29px;
-  top: 86px;
+  left: 1.8125rem;
+  top: 4.5rem;
   color: #223770;
   font-weight: 700;
-  font-size: 40px;
-  line-height: 30px;
+  font-size: 2.5rem;
+  line-height: 1.875rem;
   letter-spacing: -0.015em;
 `;
 
 export const QtyRow = styled.div`
   position: absolute;
-  left: 32px;
-  top: 157px;
-  width: 318px;
-  height: 36px;
+  left: 2rem;
+  top: 8.5rem;
+  width: 19.875rem;
+  height: 2.25rem;
   display: grid;
-  grid-template-columns: 36px 1fr 36px;
+  grid-template-columns: 2.25rem 1fr 2.25rem;
   align-items: center;
 `;
 
 export const QtyButton = styled.button`
-  width: 36px;
-  height: 36px;
+  width: 2.25rem;
+  height: 2.25rem;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -109,8 +109,8 @@ export const QtyButton = styled.button`
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 25px;
-    height: 3px;
+    width: 1.5625rem;
+    height: 0.1875rem;
     background: #272727;
     transform: translate(-50%, -50%);
   }
@@ -139,7 +139,60 @@ export const QtyValue = styled.div`
   text-align: center;
   color: #272727;
   font-weight: 500;
-  font-size: 48px;
-  line-height: 30px;
+  font-size: 3rem;
+  line-height: 1.875rem;
   letter-spacing: -0.015em;
+`;
+
+export const NameRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0 1.8125rem;
+  margin-top: 1.5rem;
+`;
+
+export const ProductName = styled.div`
+  color: #272727;
+  font-family: Pretendard;
+  font-size: 1.8rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.875rem;
+  letter-spacing: -0.03rem;
+  white-space: nowrap;
+`;
+
+export const TemperatureBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.6rem;
+  min-width: 6rem;
+  height: 3rem;
+  border-radius: 8rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 3;
+  white-space: nowrap;
+  color: #0b1b2b;
+  background: #e7eef7;
+  border: 0.1875rem solid #c8d6ea;
+
+  ${(props) =>
+    props.$variant === "cold" &&
+    css`
+      color: #3191ff;
+      background: transparent;
+      border-color: #3191ff;
+    `}
+
+  ${(props) =>
+    props.$variant === "hot" &&
+    css`
+      color: #da2525;
+      background: transparent;
+      border-color: #da2525;
+    `}
 `;

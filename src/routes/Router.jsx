@@ -15,6 +15,8 @@ import VoiceOneTwo from "../pages/VoiceOneTwo";
 import VoiceThreePlus from "../pages/VoiceThreePlus";
 import VoiceThreePlusRecording from "../pages/VoiceThreePlusRecording";
 import VoiceThreePlusDetails from "../pages/VoiceThreePlusDetails";
+import VoiceThreePlusDetailsPlus from "../pages/VoiceThreePlusDetailsPlus";
+import VoiceThreePlusConfirmOrder from "../pages/VoiceThreePlusConfirmOrder";
 import VoiceRecognize from "../pages/VoiceRecognize";
 import ColorIntro from "../pages/ColorIntro";
 import ColorOrder from "../pages/ColorOrder";
@@ -62,25 +64,33 @@ function AnimatedRoutes() {
           path="/order/voice/details"
           element={<VoiceThreePlusDetails />}
         />
+        <Route
+          path="/order/voice/details/plus"
+          element={<VoiceThreePlusDetailsPlus />}
+        />
+        <Route
+          path="/order/voice/details/plus/confirm"
+          element={<VoiceThreePlusConfirmOrder />}
+        />
         <Route path="/order/voice/recognize" element={<VoiceRecognize />} />
         <Route path="/order/voice/cart" element={<VoiceCart />} />
 
         {/* 색깔 주문 */}
         <Route
-        path="/order/color/intro"
-        element={
-          <PageTransition>
-            <ColorIntro />
-          </PageTransition>
-        }
+          path="/order/color/intro"
+          element={
+            <PageTransition>
+              <ColorIntro />
+            </PageTransition>
+          }
         />
         <Route
-        path="/order/color"
-        element={
-          <PageTransition>
-            <ColorOrder />
-          </PageTransition>
-        }
+          path="/order/color"
+          element={
+            <PageTransition>
+              <ColorOrder />
+            </PageTransition>
+          }
         />
 
         {/* 전화번호 주문 */}
