@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
   LOGIC_ORDER: (sessionId) => `/logic/order/${sessionId}`,
   LOGIC_PACKAGING: (sessionId) => `/logic/packaging/${sessionId}`,
   LOGIC_SESSION: (sessionId) => `/logic/session/${sessionId}`,
+  LOGIC_CONFIRM: "/logic/confirm",
   ORDERS_PATCH_UPDATE: (sessionId) => `/orders/${sessionId}/patch-update`,
   ORDERS_ADD: (sessionId) => `/orders/${sessionId}/add`,
   ORDERS_REMOVE: (sessionId) => `/orders/${sessionId}/remove`,

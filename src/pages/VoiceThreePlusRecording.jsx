@@ -112,6 +112,7 @@ function VoiceThreePlusRecording() {
       <VoiceRecorder
         language={language}
         disableInterim={true}
+        autoStart={true}
         onRecognized={(text) => {
           // setState during parent render를 피하기 위해 콜백에서만 상태 변경
           if (text && text !== recognizedText) {

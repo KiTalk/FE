@@ -29,7 +29,7 @@ export const ProfileIcon = styled.img`
 
 export const MessageBubble = styled.div`
   position: absolute;
-  width: 48rem;
+  width: 51.375rem;
   height: 12.625rem;
   top: 4.375rem;
   left: 15.4375rem;

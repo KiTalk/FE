@@ -4,11 +4,14 @@ import {
   ImageArea,
   PopularTag,
   InfoArea,
+  ProductName,
   Name,
   Price,
   QtyRow,
   QtyButton,
   QtyValue,
+  NameRow,
+  TemperatureBadge,
 } from "./CartProductCard.styles";
 import { getStorageKey, normalizeId } from "../utils/storage";
 
@@ -60,6 +63,20 @@ export default function CartProductCard({
       onIncrease(product.id);
   };
 
+  function getTemperatureLabel(temp) {
+    if (temp === "ice") return "시원한";
+    if (temp === "hot") return "뜨거운";
+    return null;
+  }
+
+  const temperatureLabel = getTemperatureLabel(product?.temp);
+  const temperatureVariant =
+    temperatureLabel === "시원한"
+      ? "cold"
+      : temperatureLabel === "뜨거운"
+      ? "hot"
+      : null;
+
   const isPopular = Boolean(product?.popular);
   const priceText = Number(product?.price ?? 0).toLocaleString();
 
@@ -72,7 +89,14 @@ export default function CartProductCard({
       )}
       <ImageArea />
       <InfoArea>
-        <Name>{product?.name}</Name>
+        <NameRow>
+          <ProductName>{product?.name}</ProductName>
+          {temperatureLabel && (
+            <TemperatureBadge $variant={temperatureVariant}>
+              {temperatureLabel}
+            </TemperatureBadge>
+          )}
+        </NameRow>
         <Price>{priceText}원</Price>
         <QtyRow>
           <QtyButton
