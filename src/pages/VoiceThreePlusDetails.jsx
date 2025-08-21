@@ -34,7 +34,6 @@ import {
   VoiceRecognitionArea,
   AudioSpectrumContainer,
 } from "./VoiceThreePlusDetails.styles";
-import BackButton from "../components/BackButton";
 import CartProductCard from "../components/CartProductCard";
 import VoiceRecorder from "../components/VoiceRecorder";
 import AudioSpectrum from "../components/AudioSpectrum";
@@ -46,7 +45,7 @@ import { getSettings } from "../utils/settingsUtils";
 import { orderStorage } from "../utils/storage";
 import { useOrderSync } from "../utils/orderSync";
 
-function VoiceThreePlusDetails() {
+export default function VoiceThreePlusDetails() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const recognizedText = state?.recognized || "";
@@ -76,11 +75,6 @@ function VoiceThreePlusDetails() {
 
   // 간단한 주문 동기화 훅 (음성 인식 완료 시에만 사용)
   const { syncNow } = useOrderSync(sessionId);
-
-  // handleBack 함수는 현재 사용되지 않음 (뒤로가기 버튼 제거됨)
-  // function handleBack() {
-  //   navigate(-1);
-  // }
 
   function handleStartVoice() {
     // 음성 인식 시작 시 타이머 리셋 및 자동중지 플래그 초기화
@@ -550,5 +544,3 @@ function VoiceThreePlusDetails() {
     </Page>
   );
 }
-
-export default VoiceThreePlusDetails;

@@ -10,10 +10,11 @@ export const Page = styled.div`
     Roboto, sans-serif;
 `;
 
-// 안내 멘트 섹션
 export const GuideSection = styled.div`
   position: absolute;
-  gap: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
 `;
 
 export const ProfileIcon = styled.img`
@@ -77,9 +78,8 @@ export const SpeakButton = styled.button`
   height: 9.375rem;
   top: 19.5rem;
   left: 39.125rem;
-
   background: linear-gradient(360deg, #223770 0%, #375ab9 100%);
-  border-radius: 1.875rem 1.875rem 0rem 1.875rem;
+  border-radius: 1.875rem 1.875rem 0 1.875rem;
   border: none;
   cursor: pointer;
   transition: transform 0.1s ease;
@@ -98,15 +98,17 @@ export const SpeakButton = styled.button`
 `;
 
 export const SpeakButtonContent = styled.div`
-  gap: 18px;
+  display: flex;
+  align-items: center;
+  gap: 1.125rem;
 `;
 
 export const MicIcon = styled.img`
   position: absolute;
   top: 2.5rem;
   left: 9.5rem;
-  width: 70px;
-  height: 70px;
+  width: 4.375rem;
+  height: 4.375rem;
 `;
 
 export const SpeakButtonText = styled.span`
@@ -123,7 +125,6 @@ export const SpeakButtonText = styled.span`
   white-space: nowrap;
 `;
 
-// 손가락 가이드
 export const FingerGuide = styled.div`
   position: absolute;
   top: 20.5rem;
@@ -136,13 +137,12 @@ export const FingerImage = styled.img`
   object-fit: contain;
 `;
 
-// 하단 주문 내역 섹션
 export const OrderSection = styled.div`
   position: absolute;
-  width: 1440px;
-  height: 512px;
-  left: 0px;
-  top: 512px;
+  width: 90rem;
+  height: 32rem;
+  left: 0;
+  top: 32rem;
 `;
 
 export const OrderHeader = styled.div`
@@ -160,7 +160,6 @@ export const OrderTitle = styled.div`
   height: 3rem;
   top: 1.9rem;
   left: 5.31rem;
-
   text-align: center;
   font-family: "Pretendard";
   font-style: normal;
@@ -178,7 +177,6 @@ export const CancelButton = styled.button`
   height: 3rem;
   top: 1.81rem;
   left: 76.6875rem;
-
   font-family: "Pretendard";
   font-style: normal;
   font-weight: 500;
@@ -188,7 +186,6 @@ export const CancelButton = styled.button`
   color: #dbdbdb;
   background: transparent;
   white-space: nowrap;
-
   border: none;
   border-bottom: 0.125rem solid #dbdbdb;
   border-radius: 0;
@@ -201,14 +198,14 @@ export const CancelButton = styled.button`
 
 export const ProductsArea = styled.div`
   position: absolute;
-  width: 1440px;
-  height: 406px;
-  left: 0px;
-  top: 106px;
+  width: 90rem;
+  height: 25.375rem;
+  left: 0;
+  top: 6.625rem;
   background: #ffffff;
   display: flex;
   align-items: flex-start;
-  padding: 34px 84px 0 90px;
+  padding: 2.125rem 5.25rem 0 5.625rem;
   box-sizing: border-box;
   overflow-x: auto;
   overflow-y: hidden;
@@ -216,29 +213,27 @@ export const ProductsArea = styled.div`
 
 export const ProductCardContainer = styled.div`
   flex-shrink: 0;
-  margin-right: -65px;
+  margin-right: -4.0625rem;
   opacity: ${(props) => (props.$animate ? 1 : 0)};
   transform: ${(props) =>
     props.$animate
-      ? "translateY(0) scale(0.75)" /* 0.85 → 0.75로 더 작게 */
-      : "translateY(20px) scale(0.68)"};
+      ? "translateY(0) scale(0.75)"
+      : "translateY(1.25rem) scale(0.68)"};
   transition: opacity 0.4s ease ${(p) => Number(p.$delay) || 0}s,
     transform 0.4s ease ${(p) => Number(p.$delay) || 0}s;
   transform-origin: top left;
 `;
 
-// 동적 스크롤 공간을 위한 컴포넌트
 export const ScrollSpacer = styled.div`
   flex-shrink: 0;
-  width: ${(p) => Number(p.width) || 0}px;
-  height: 1px; /* 최소 높이 */
+  width: ${(p) => Number(p.width) || 0}rem;
+  height: 0.0625rem;
 `;
 
-// 상품 카드 스타일
 export const ProductCard = styled.div`
   position: absolute;
-  width: 307.59px;
-  height: 339.08px;
+  width: 19.224rem;
+  height: 21.1925rem;
   border: 0.0505rem solid #adadad;
   border-radius: 1.009rem;
   background: #ffffff;
@@ -247,17 +242,17 @@ export const ProductCard = styled.div`
 export const ProductImage = styled.div`
   position: relative;
   width: 100%;
-  height: 161.5px;
+  height: 10.09375rem;
   background: ${(props) => props.bgColor || "#f2f6fb"};
   border-radius: 1.009rem 1.009rem 0 0;
 `;
 
 export const PopularTag = styled.div`
   position: absolute;
-  width: 75.08px;
-  height: 49.25px;
-  left: 0px;
-  top: 0px;
+  width: 4.6925rem;
+  height: 3.0781rem;
+  left: 0;
+  top: 0;
   background: #223770;
   border-radius: 0 0 1.009rem 0;
   display: flex;
@@ -279,7 +274,7 @@ export const PopularTagText = styled.span`
 export const ProductInfo = styled.div`
   position: relative;
   width: 100%;
-  height: 177.58px;
+  height: 11.09875rem;
   padding: 1.766rem 1.463rem;
   box-sizing: border-box;
 `;
@@ -308,16 +303,16 @@ export const ProductPrice = styled.div`
 
 export const QuantityControls = styled.div`
   position: relative;
-  width: 256.73px;
-  height: 29.06px;
+  width: 16.045rem;
+  height: 1.816rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 `;
 
 export const QuantityButton = styled.button`
-  width: 29.06px;
-  height: 29.06px;
+  width: 1.816rem;
+  height: 1.816rem;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -327,8 +322,8 @@ export const QuantityButton = styled.button`
 `;
 
 export const MinusIcon = styled.div`
-  width: 20.18px;
-  height: 2.42px;
+  width: 1.261rem;
+  height: 0.15125rem;
   background: #272727;
 `;
 
@@ -343,13 +338,13 @@ export const PlusIcon = styled.div`
     background: #272727;
   }
   &::before {
-    width: 20.18px;
-    height: 2.42px;
+    width: 1.261rem;
+    height: 0.15125rem;
     transform: translate(-50%, -50%);
   }
   &::after {
-    width: 2.42px;
-    height: 20.18px;
+    width: 0.15125rem;
+    height: 1.261rem;
     transform: translate(-50%, -50%);
   }
 `;
@@ -367,8 +362,8 @@ export const QuantityText = styled.span`
 
 export const TagButton = styled.button`
   position: absolute;
-  width: 77.5px;
-  height: 33.91px;
+  width: 4.844rem;
+  height: 2.119rem;
   border: 0.101rem solid ${(props) => props.color || "#3191ff"};
   border-radius: 2.523rem;
   background: transparent;
@@ -387,8 +382,8 @@ export const TagButton = styled.button`
 
 export const RemoveButton = styled.button`
   position: absolute;
-  width: 37.67px;
-  height: 37.67px;
+  width: 2.354rem;
+  height: 2.354rem;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -397,8 +392,8 @@ export const RemoveButton = styled.button`
   &::after {
     content: "";
     position: absolute;
-    width: 29.89px;
-    height: 2.69px;
+    width: 1.868rem;
+    height: 0.168rem;
     background: #5d5d5d;
     border-radius: 1.766rem;
     left: 50%;
@@ -414,7 +409,6 @@ export const RemoveButton = styled.button`
   }
 `;
 
-// 우측 주문 요약 영역
 export const OrderSummary = styled.div`
   position: absolute;
   width: 35.1875rem;
@@ -430,18 +424,18 @@ export const OrderSummary = styled.div`
 
 export const OrderDetails = styled.div`
   position: absolute;
-  width: 307px;
-  height: 133px;
-  left: 180px;
-  top: 102px;
+  width: 19.1875rem;
+  height: 8.3125rem;
+  left: 11.25rem;
+  top: 6.375rem;
 `;
 
 export const OrderQuantityRow = styled.div`
   position: absolute;
-  width: 293px;
-  height: 49px;
-  left: 0px;
-  top: 0px;
+  width: 18.3125rem;
+  height: 3.0625rem;
+  left: 0;
+  top: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -470,19 +464,19 @@ export const OrderQuantityValue = styled.span`
 
 export const OrderDivider = styled.div`
   position: absolute;
-  width: 2px;
-  height: 42px;
-  left: 177px;
-  top: 4px;
+  width: 0.125rem;
+  height: 2.625rem;
+  left: 11.0625rem;
+  top: 0.25rem;
   background: #223770;
 `;
 
 export const OrderTotal = styled.div`
   position: absolute;
-  width: 307px;
-  height: 84px;
-  left: 0px;
-  top: 49px;
+  width: 19.1875rem;
+  height: 5.25rem;
+  left: 0;
+  top: 3.0625rem;
   font-family: "Pretendard";
   font-style: normal;
   font-weight: 600;
@@ -496,10 +490,10 @@ export const OrderTotal = styled.div`
 
 export const OrderButton = styled.button`
   position: absolute;
-  width: 310px;
-  height: 100px;
-  left: 177px;
-  top: 260px;
+  width: 19.375rem;
+  height: 6.25rem;
+  left: 11.0625rem;
+  top: 16.25rem;
   background: #223770;
   border-radius: 1.25rem;
   border: none;
@@ -516,7 +510,6 @@ export const OrderButton = styled.button`
   cursor: pointer;
 `;
 
-// 음성 인식 관련 스타일 추가
 export const RecognizedVoiceArea = styled.div`
   position: absolute;
   width: 44rem;
@@ -524,8 +517,8 @@ export const RecognizedVoiceArea = styled.div`
   top: 19.5rem;
   left: 39.125rem;
   background: #ffffff;
-  border: 2px solid #223770;
-  border-radius: 1.875rem 1.875rem 0rem 1.875rem;
+  border: 0.125rem solid #223770;
+  border-radius: 1.875rem 1.875rem 0 1.875rem;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -561,15 +554,15 @@ export const VoiceRecognitionArea = styled.div`
   top: 19.5rem;
   left: 39.125rem;
   background: #ffffff;
-  border: 2px solid #223770;
-  border-radius: 1.875rem 1.875rem 0rem 1.875rem;
+  border: 0.125rem solid #223770;
+  border-radius: 1.875rem 1.875rem 0 1.875rem;
   box-sizing: border-box;
 `;
 
 export const AudioSpectrumContainer = styled.div`
   position: absolute;
-  width: 283px;
-  height: 98.31px;
+  width: 17.6875rem;
+  height: 6.144rem;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);

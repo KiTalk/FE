@@ -24,14 +24,14 @@ export const Title = styled.h1`
   font-size: 4rem;
   font-style: normal;
   font-weight: 570;
-  line-height: 86px;
+  line-height: 5.375rem;
   letter-spacing: -0.015em;
   white-space: nowrap;
 `;
 
 export const Example = styled.p`
   position: absolute;
-  width: ${(props) => (props.wide ? "703px" : "409px")};
+  width: ${(props) => (props.wide ? "43.9375rem" : "25.5625rem")};
   height: 3.125rem;
   left: ${(props) => (props.wide ? "23.0625rem" : "32.25rem")};
   top: ${(props) => props.top || "50.875rem"};
@@ -49,13 +49,13 @@ export const Example = styled.p`
 
 export const MicButton = styled.button`
   position: absolute;
-  width: 296px;
-  height: 296px;
-  left: calc(50% - 296px / 2);
-  top: 238px;
+  width: 18.5rem;
+  height: 18.5rem;
+  left: calc(50% - 18.5rem / 2);
+  top: 14.875rem;
   background: linear-gradient(360deg, #223770 0%, #375ab9 90.88%);
-  box-shadow: 3px 7px 10px rgba(0, 0, 0, 0.25);
-  border-radius: 30px;
+  box-shadow: 0.1875rem 0.4375rem 0.625rem rgba(0, 0, 0, 0.25);
+  border-radius: 1.875rem;
   border: none;
   cursor: pointer;
 

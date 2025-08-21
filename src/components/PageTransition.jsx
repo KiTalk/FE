@@ -9,10 +9,8 @@ import {
 
 const MotionDiv = motion.div;
 
-const PageTransition = ({ children, stableKey = true }) => {
+export default function PageTransition({ children, stableKey = true }) {
   const location = useLocation();
-  // stableKey=true: keep initial key for per-page wrapper usage (avoids key collision)
-  // stableKey=false: use dynamic key for router-level wrapper so transitions trigger on path change
   const initialPathRef = useRef(location.pathname);
   const motionKey = stableKey ? initialPathRef.current : location.pathname;
 
@@ -32,5 +30,3 @@ const PageTransition = ({ children, stableKey = true }) => {
     </AnimatePresence>
   );
 };
-
-export default PageTransition;

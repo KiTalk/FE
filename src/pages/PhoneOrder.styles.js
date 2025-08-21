@@ -4,13 +4,12 @@ import checkIcon from "/src/assets/images/check2.png";
 export const Page = styled.div`
   position: relative;
   width: 1440px;
-  min-height: 1024px;
+  height: 1024px;
   margin: 0 auto;
   background: #ffffff;
   padding-bottom: 1rem;
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
-  /* 커스텀 세로 스크롤바 오른쪽 간격만 CSS로 설정 */
   --page-scrollbar-right-inset: 5rem;
 `;
 
@@ -70,7 +69,7 @@ export const CartWidget = styled.button`
   width: 20.625rem;
   height: 6.875rem;
   background: #ffffff;
-  box-shadow: 3px 7px 10px rgba(0, 0, 0, 0.25);
+  box-shadow: 0.1875rem 0.4375rem 0.625rem rgba(0, 0, 0, 0.25);
   border-radius: 0.625rem;
   position: relative;
 `;
@@ -102,8 +101,8 @@ export const CartBadgeWrap = styled.div`
   top: 52%;
   right: 3.2rem;
   transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
+  width: 2.25rem;
+  height: 2.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,7 +135,7 @@ export const CartBadgeCount = styled.div`
   font-variant-numeric: tabular-nums;
   transform: translate(
     var(--badge-count-offset-x, 0px),
-    var(--badge-count-offset-y, -2px)
+    var(--badge-count-offset-y, -0.125rem)
   );
 `;
 
@@ -162,22 +161,21 @@ export const CartRight = styled.div`
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 `;
 
-// Sections
 export const Section = styled.section`
   position: relative;
-  width: 1220px;
-  margin: 40px auto 40px auto;
+  width: 76.25rem;
+  margin: 2.5rem auto;
 `;
 
 export const SectionTitle = styled.h3`
   position: relative;
   margin: 0 0 1.87rem 0;
-  padding-left: 34px;
-  font-size: 48px;
-  line-height: 57px;
+  padding-left: 2.125rem;
+  font-size: 3rem;
+  line-height: 3.5625rem;
   font-weight: 700;
   letter-spacing: -0.015em;
   color: #272727;
@@ -186,27 +184,26 @@ export const SectionTitle = styled.h3`
     content: "";
     position: absolute;
     left: 0;
-    top: 8px;
-    width: 10px;
-    height: 42px;
-    border-radius: 2px;
+    top: 0.5rem;
+    width: 0.625rem;
+    height: 2.625rem;
+    border-radius: 0.125rem;
     background: #223770;
   }
 `;
 
 export const ProductRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 381px);
-  gap: 70px;
+  grid-template-columns: repeat(2, 23.8125rem);
+  gap: 4.375rem;
 `;
 
-/* ====== ★ 추가: 주문 내역 UI 전용 스타일 ====== */
 export const SubSectionTitle = styled.h4`
   position: relative;
   margin: 0 0 1.37rem 0;
-  padding-left: 34px;
-  font-size: 48px;
-  line-height: 57px;
+  padding-left: 2.125rem;
+  font-size: 3rem;
+  line-height: 3.5625rem;
   font-weight: 700;
   letter-spacing: -0.015em;
   color: #272727;
@@ -215,10 +212,10 @@ export const SubSectionTitle = styled.h4`
     content: "";
     position: absolute;
     left: 0;
-    top: 8px;
-    width: 10px;
-    height: 42px;
-    border-radius: 2px;
+    top: 0.5rem;
+    width: 0.625rem;
+    height: 2.625rem;
+    border-radius: 0.125rem;
     background: #223770;
   }
 `;
@@ -237,19 +234,19 @@ export const HistoryNav = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  margin: 40px 0 24px 0;
+  gap: 1.5rem;
+  margin: 2.5rem 0 1.5rem 0;
 `;
 
 export const PaginationDots = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 `;
 
 export const PaginationDot = styled.div`
-  width: ${(p) => (p.$active ? "23px" : "20px")};
-  height: ${(p) => (p.$active ? "23px" : "20px")};
+  width: ${(p) => (p.$active ? "1.4375rem" : "1.25rem")};
+  height: ${(p) => (p.$active ? "1.4375rem" : "1.25rem")};
   border-radius: 50%;
   background: ${(p) => (p.$active ? "#FFBA59" : "#D9D9D9")};
 `;
@@ -258,55 +255,47 @@ export const NavButtons = styled.div`
   display: flex;
   align-items: center;
   margin-top: 2.59rem;
-  gap: 40px;
+  gap: 2.5rem;
 `;
 
 export const HistoryNavIcon = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 6.25rem;
+  height: 6.25rem;
   object-fit: contain;
   cursor: ${(p) => (p.$disabled ? "not-allowed" : "pointer")};
   filter: ${(p) => (p.$disabled ? "grayscale(1) opacity(0.5)" : "none")};
 `;
 
 export const HistoryDivider = styled.hr`
-  margin: 16px 0 24px 0;
+  margin: 1rem 0 1.5rem 0;
   border: none;
-  border-top: 1px solid #e5e7eb;
+  border-top: 0.0625rem solid #e5e7eb;
 `;
 
 export const FavWrap = styled.div`
-  width: 1220px;
+  width: 76.25rem;
   margin: 0 auto 3.75rem auto;
   position: relative;
-  /* 세로 스크롤 영역 공통 변수 */
-  --fav-viewport-h: 560px; /* 보이는 높이(이제 페이지 스크롤 사용으로 고정 높이 비활성) */
-  --fav-gap: 2.38rem; /* 카드 간격 */
-  --fav-scrollbar-offset: -12px; /* 스크롤바를 더 오른쪽으로 밀고 싶다면 음수 확대 */
-  /* 페이지 전체 스크롤 사용: 내부 고정 높이 제거 */
   height: auto;
 `;
 
-/* ===== '자주 시킨 메뉴' 스크롤 전용 ===== */
 export const FavViewport = styled.div`
-  width: 1220px;
-  /* 페이지 전체 스크롤 사용: 내부 스크롤 제거 */
+  width: 76.25rem;
   height: auto;
   overflow: visible;
-  padding: 0; /* 내부 스크롤 제거로 패딩 제거 */
+  padding: 0;
   box-sizing: border-box;
   scroll-snap-type: y proximity;
   scroll-padding-top: 0;
-  /* 페이지 스크롤 전파 허용 */
   overscroll-behavior: auto;
   -webkit-overflow-scrolling: auto;
 `;
 
 export const FavScrollArea = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 381px); /* 카드 폭 고정 */
-  column-gap: var(--fav-gap); /* 가로 간격 */
-  row-gap: 3.3rem; /* 세로 간격 */
+  grid-template-columns: repeat(3, 23.8125rem);
+  column-gap: 2.38rem;
+  row-gap: 3.3rem;
   justify-content: center;
   align-items: start;
   min-height: max-content;
@@ -320,7 +309,7 @@ export const FavScrollbar = styled.div`
   height: 100%;
   position: absolute;
   top: 0;
-  right: -50px;
+  right: -3.125rem;
 `;
 
 export const FavTrack = styled.div`
@@ -336,33 +325,30 @@ export const FavThumb = styled.div`
   top: 0;
   width: 100%;
   min-height: 2.5rem;
-  height: 4rem; /* 초기값 (JS에서 업데이트) */
+  height: 4rem;
   border-radius: 0.75rem;
   background: #ffba59;
   pointer-events: auto;
 `;
 
-/* ===== 체크리스트 UI ===== */
 export const PastListWrap = styled.div`
   width: 100%;
-  margin-top: 8px;
+  margin-top: 0.5rem;
 `;
 
 export const DateHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 2.62rem;
-  margin: 24px 0 32px 0;
+  margin: 1.5rem 0 2rem 0;
 `;
 
 export const DateCheck = styled.input.attrs({ type: "checkbox" })`
-  width: 80px;
-  height: 80px;
+  width: 5rem;
+  height: 5rem;
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  border: 2px solid #c0c0c0;
-  border-radius: 10px;
+  border: 0.125rem solid #c0c0c0;
+  border-radius: 0.625rem;
   cursor: pointer;
   background: #ffffff;
   position: relative;
@@ -403,26 +389,24 @@ export const MenuList = styled.div`
   display: grid;
   grid-auto-rows: auto;
   row-gap: 1.25rem;
-  margin: 0 0 32px 34px;
+  margin: 0 0 2rem 2.125rem;
 `;
 
 export const MenuRow = styled.div`
   display: grid;
-  grid-template-columns: 80px 141px 1fr 205px 177px;
+  grid-template-columns: 5rem 8.8125rem 1fr 12.8125rem 11.0625rem;
   align-items: center;
-  column-gap: 24px;
+  column-gap: 1.5rem;
   padding: 0;
-  margin-left: -34px;
+  margin-left: -2.125rem;
 `;
 
 export const MenuCheck = styled.input.attrs({ type: "checkbox" })`
-  width: 80px;
-  height: 80px;
+  width: 5rem;
+  height: 5rem;
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  border: 2px solid #c0c0c0;
-  border-radius: 10px;
+  border: 0.125rem solid #c0c0c0;
+  border-radius: 0.625rem;
   cursor: pointer;
   background: #ffffff;
   position: relative;
@@ -447,10 +431,10 @@ export const MenuCheck = styled.input.attrs({ type: "checkbox" })`
 `;
 
 export const MenuImage = styled.div`
-  width: 141px;
-  height: 141px;
+  width: 8.8125rem;
+  height: 8.8125rem;
   background: #f2f6fb;
-  border-radius: 20px;
+  border-radius: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -474,17 +458,17 @@ export const Stepper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 51px;
+  gap: 3.1875rem;
   width: 15.6875rem;
   height: 5rem;
-  border: 2px solid #c0c0c0;
-  border-radius: 40px;
+  border: 0.125rem solid #c0c0c0;
+  border-radius: 2.5rem;
   margin-left: -6.81rem;
 `;
 
 export const StepBtn = styled.button`
-  width: 36px;
-  height: 36px;
+  width: 2.25rem;
+  height: 2.25rem;
   border: none;
   border-radius: 50%;
   background: transparent;
@@ -498,8 +482,8 @@ export const StepBtn = styled.button`
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 25px;
-    height: 3px;
+    width: 1.5625rem;
+    height: 0.1875rem;
     background: ${(p) => (p.disabled ? "#ADADAD" : "#272727")};
     transform: translate(-50%, -50%);
   }
@@ -519,7 +503,7 @@ export const StepValue = styled.div`
   color: #272727;
   line-height: 1.875rem;
   letter-spacing: -0.045rem;
-  min-width: 30px;
+  min-width: 1.875rem;
 `;
 
 export const Price = styled.div`
@@ -537,7 +521,7 @@ export const FooterBar = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 30px;
+  gap: 1.875rem;
   margin-top: 6.15rem;
   width: 100%;
 `;
@@ -545,8 +529,8 @@ export const FooterBar = styled.div`
 export const GhostButton = styled.button`
   width: 37.25rem;
   height: 9.375rem;
-  border-radius: 20px;
-  border: 4px solid #223770;
+  border-radius: 1.25rem;
+  border: 0.25rem solid #223770;
   background: #fff;
   color: #223770;
   text-align: center;
@@ -562,7 +546,7 @@ export const GhostButton = styled.button`
 export const PrimaryButton = styled.button`
   width: 37.25rem;
   height: 9.375rem;
-  border-radius: 20px;
+  border-radius: 1.25rem;
   border: none;
   background: #223770;
   color: #fff;
@@ -575,24 +559,21 @@ export const PrimaryButton = styled.button`
   letter-spacing: -0.045rem;
 `;
 
-/* ===== 일반 태그 스타일 컴포넌트 ===== */
 export const ContentWrapper = styled.div``;
 
 export const TabsContainer = styled.div``;
 
-/* ===== 페이지 전체 커스텀 스크롤바 ===== */
 export const PageViewport = styled.div`
   position: relative;
   width: 100%;
-  height: 100vh; /* 전체 화면 높이에 맞춘 내부 뷰포트 */
-  overflow-y: auto; /* 네이티브는 숨기고, 스크롤은 내부에서 */
+  height: 100vh;
+  overflow-y: auto;
   overflow-x: hidden;
   box-sizing: border-box;
 
-  /* 네이티브 스크롤바 완전 숨김 */
   &::-webkit-scrollbar {
-    width: 0px !important;
-    height: 0px !important;
+    width: 0 !important;
+    height: 0 !important;
     display: none !important;
   }
   &::-webkit-scrollbar-track {
@@ -613,9 +594,9 @@ export const PageScrollbar = styled.div`
   width: 0.875rem;
   height: 50vh;
   position: fixed;
-  top: 200px;
+  top: 12.5rem;
   right: calc(
-    max((100vw - 1440px) / 2, 0px) + var(--page-scrollbar-right-inset)
+    max((100vw - 90rem) / 2, 0px) + var(--page-scrollbar-right-inset)
   );
   z-index: 1000;
 `;
@@ -633,9 +614,9 @@ export const PageThumb = styled.div`
   top: 0;
   width: 100%;
   min-height: 2.5rem;
-  height: 4rem; /* 초기값 (JS에서 업데이트) */
+  height: 4rem;
   border-radius: 0.75rem;
   background: #ffba59;
   pointer-events: auto;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.15);
 `;

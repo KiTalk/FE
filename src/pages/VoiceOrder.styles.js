@@ -41,11 +41,11 @@ export const Title = styled.h1`
 
 export const Card = styled.button`
   position: absolute;
-  width: 514px;
-  height: 600px;
+  width: 32.125rem;
+  height: 37.5rem;
   background: #ffffff;
-  box-shadow: 3px 7px 10px rgba(0, 0, 0, 0.25);
-  border-radius: 30px;
+  box-shadow: 0.1875rem 0.4375rem 0.625rem rgba(0, 0, 0, 0.25);
+  border-radius: 1.875rem;
   z-index: 1;
   border: none;
   cursor: pointer;
@@ -57,13 +57,13 @@ export const Card = styled.button`
 `;
 
 export const CardLeft = styled(Card)`
-  left: 184px;
-  top: 290px;
+  left: 11.5rem;
+  top: 18.125rem;
 `;
 
 export const CardRight = styled(Card)`
-  left: 742px;
-  top: 290px;
+  left: 46.375rem;
+  top: 18.125rem;
 `;
 
 export const CardTitle = styled.div`
@@ -73,8 +73,8 @@ export const CardTitle = styled.div`
   left: 50%;
   transform: translateX(-50%);
   font-weight: 650;
-  font-size: 70px;
-  line-height: 84px;
+  font-size: 4.375rem;
+  line-height: 5.25rem;
   display: flex;
   align-items: center;
   text-align: center;
@@ -90,8 +90,8 @@ export const CardExample = styled.div`
   margin-top: 0.94rem;
   transform: translateX(-50%);
   font-weight: 500;
-  font-size: 36px;
-  line-height: 50px;
+  font-size: 2.25rem;
+  line-height: 3.125rem;
   display: flex;
   align-items: center;
   text-align: center;

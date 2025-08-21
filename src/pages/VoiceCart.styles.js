@@ -2,8 +2,8 @@ import styled from "styled-components";
 
 export const Page = styled.div`
   position: relative;
-  width: 90rem;
-  height: 64rem;
+  width: 1440px;
+  height: 1024px;
   margin: 0 auto;
   background: #f2f6fb;
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -75,7 +75,7 @@ export const OutlineButton = styled.button`
   bottom: 3rem;
   width: 15.3125rem;
   height: 6.25rem;
-  border: 3px solid #272727;
+  border: 0.1875rem solid #272727;
   background: transparent;
   color: #272727;
   font-weight: 500;

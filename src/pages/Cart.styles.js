@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 export const Page = styled.div`
   position: relative;
   width: 1440px;
-  min-height: 1024px;
+  height: 1024px;
   height: 100vh;
   margin: 0 auto;
   background: #ffffff;
@@ -27,14 +27,12 @@ export const CartPageContainer = styled.div`
   padding-bottom: 10rem;
 `;
 
-/* 헤더 */
 export const HeaderContainer = styled.header`
-  /* [UPDATED] displayName */
   position: relative;
   width: 100%;
   height: 13.375rem;
   background: #f2f6fb;
-  border-bottom: 1px solid #e9f0f9;
+  border-bottom: 0.0625rem solid #e9f0f9;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -44,8 +42,8 @@ export const HeaderContainer = styled.header`
 
 export const HeaderTitle = styled.h1`
   position: absolute;
-  top: 3.69rem;
-  left: 6.94rem;
+  top: 3.6875rem;
+  left: 6.9375rem;
   font-size: 3rem;
   font-style: normal;
   font-weight: 700;
@@ -56,7 +54,7 @@ export const HeaderTitle = styled.h1`
 export const HeaderSubtitle = styled.p`
   position: absolute;
   top: 8rem;
-  left: 6.94rem;
+  left: 6.9375rem;
   font-size: 2rem;
   font-style: normal;
   font-weight: 400;
@@ -67,15 +65,15 @@ export const HeaderSubtitle = styled.p`
 
 export const CancelButton = styled.button`
   position: absolute;
-  left: 67.12rem;
-  top: 3.19rem;
+  left: 67.125rem;
+  top: 3.1875rem;
   width: 15.9375rem;
   height: 6.875rem;
   border-radius: 1.25rem;
   box-shadow: 0.1875rem 0.4375rem 0.625rem rgba(0, 0, 0, 0.25);
   background: #ffffff;
   color: #272727;
-  font-size: 2.39888rem;
+  font-size: 2.4rem;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
@@ -83,7 +81,7 @@ export const CancelButton = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 0.25rem;
   white-space: nowrap;
   cursor: pointer;
 `;
@@ -94,10 +92,9 @@ export const CancelIcon = styled.img`
   object-fit: contain;
 `;
 
-/* 카드 리스트 */
 export const CardsViewport = styled.div`
-  width: 1222px;
-  margin: 0 auto 0.75rem auto; /* 카드와 스크롤바 사이 적정 간격 */
+  width: 76.375rem;
+  margin: 0 auto 0.75rem auto;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0 6.875rem 0;
@@ -105,7 +102,6 @@ export const CardsViewport = styled.div`
   scroll-snap-type: x proximity;
   scroll-padding-left: 6.875rem;
 
-  /* 네이티브 스크롤바 숨김 (커스텀 바 사용) */
   &::-webkit-scrollbar {
     height: 0;
     display: none;
@@ -126,9 +122,9 @@ export const CardsScrollArea = styled.div`
 `;
 
 export const CustomScrollbar = styled.div`
-  width: 1222px;
+  width: 76.375rem;
   position: absolute;
-  left: 7.19rem;
+  left: 7.1875rem;
   top: 45.5625rem;
   height: 0.875rem;
   z-index: 6;
@@ -147,19 +143,18 @@ export const CustomThumb = styled.div`
   top: 0;
   height: 0.875rem;
   min-width: 5rem;
-  width: 12.5rem; /* 초기 가시성 확보 (JS로 덮어쓰기) */
+  width: 12.5rem;
   border-radius: 0.75rem;
   background: #ffba59;
   pointer-events: auto;
 `;
 
-/* 카드 */
 export const CartItemCard = styled.div`
   position: relative;
   width: 21rem;
   height: 18rem;
   background: #ffffff;
-  border: 1px solid #d9dfe8;
+  border: 0.0625rem solid #d9dfe8;
   border-radius: 1rem;
   overflow: hidden;
   flex: 0 0 auto;
@@ -183,19 +178,16 @@ export const PopularTag = styled.div`
 `;
 
 export const ImageArea = styled.div`
-  /* [UPDATED] displayName */
   width: 100%;
   height: 4.5rem;
   background: #f2f6fb;
 `;
 
 export const ItemInfoArea = styled.div`
-  /* [UPDATED] displayName */
   padding: 0.875rem 1rem 1rem;
 `;
 
 export const NameRow = styled.div`
-  /* [UPDATED] displayName */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -203,16 +195,14 @@ export const NameRow = styled.div`
 `;
 
 export const ProductName = styled.h3`
-  /* [UPDATED] displayName */
   margin: 0;
   color: #272727;
   font-size: 1.0625rem;
   font-weight: 700;
-  letter-spacing: -0.32px;
+  letter-spacing: -0.02rem;
 `;
 
 export const TemperatureBadge = styled.span`
-  /* [UPDATED] displayName */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -244,7 +234,6 @@ export const TemperatureBadge = styled.span`
 `;
 
 export const ProductPrice = styled.div`
-  /* [UPDATED] displayName */
   margin-top: 0.5rem;
   color: #223770;
   font-size: 1.375rem;
@@ -252,7 +241,6 @@ export const ProductPrice = styled.div`
 `;
 
 export const QuantityRow = styled.div`
-  /* [UPDATED] displayName */
   display: grid;
   grid-template-columns: 2.25rem 1fr 2.25rem;
   align-items: center;
@@ -263,7 +251,6 @@ export const QuantityRow = styled.div`
 `;
 
 export const QuantityButton = styled.button`
-  /* [UPDATED] displayName */
   width: 2.25rem;
   height: 2.25rem;
   border: none;
@@ -319,7 +306,6 @@ export const QuantityValue = styled.div`
   font-weight: 700;
 `;
 
-/* 푸터: Page 내부 하단 고정 */
 export const FooterBar = styled.footer`
   position: absolute;
   bottom: 0;
@@ -354,7 +340,7 @@ export const FooterMetaRow = styled.div`
 export const FooterDivider = styled.div`
   position: absolute;
   left: 17.25rem;
-  top: 3.31rem;
+  top: 3.3125rem;
   width: 0.125rem;
   height: 2.625rem;
   background: #ffffff;
@@ -363,7 +349,7 @@ export const FooterDivider = styled.div`
 
 export const FooterMetaLabel = styled.span`
   position: absolute;
-  left: 6.43rem;
+  left: 6.4375rem;
   top: 2.6rem;
   font-style: normal;
   font-weight: 400;
@@ -374,7 +360,7 @@ export const FooterMetaLabel = styled.span`
 
 export const FooterMetaValue = styled.span`
   position: absolute;
-  left: 18.81rem;
+  left: 18.8125rem;
   top: 2.6rem;
   text-align: right;
   font-style: normal;
@@ -399,7 +385,7 @@ export const FooterTotal = styled.div`
   font-style: normal;
   font-weight: 600;
   line-height: normal;
-  letter-spacing: 0.18625rem;
+  letter-spacing: 0.1875rem;
 `;
 
 export const FooterRight = styled.div`
@@ -477,9 +463,8 @@ export const QuantityBadge = styled.div`
   line-height: 1;
 `;
 
-// 옵션 바 (포장/매장, 적립 여부)
 export const OptionsBar = styled.div`
-  width: 1222px;
+  width: 76.375rem;
   margin: 1rem auto 0;
   display: flex;
   align-items: center;
@@ -491,7 +476,7 @@ export const OptionGroup = styled.div`
   align-items: center;
   gap: 0.625rem;
   background: #f6f8fc;
-  border: 1px solid #e2e7f0;
+  border: 0.0625rem solid #e2e7f0;
   border-radius: 0.875rem;
   padding: 0.75rem 0.875rem;
 `;
@@ -506,7 +491,7 @@ export const OptionButton = styled.button`
   min-width: 5.625rem;
   padding: 0 0.875rem;
   border-radius: 0.625rem;
-  border: 1px solid #cdd6e6;
+  border: 0.0625rem solid #cdd6e6;
   background: ${(p) => (p.$active ? "#223770" : "#ffffff")};
   color: ${(p) => (p.$active ? "#ffffff" : "#223770")};
   font-weight: 700;

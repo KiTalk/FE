@@ -12,7 +12,7 @@ import {
   QuantityValue,
 } from "./VoiceProductCard.styles";
 
-function VoiceProductCard({
+export default function VoiceProductCard({
   imageSrc,
   productName,
   productPrice,
@@ -54,5 +54,3 @@ function VoiceProductCard({
     </ItemCard>
   );
 }
-
-export default VoiceProductCard;

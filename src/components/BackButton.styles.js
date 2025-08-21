@@ -2,10 +2,10 @@ import styled from "styled-components";
 
 export const BackButtonWrapper = styled.div`
   position: absolute;
-  top: 4.8125rem; /* 77px */
-  left: 6.375rem; /* 102px */
-  width: 7.875rem; /* 126px */
-  height: 7.875rem; /* 126px */
+  top: 4.8125rem;
+  left: 6.375rem;
+  width: 7.875rem;
+  height: 7.875rem;
 `;
 
 export const BackButtonRoot = styled.button`

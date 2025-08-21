@@ -12,8 +12,8 @@ export const Page = styled.div`
 
 export const GuideSection = styled.div`
   position: absolute;
-  width: 905px;
-  height: 202px;
+  width: 56.5625rem;
+  height: 12.625rem;
   left: 8.125rem;
   top: 16.4375rem;
 `;
@@ -31,13 +31,13 @@ export const ProfileIcon = styled.img`
 
 export const MessageBubble = styled.div`
   position: absolute;
-  width: 768px;
-  height: 202px;
+  width: 48rem;
+  height: 12.625rem;
   left: 7.7225rem;
   top: 0;
   background: #ffffff;
   border: 0.125rem solid #dcdcdc;
-  border-radius: 0rem 1.875rem 1.875rem 1.875rem;
+  border-radius: 0 1.875rem 1.875rem 1.875rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -81,12 +81,12 @@ export const ExampleText = styled.p`
 
 export const SpeakButton = styled.button`
   position: absolute;
-  width: 704px;
-  height: 150px;
+  width: 44rem;
+  height: 9.375rem;
   left: 39.125rem;
   top: 31.5625rem;
   background: linear-gradient(360deg, #223770 0%, #375ab9 100%);
-  border-radius: 1.875rem 1.875rem 0rem 1.875rem;
+  border-radius: 1.875rem 1.875rem 0 1.875rem;
   border: none;
   cursor: pointer;
   transition: transform 0.1s ease;
@@ -105,15 +105,15 @@ export const SpeakButton = styled.button`
 `;
 
 export const SpeakButtonContent = styled.div`
-  gap: 18px;
+  gap: 1.125rem;
 `;
 
 export const MicIcon = styled.img`
   position: absolute;
   top: 2.5rem;
   left: 9.5rem;
-  width: 70px;
-  height: 70px;
+  width: 4.375rem;
+  height: 4.375rem;
 `;
 
 export const SpeakButtonText = styled.span`
@@ -154,7 +154,7 @@ export const RecognizedTextContainer = styled.div`
 
 export const RecognizedText = styled.div`
   background: white;
-  border: 2px solid #dcdcdc;
+  border: 0.125rem solid #dcdcdc;
   border-radius: 1.875rem;
   padding: 1.5rem 2rem;
   font-family: "Pretendard";
@@ -166,5 +166,5 @@ export const RecognizedText = styled.div`
   color: #375ab9;
   text-align: center;
   min-width: 20rem;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
 `;

@@ -14,7 +14,7 @@ import {
   CircleIcon,
 } from "./PointCheck.styles";
 
-function PointCheckPage() {
+export default function PointCheckPage() {
   const navigate = useNavigate();
 
   function handleBack() {
@@ -56,5 +56,3 @@ function PointCheckPage() {
     </Page>
   );
 }
-
-export default PointCheckPage;

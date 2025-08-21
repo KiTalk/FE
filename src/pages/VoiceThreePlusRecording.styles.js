@@ -12,16 +12,16 @@ export const Page = styled.div`
 
 export const GuideSection = styled.div`
   position: absolute;
-  width: 905px;
-  height: 202px;
-  left: 130px;
-  top: 263px;
+  width: 56.5625rem;
+  height: 12.625rem;
+  left: 8.125rem;
+  top: 16.4375rem;
 `;
 
 export const ProfileIcon = styled.img`
   position: absolute;
-  width: 97px;
-  height: 97px;
+  width: 6.0625rem;
+  height: 6.0625rem;
   left: 0;
   top: 0;
   background: #ffffff;
@@ -31,8 +31,8 @@ export const ProfileIcon = styled.img`
 
 export const MessageBubble = styled.div`
   position: absolute;
-  width: 768px;
-  height: 202px;
+  width: 48rem;
+  height: 12.625rem;
   left: 7.7225rem;
   top: 0;
   background: #ffffff;
@@ -81,8 +81,8 @@ export const ExampleText = styled.p`
 
 export const SpeakButton = styled.button`
   position: absolute;
-  width: 704px;
-  height: 150px;
+  width: 44rem;
+  height: 9.375rem;
   left: 39.125rem;
   top: 31.5625rem;
   background: linear-gradient(360deg, #223770 0%, #375ab9 100%);
@@ -105,15 +105,15 @@ export const SpeakButton = styled.button`
 `;
 
 export const SpeakButtonContent = styled.div`
-  gap: 18px;
+  gap: 1.125rem;
 `;
 
 export const MicIcon = styled.img`
   position: absolute;
   top: 2.5rem;
   left: 9.5rem;
-  width: 70px;
-  height: 70px;
+  width: 4.375rem;
+  height: 4.375rem;
 `;
 
 export const SpeakButtonText = styled.span`
@@ -142,16 +142,15 @@ export const FingerImage = styled.img`
   object-fit: contain;
 `;
 
-// 인식된 텍스트가 표시될 때의 음성 인식 영역 (음성 인식 완료 후)
 export const RecognizedVoiceArea = styled.div`
   position: absolute;
-  width: 747px;
-  height: 150px;
-  left: 583px;
-  top: 505px;
+  width: 46.6875rem;
+  height: 9.375rem;
+  left: 36.4375rem;
+  top: 31.5625rem;
   background: #ffffff;
-  border: 2px solid #223770;
-  border-radius: 30px 30px 0px 30px;
+  border: 0.125rem solid #223770;
+  border-radius: 1.875rem 1.875rem 0rem 1.875rem;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -167,13 +166,13 @@ export const RecognizedTextContainer = styled.div`
 `;
 
 export const RecognizedText = styled.div`
-  width: 646px;
-  height: 48px;
+  width: 40.375rem;
+  height: 3rem;
   font-family: "Pretendard";
   font-style: normal;
   font-weight: 600;
-  font-size: 40px;
-  line-height: 48px;
+  font-size: 2.5rem;
+  line-height: 3rem;
   display: flex;
   align-items: center;
   text-align: center;
@@ -182,24 +181,22 @@ export const RecognizedText = styled.div`
   justify-content: center;
 `;
 
-// 음성 인식 영역 (녹음 중일 때 표시)
 export const VoiceRecognitionArea = styled.div`
   position: absolute;
-  width: 747px;
-  height: 150px;
-  left: 583px;
-  top: 505px;
+  width: 46.6875rem;
+  height: 9.375rem;
+  left: 36.4375rem;
+  top: 31.5625rem;
   background: #ffffff;
-  border: 2px solid #223770;
-  border-radius: 30px 30px 0px 30px;
+  border: 0.125rem solid #223770;
+  border-radius: 1.875rem 1.875rem 0rem 1.875rem;
   box-sizing: border-box;
 `;
 
-// 오디오 스펙트럼 컨테이너
 export const AudioSpectrumContainer = styled.div`
   position: absolute;
-  width: 283px;
-  height: 98.31px;
-  left: 240px;
-  top: 26px;
+  width: 17.6875rem;
+  height: 6.144375rem;
+  left: 15rem;
+  top: 1.625rem;
 `;

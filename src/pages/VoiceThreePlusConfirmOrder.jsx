@@ -45,7 +45,7 @@ import { getSettings } from "../utils/settingsUtils";
 import { orderStorage } from "../utils/storage";
 import { useOrderSync } from "../utils/orderSync";
 
-function VoiceThreePlusConfirmOrder() {
+export default function VoiceThreePlusConfirmOrder() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const sessionId =
@@ -60,7 +60,6 @@ function VoiceThreePlusConfirmOrder() {
   const [animateProducts, setAnimateProducts] = useState(false);
   const [showTopSection, setShowTopSection] = useState(false);
 
-  // 음성 인식 관련 상태
   const [voiceDetected, setVoiceDetected] = useState(false); // eslint-disable-line no-unused-vars
   const [timeLeft, setTimeLeft] = useState(3);
   const [autoStopTriggered, setAutoStopTriggered] = useState(false);
@@ -73,12 +72,7 @@ function VoiceThreePlusConfirmOrder() {
 
   const language = useMemo(() => getSettings().defaultLanguage || "ko", []);
 
-  // 간단한 주문 동기화 훅 (음성 인식 완료 시에만 사용)
   const { syncNow } = useOrderSync(sessionId);
-  // handleBack 함수는 현재 사용되지 않음 (뒤로가기 버튼 제거됨)
-  // function handleBack() {
-  //   navigate(-1);
-  // }
 
   function handleStartVoice() {
     // 음성 인식 시작 시 타이머 리셋 및 자동중지 플래그 초기화
@@ -558,5 +552,3 @@ function VoiceThreePlusConfirmOrder() {
     </Page>
   );
 }
-
-export default VoiceThreePlusConfirmOrder;

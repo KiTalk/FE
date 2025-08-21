@@ -17,55 +17,47 @@ export const BottomBar = styled.div`
   width: 1440px;
   height: 229px;
   background: #223770;
-  border-radius: 30px 30px 0px 0px;
+  border-radius: 1.875rem 1.875rem 0 0;
 `;
 
 export const Title = styled.h1`
   position: absolute;
-  width: max-content;
-  left: 17rem;
+  width: 57.125rem;
+  height: 4.75rem;
+  left: 17.06rem;
   top: 6.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  color: #000;
   text-align: center;
-  font-family: Pretendard;
   font-size: 4rem;
   font-style: normal;
-  font-weight: 570;
+  font-weight: 500;
   line-height: normal;
   letter-spacing: -0.06rem;
+  color: #272727;
+  white-space: nowrap;
 `;
 
 export const SubTitle = styled.h2`
-  color: #5d5d5d;
-  font-family: Pretendard;
-  font-size: 46px;
+  position: absolute;
+  width: 38.125rem;
+  height: 3.4375rem;
+  left: 17.06rem;
+  top: 11.88rem;
+  font-size: 2.875rem;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  letter-spacing: -0.69px;
-
-  position: absolute;
-  width: max-content;
-  left: 17rem;
-  top: 12rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  letter-spacing: -0.04313rem;
+  color: #5d5d5d;
   white-space: nowrap;
-  text-align: center;
 `;
 
 export const Card = styled.button`
   position: absolute;
-  width: 514px;
-  height: 600px;
+  width: 32.125rem;
+  height: 37.5rem;
   background: #ffffff;
-  box-shadow: 3px 7px 10px rgba(0, 0, 0, 0.25);
-  border-radius: 30px;
+  box-shadow: 0.1875rem 0.4375rem 0.625rem rgba(0, 0, 0, 0.25);
+  border-radius: 1.875rem;
   z-index: 1;
   border: none;
   cursor: pointer;
@@ -77,58 +69,56 @@ export const Card = styled.button`
 `;
 
 export const CardLeft = styled(Card)`
-  left: 184px;
-  top: 290px;
-  border: 8px solid #4D9E17;
+  left: 11.5rem;
+  top: 18.125rem;
+  border: 0.5rem solid #4D9E17;
 `;
 
 export const CardRight = styled(Card)`
-  left: 742px;
-  top: 290px;
-  border: 8px solid #9F1FDA;
+  left: 46.375rem;
+  top: 18.125rem;
+  border: 0.5rem solid #9F1FDA;
 `;
 
 export const CardTitle = styled.div`
   position: absolute;
+  width: 15.125rem;
   height: 5.25rem;
-  top: 24.44rem;
+  top: 22.5rem;
   left: 50%;
   transform: translateX(-50%);
-  font-weight: 650;
-  font-size: 55px;
-  line-height: 84px;
-  display: flex;
-  align-items: center;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 3.5rem;
+  line-height: normal;
   text-align: center;
-  letter-spacing: -0.015em;
   color: #272727;
+  white-space: nowrap;
 `;
 
 export const CardExample = styled.div`
   position: absolute;
   height: 3.125rem;
-  top: 28.7rem;
+  top: 27.44rem;
   left: 50%;
-  margin-top: 0.94rem;
+  margin-top: 0.75rem;
   transform: translateX(-50%);
-  font-weight: 500;
-  font-size: 36px;
-  line-height: 50px;
-  display: flex;
-  align-items: center;
+  font-weight: 400;
+  font-size: 2rem;
+  font-style: normal;
+  line-height: normal;
   text-align: center;
-  letter-spacing: -0.015em;
-  color: #878787;
+  color: #272727;
   white-space: nowrap;
 `;
 
 export const CardImage = styled.img`
   position: absolute;
   inset: 0;
-  top: 3.81rem;
-  left: 6.69rem;
-  width: 18.75rem;
-  height: 18.75rem;
+  top: 6.19rem;
+  left: 11.26rem;
+  width: 8.9621rem;
+  height: 14.6082rem;
   flex-shrink: 0;
   object-fit: contain;
   pointer-events: none;

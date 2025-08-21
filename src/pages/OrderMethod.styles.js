@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-  --ButtonHeight: 16.25rem; /* 공통 변수: 버튼 높이를 한 곳에서 관리 */
+  --ButtonHeight: 16.25rem;
 
   position: relative;
   width: 1440px;
@@ -14,13 +14,6 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  /* 모바일 대응 */
-  @media (max-width: 900px) {
-    max-width: 100vw;
-    height: auto;
-    padding: 2.275rem 2vw;
-  }
 `;
 
 export const BottomAccentBar = styled.div`
@@ -33,10 +26,6 @@ export const BottomAccentBar = styled.div`
   border-top-left-radius: 2.4375rem;
   border-top-right-radius: 2.4375rem;
   z-index: 0;
-
-  @media (max-width: 900px) {
-    height: 8.4rem;
-  }
 `;
 
 export const Title = styled.h1`
@@ -61,18 +50,12 @@ export const ButtonGroup = styled.div`
   display: flex;
   gap: 1.75rem;
   width: 91%;
-  min-width: 756px;
-  max-width: 1148px;
+  min-width: 47.25rem;
+  max-width: 71.75rem;
   justify-content: center;
   margin-bottom: 1.3125rem;
   position: relative;
-  z-index: 1; /* 바 위로 */
-
-  @media (max-width: 900px) {
-    width: 100%;
-    min-width: 0;
-    max-width: 100vw;
-  }
+  z-index: 1;
 `;
 
 export const Button = styled.button`
@@ -91,11 +74,11 @@ export const Button = styled.button`
   min-height: var(--ButtonHeight);
 
   flex: 1 1 0;
-  min-width: 350px;
+  min-width: 21.875rem;
   padding: 3.15rem 2.45rem;
   padding-left: 2.5rem;
   border-radius: 1.75rem;
-  box-shadow: 3px 7px 10px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: 0.1875rem 0.4375rem 0.625rem rgba(0, 0, 0, 0.25);
 
   &:hover {
     box-shadow: 0 0.5rem 2rem rgba(23, 78, 149, 0.16);
@@ -103,11 +86,6 @@ export const Button = styled.button`
 
   &:focus {
     outline: none;
-  }
-
-  @media (max-width: 900px) {
-    padding: 1.925rem 0.875rem;
-    min-width: 168px;
   }
 `;
 
@@ -117,11 +95,6 @@ export const Icon = styled.img`
   object-fit: contain;
   width: 7.75rem;
   height: 7.75rem;
-
-  @media (max-width: 900px) {
-    width: 3.325rem;
-    height: 3.325rem;
-  }
 `;
 
 export const TextGroup = styled.div`
