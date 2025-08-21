@@ -71,7 +71,7 @@ import { useCart } from "../components/CartContext";
 
 /* 컴포넌트 */
 import LastFourDigits from "../components/LastFourDigits";
-import OrderHistory from "../components/OrderHistory.jsx"; // ← Headless(데이터 전용)
+import OrderHistory from "../components/OrderHistory.jsx";
 
 export default function TouchOrderPage() {
   return (

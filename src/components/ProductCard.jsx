@@ -14,9 +14,9 @@ import {
   NameRow,
   TemperatureBadge,
   AddedOverlay,
-} from "./Product.styles";
+} from "./ProductCard.styles";
 import { getStorageKey, normalizeId } from "../utils/storage";
-import americanoIceImg from "../assets/images/americano-ice.png"; // ✅ 이미지 import
+import americanoIceImg from "../assets/images/americano-ice.png";
 
 export default function ProductCard({
   product,

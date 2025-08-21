@@ -2,8 +2,8 @@ import styled from "styled-components";
 
 export const Page = styled.div`
   position: relative;
-  width: 90rem;
-  height: 64rem;
+  width: 1440px;
+  height: 1024px;
   margin: 0 auto;
   background: #f2f6fb;
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",

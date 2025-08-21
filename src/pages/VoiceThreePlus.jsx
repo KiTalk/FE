@@ -19,7 +19,7 @@ import mikeIcon from "../assets/images/mike-solid.png";
 import hand from "../assets/images/hand.png";
 import profile from "../assets/images/profile.png";
 
-function VoiceThreePlus() {
+export default function VoiceThreePlus() {
   const navigate = useNavigate();
 
   function handleBack() {
@@ -32,10 +32,8 @@ function VoiceThreePlus() {
 
   return (
     <Page>
-      {/* 뒤로가기 버튼 */}
       <BackButton onClick={handleBack} />
 
-      {/* 안내 섹션 */}
       <GuideSection>
         <ProfileIcon src={profile} alt="프로필" />
 
@@ -47,7 +45,6 @@ function VoiceThreePlus() {
         </MessageBubble>
       </GuideSection>
 
-      {/* 눌러서 말하기 버튼 */}
       <SpeakButton onClick={handleStartVoice}>
         <SpeakButtonContent>
           <MicIcon src={mikeIcon} alt="마이크" />
@@ -55,12 +52,9 @@ function VoiceThreePlus() {
         </SpeakButtonContent>
       </SpeakButton>
 
-      {/* 손가락 가이드 */}
       <FingerGuide>
         <FingerImage src={hand} alt="손가락 가이드" />
       </FingerGuide>
     </Page>
   );
 }
-
-export default VoiceThreePlus;

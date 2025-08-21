@@ -6,7 +6,7 @@ import {
 } from "./BackButton.styles";
 import backImage from "../assets/images/back.png";
 
-function BackButton({ onClick, ariaLabel = "뒤로가기", top, left }) {
+export default function BackButton({ onClick, ariaLabel = "뒤로가기", top, left }) {
   return (
     <BackButtonWrapper style={{ top, left }}>
       <BackButtonRoot onClick={onClick} aria-label={ariaLabel}>
@@ -15,5 +15,3 @@ function BackButton({ onClick, ariaLabel = "뒤로가기", top, left }) {
     </BackButtonWrapper>
   );
 }
-
-export default BackButton;

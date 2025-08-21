@@ -2,7 +2,6 @@ import { createContext, useContext } from "react";
 
 export const CartContext = createContext(null);
 
-/* ✅ 함수 선언식 */
 export function useCart() {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error("useCart must be used within <CartProvider>");

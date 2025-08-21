@@ -1,13 +1,12 @@
 import React, { useEffect, useRef } from "react";
 
-function AudioSpectrum({
+export default function AudioSpectrum({
   stream,
   active = true,
   width = 475,
   height = 165,
   style,
   onVoiceDetected,
-  // 스타일/동작 커스터마이즈
   numBars = 48,
   barWidth = 8,
   gap = 10,
@@ -16,7 +15,7 @@ function AudioSpectrum({
   smoothing = 0.2, // 0~1, 높을수록 반응 빠름
   threshold = 0.02, // 음성 감지 임계값 (더 민감)
   amplify = 2.1, // 막대 높이 증폭 계수
-  curve = 0.5, // 0<curve<=1 작을수록 작은 값이 더 커짐
+  curve = 0.5,
 }) {
   const canvasRef = useRef(null);
   const analyserRef = useRef(null);
@@ -24,7 +23,6 @@ function AudioSpectrum({
   const rafRef = useRef(null);
   const heightsRef = useRef([]);
 
-  // Start/stop visualization based on stream and active flag
   useEffect(() => {
     if (!active || !stream) {
       stopSpectrum();
@@ -84,7 +82,7 @@ function AudioSpectrum({
           sumSquares += centered * centered;
         }
         const rms = Math.sqrt(sumSquares / timeArray.length) / 128;
-        const isVoice = rms > threshold; // sensitivity threshold
+        const isVoice = rms > threshold;
         if (typeof onVoiceDetected === "function") onVoiceDetected(isVoice);
 
         analyser.getByteFrequencyData(freqArray);
@@ -152,5 +150,3 @@ function AudioSpectrum({
 
   return <canvas ref={canvasRef} width={width} height={height} style={style} />;
 }
-
-export default AudioSpectrum;

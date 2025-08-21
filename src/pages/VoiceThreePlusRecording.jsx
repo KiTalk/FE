@@ -24,7 +24,7 @@ import { getSettings } from "../utils/settingsUtils";
 import mikeIcon from "../assets/images/mike-solid.png";
 import profile from "../assets/images/profile.png";
 
-function VoiceThreePlusRecording() {
+export default function VoiceThreePlusRecording() {
   const navigate = useNavigate();
   const [voiceDetected, setVoiceDetected] = useState(false); // eslint-disable-line no-unused-vars
   const [timeLeft, setTimeLeft] = useState(5);
@@ -203,5 +203,3 @@ function VoiceThreePlusRecording() {
     </Page>
   );
 }
-
-export default VoiceThreePlusRecording;

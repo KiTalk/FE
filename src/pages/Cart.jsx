@@ -29,7 +29,7 @@ import { useCart } from "../components/CartContext";
 import CartProductCard from "../components/CartProductCard";
 import CancelImage from "../assets/images/cancel.png";
 import { useNavigate } from "react-router-dom";
-import { getStorageKey, normalizeId } from "../utils/storage"; // ✅ 추가
+import { getStorageKey, normalizeId } from "../utils/storage";
 
 export default function CartPage(props) {
   return (

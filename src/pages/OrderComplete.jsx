@@ -9,7 +9,7 @@ import {
   CheckImage,
 } from "./OrderComplete.styles";
 
-function OrderCompletePage() {
+export default function OrderCompletePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,5 +80,3 @@ function OrderCompletePage() {
     </Page>
   );
 }
-
-export default OrderCompletePage;

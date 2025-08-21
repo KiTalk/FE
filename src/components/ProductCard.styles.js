@@ -2,28 +2,20 @@ import styled, { css } from "styled-components";
 
 export const ProductCard = styled.div`
   position: relative;
-  width: 381px;
-  height: 507px;
+  width: 23.8125rem;
+  height: 31.6875rem;
 
-  /**
-   * ✅ 컬러 모드일 때만 테두리 색상 로직 활성화
-   *  - id에 'americano' 포함 → green
-   *  - id에 'latte' 포함 → purple
-   *  - 그 외 → #adadad
-   *  - 안전하게 소문자 변환 및 null 방어
-   */
   border: ${({ currentMode, productId }) => {
     if (currentMode === "color") {
       const id = String(productId || "").toLowerCase();
-      if (id.includes("americano")) return "7px solid #4D9E17"; // ✅ 굵기 7px
-      if (id.includes("latte")) return "7px solid #9F1FDA"; // ✅ 굵기 7px
-      return "7px solid #adadad"; // color 모드지만 americano/latte 아닌 경우
+      if (id.includes("americano")) return "0.4375rem solid #4D9E17";
+      if (id.includes("latte")) return "0.4375rem solid #9F1FDA";
+      return "0.4375rem solid #adadad";
     }
-    // 기본 모드
-    return "1px solid #adadad";
+    return "0.0625rem solid #adadad";
   }};
 
-  border-radius: 20px;
+  border-radius: 1.25rem;
   box-sizing: border-box;
   overflow: hidden;
   background: #ffffff;
@@ -33,16 +25,16 @@ export const PopularTag = styled.div`
   position: absolute;
   left: 0;
   top: 0;
-  width: 93px;
-  height: 61px;
-  border-radius: 0 0 20px 0;
+  width: 5.8125rem;
+  height: 3.8125rem;
+  border-radius: 0 0 1.25rem 0;
   background: #223770;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
   font-weight: 600;
-  font-size: 28px;
+  font-size: 1.75rem;
 `;
 
 export const ImageArea = styled.div`
@@ -60,30 +52,30 @@ export const ImageArea = styled.div`
 `;
 
 export const ProductImage = styled.img`
-  width: 180px;
-  height: 180px;
+  width: 14.3125rem;
+  height: 12.4375rem;
   object-fit: contain;
 `;
 
 export const InfoArea = styled.div`
   position: relative;
-  height: calc(100% - 230px - 17%);
+  height: calc(100% - 14.375rem - 17%);
   background: #ffffff;
   box-sizing: border-box;
-  padding: 28px 24px 24px 24px;
+  padding: 1.75rem 1.5rem 1.5rem 1.5rem;
 `;
 
 export const AddedOverlay = styled.div`
   position: absolute;
-  left: 24px;
-  right: 24px;
-  top: -70px;
+  left: 1.5rem;
+  right: 1.5rem;
+  top: -4.375rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
-  padding: 8px 12px;
-  border-radius: 12px;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
   background: rgba(0, 0, 0, 0.5);
   color: #fff;
   font-weight: 500;
@@ -92,7 +84,7 @@ export const AddedOverlay = styled.div`
   pointer-events: none;
   z-index: 2;
   opacity: ${(p) => (p.$show ? 1 : 0)};
-  transform: translateY(${(p) => (p.$show ? "0" : "-6px")});
+  transform: translateY(${(p) => (p.$show ? "0" : "-0.375rem")});
   transition: opacity 180ms ease, transform 180ms ease;
 `;
 
@@ -128,7 +120,7 @@ export const TemperatureBadge = styled.span`
   white-space: nowrap;
   color: #0b1b2b;
   background: #e7eef7;
-  border: 3px solid #c8d6ea;
+  border: 0.1875rem solid #c8d6ea;
 
   ${(props) =>
     props.$variant === "cold" &&
@@ -160,18 +152,18 @@ export const ProductPrice = styled.div`
 
 export const QuantityRow = styled.div`
   display: grid;
-  grid-template-columns: 36px 1fr 36px;
+  grid-template-columns: 2.25rem 1fr 2.25rem;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  width: 318px;
-  height: 36px;
+  gap: 1rem;
+  width: 19.875rem;
+  height: 2.25rem;
   margin: 2rem auto 0;
 `;
 
 export const QuantityButton = styled.button`
-  width: 36px;
-  height: 36px;
+  width: 2.25rem;
+  height: 2.25rem;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -192,8 +184,8 @@ export const QuantityButton = styled.button`
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 25px;
-    height: 3px;
+    width: 1.5625rem;
+    height: 0.1875rem;
     background: #272727;
     transform: translate(-50%, -50%);
   }
@@ -268,7 +260,7 @@ export const AddButton = styled.button`
   background: #223770;
   color: #ffffff;
   font-weight: 700;
-  font-size: 32px;
+  font-size: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;

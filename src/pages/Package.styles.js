@@ -81,8 +81,8 @@ export const Card = styled.button`
   }
 
   &:nth-child(1) ${IconImage} {
-    width: 219.7598px;
-    height: 197.6741px;
+    width: 13.735rem;
+    height: 12.3546rem;
   }
 
   /* Second card (dine-in) icon position and size */
@@ -92,8 +92,8 @@ export const Card = styled.button`
   }
 
   &:nth-child(2) ${IconImage} {
-    width: 225px;
-    height: 198.0001px;
+    width: 14.0625rem;
+    height: 12.375rem;
   }
 `;
 

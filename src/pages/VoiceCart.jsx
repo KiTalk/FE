@@ -19,7 +19,7 @@ import {
   RecognizingText,
 } from "./VoiceCart.styles";
 
-function VoiceCart() {
+export default function VoiceCart() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const recognizedText = useMemo(() => state.recognized, [state]);
@@ -152,5 +152,3 @@ function VoiceCart() {
     </Page>
   );
 }
-
-export default VoiceCart;

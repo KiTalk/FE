@@ -16,11 +16,11 @@ import drinkG from "../assets/images/drinkgreen.png";
 import drinkP from "../assets/images/drinkpurple.png";
 import { setMode } from "../utils/orderSpec";
 
-function ColorIntro() {
+export default function ColorIntro() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    setMode("color");       // ✅ color 모드 설정
+    setMode("color");
     navigate("/order/color");
   };
 
@@ -33,14 +33,12 @@ function ColorIntro() {
       <Title>주문하실 메뉴의 색상을 확인해주세요</Title>
       <SubTitle>클릭 시 '메뉴 선택'으로 넘어갑니다</SubTitle>
 
-      {/* 좌측 카드: 아메리카노 */}
       <CardLeft onClick={handleClick}>
         <CardImage src={drinkG} alt="아메리카노" />
         <CardTitle>아메리카노</CardTitle>
         <CardExample>초록색 테두리를 따라가세요</CardExample>
       </CardLeft>
 
-      {/* 우측 카드: 라떼 */}
       <CardRight onClick={handleClick}>
         <CardImage src={drinkP} alt="라떼" />
         <CardTitle>라떼</CardTitle>
@@ -52,7 +50,3 @@ function ColorIntro() {
     </Page>
   );
 }
-
-export default ColorIntro;
-
-//

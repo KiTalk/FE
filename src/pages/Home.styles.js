@@ -1,8 +1,5 @@
 import styled from "styled-components";
 
-// 대기화면 1440x1024 해상도 전용 스타일드 컴포넌트
-
-// 메인 컨테이너 (대기화면)
 export const WaitingScreenContainer = styled.div`
   position: relative;
   width: 1440px;
@@ -12,42 +9,14 @@ export const WaitingScreenContainer = styled.div`
   overflow: hidden;
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
-
-  /* 전체화면 중앙 정렬 */
-  @media (min-width: 1441px) {
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  }
-
-  /* 작은 화면에서의 대응 */
-  @media (max-width: 1439px) {
-    width: 100vw;
-    height: 100vh;
-    min-height: 600px;
-  }
 `;
 
-// 로고 영역
 export const LogoContainer = styled.div`
   position: absolute;
   top: 3.5rem;
   left: 4rem;
   width: 11.875rem;
   height: 2.5007rem;
-
-  /* 반응형 대응 */
-  @media (max-width: 1439px) {
-    top: 2rem;
-    left: 2rem;
-    width: 9rem;
-    height: 1.9rem;
-  }
-
-  @media (max-width: 768px) {
-    top: 1.5rem;
-    left: 1.5rem;
-    width: 7rem;
-    height: 1.5rem;
-  }
 `;
 
 export const LogoImage = styled.img`
@@ -56,7 +25,6 @@ export const LogoImage = styled.img`
   object-fit: contain;
 `;
 
-// 부제목 텍스트
 export const SubtitleText = styled.div`
   position: absolute;
   width: 43.6875rem;
@@ -75,24 +43,8 @@ export const SubtitleText = styled.div`
   white-space: nowrap;
 
   color: #272727;
-
-  /* 작은 화면 대응 */
-  @media (max-width: 1439px) {
-    font-size: 3rem;
-    width: 80%;
-    left: 10%;
-    top: 15rem;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-    width: 90%;
-    left: 5%;
-    top: 12rem;
-  }
 `;
 
-// 제목 그룹
 export const TitleGroup = styled.div`
   position: absolute;
   width: 52rem;
@@ -103,22 +55,8 @@ export const TitleGroup = styled.div`
   align-items: center;
   gap: 1.25rem;
   white-space: nowrap;
-
-  /* 작은 화면 대응 */
-  @media (max-width: 1439px) {
-    flex-direction: column;
-    gap: 0.625rem;
-    left: 10%;
-    top: 20rem;
-  }
-
-  @media (max-width: 768px) {
-    top: 16rem;
-    left: 5%;
-  }
 `;
 
-// 제목 파란색 부분
 export const TitleBlue = styled.div`
   font-family: "Pretendard";
   font-style: normal;
@@ -131,18 +69,8 @@ export const TitleBlue = styled.div`
   white-space: nowrap;
 
   color: #224094;
-
-  /* 작은 화면 대응 */
-  @media (max-width: 1439px) {
-    font-size: 4.5rem;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 3rem;
-  }
 `;
 
-// 제목 검은색 부분
 export const TitleBlack = styled.div`
   font-family: "Pretendard";
   font-style: normal;
@@ -155,18 +83,8 @@ export const TitleBlack = styled.div`
   white-space: nowrap;
 
   color: #272727;
-
-  /* 작은 화면 대응 */
-  @media (max-width: 1439px) {
-    font-size: 4.5rem;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 3rem;
-  }
 `;
 
-// 주문하기 버튼 컨테이너
 export const OrderButton = styled.button`
   position: absolute;
   width: 55rem;
@@ -179,14 +97,14 @@ export const OrderButton = styled.button`
   justify-content: center;
 
   background: #223770;
-  border-radius: 30px;
+  border-radius: 1.875rem;
 
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(34, 55, 112, 0.3);
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.5rem 1.25rem rgba(34, 55, 112, 0.3);
   }
 
   &:focus {
@@ -196,22 +114,9 @@ export const OrderButton = styled.button`
   &:active {
     transform: translateY(0);
   }
-
-  /* 작은 화면 대응 */
-  @media (max-width: 1439px) {
-    width: 80%;
-    left: 10%;
-    height: 120px;
-  }
-
-  @media (max-width: 768px) {
-    width: 90%;
-    left: 5%;
-    height: 100px;
-  }
 `;
 
-// 주문하기 버튼 텍스트
+
 export const OrderButtonText = styled.div`
   font-family: "Pretendard";
   font-style: normal;
@@ -221,13 +126,4 @@ export const OrderButtonText = styled.div`
   letter-spacing: 0%;
 
   color: #ffffff;
-
-  /* 작은 화면 대응 */
-  @media (max-width: 1439px) {
-    font-size: 2.25rem;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 1.75rem;
-  }
 `;

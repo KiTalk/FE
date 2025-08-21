@@ -2,8 +2,8 @@ import styled, { css } from "styled-components";
 
 export const Page = styled.div`
   position: relative;
-  width: 90rem;
-  height: 64rem;
+  width: 1440px;
+  height: 1024px;
   margin: 0 auto;
   background: #f2f6fb;
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -158,7 +158,7 @@ export const Keypad = styled.div`
 export const KeyButton = styled.button`
   width: 7.875rem;
   height: 7.875rem;
-  border-radius: 999px;
+  border-radius: 50%;
   border: none;
   background: #f2f2f2;
   cursor: pointer;

@@ -26,10 +26,8 @@ import badgeImage from "../assets/images/badge.png";
 import { MENU_DATA } from "../data/TouchOrder.data.js";
 import CategoryTabs from "../components/CategoryTabs";
 
-/** ProductCard 컴포넌트는 내부에서 /src/components/Product.styles.js의 스타일드를 사용한다고 가정 */
 import ProductCard from "../components/ProductCard";
 
-/* Context */
 import CartProvider from "../components/CartProvider.jsx";
 import { useCart } from "../components/CartContext";
 import { clearAllAddedTotals } from "../utils/storage";
@@ -47,10 +45,8 @@ function ColorOrderContent() {
   const [activeTabId, setActiveTabId] = useState("all");
   const { addItem, totalQty } = useCart();
 
-  /* ✅ 이 페이지는 항상 컬러 모드로 동작 */
   const currentMode = "color";
 
-  /* ✅ 카트가 비면 과거 added_total_* 싹 정리 */
   useEffect(() => {
     setMode("color");
     if (Number(totalQty ?? 0) === 0) {
@@ -58,12 +54,10 @@ function ColorOrderContent() {
     }
   }, [totalQty]);
 
-  /* 내부 동작: 장바구니 이동 */
   function handleCartClick() {
     navigate("/order/cart");
   }
 
-  /* 내부 동작: 장바구니 추가 */
   function handleAddToCart(product, quantity) {
     const qty = Number(quantity ?? 1);
     if (!product?.id || qty <= 0) return;
@@ -120,11 +114,8 @@ function ColorOrderContent() {
           <ProductRow>
             {section.products.map((item) => (
               <ProductCard
-                /** ✅ 컬러 모드 적용을 위해 명시적으로 내려보냄 */
                 currentMode={currentMode}
-                /** ✅ 테두리 로직이 id를 검사하므로 productId도 직접 내려보냄 */
                 productId={item.id}
-                /** 아래는 기존 로직 유지 */
                 key={item.id}
                 product={item}
                 onAdd={makeOnAddHandler(item)}

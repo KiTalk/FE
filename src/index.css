@@ -12,7 +12,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* 1440x1024 해상도 최적화 */
   --viewport-width: 1440px;
   --viewport-height: 1024px;
   --content-max-width: 1200px;
@@ -40,7 +39,6 @@ body {
   width: 100vw;
   height: 100vh;
   overflow-x: hidden;
-  /* 1440x1024 해상도에 최적화된 폰트 크기 */
   font-size: 16px;
 }
 
@@ -95,7 +93,6 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-/* 1440x1024 해상도를 위한 미디어 쿼리 */
 @media (min-width: 1440px) and (min-height: 1024px) {
   html {
     font-size: 16px;

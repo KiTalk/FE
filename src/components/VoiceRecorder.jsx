@@ -3,7 +3,7 @@ import { AudioRecorder, getAudioDuration } from "../utils/audioUtils";
 import { addToHistory } from "../utils/historyUtils";
 import { sttService } from "../services/api";
 
-function VoiceRecorder({
+export default function VoiceRecorder({
   language,
   children,
   disableInterim = false,
@@ -107,11 +107,8 @@ function VoiceRecorder({
     } else {
       try {
         setLoading(true);
-        console.log("🛑 녹음 중지 시작...");
         const audioFile = await recorderRef.current.stopRecording();
         setIsRecording(false);
-
-        console.log("📁 오디오 파일 생성 결과:", audioFile);
 
         if (!audioFile) {
           console.error("❌ 오디오 파일이 null 또는 undefined입니다.");
@@ -127,14 +124,7 @@ function VoiceRecorder({
           return;
         }
 
-        console.log("📁 오디오 파일 정보:");
-        console.log(`  - 파일명: ${audioFile.name}`);
-        console.log(`  - 크기: ${audioFile.size} bytes`);
-        console.log(`  - 타입: ${audioFile.type}`);
-        console.log(`  - 언어: ${language}`);
-
         const duration = await getAudioDuration(audioFile);
-        console.log(`  - 계산된 재생시간: ${duration}초`);
 
         if (Number.isFinite(duration) && duration <= 0) {
           setError("유효한 음성 데이터가 아닙니다.");
@@ -152,9 +142,7 @@ function VoiceRecorder({
           console.log("📤 짧은 녹음이지만 STT 처리를 계속 진행합니다.");
         }
 
-        console.log("🌐 STT API 호출 시작...");
         const data = await sttService.convertSpeechToText(audioFile, language);
-        console.log("📥 STT API 응답:", data);
 
         const text = extractTextFromSttResponse(data);
         console.log("✅ 추출된 텍스트:", text);
@@ -225,7 +213,6 @@ function VoiceRecorder({
   }, [autoStart]);
 
   useEffect(() => {
-    // disableInterim이 true면 중간 스냅샷을 비활성화
     if (isRecording && !disableInterim) {
       if (interimTimerRef.current) clearInterval(interimTimerRef.current);
       interimTimerRef.current = setInterval(() => {
@@ -267,5 +254,3 @@ function VoiceRecorder({
     toggleRecording,
   });
 }
-
-export default VoiceRecorder;

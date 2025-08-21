@@ -15,7 +15,7 @@ import {
   CardLabel,
 } from "./Package.styles";
 
-function PackagePage() {
+export default function PackagePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { totalPrice = 0, totalQty = 0 } = location.state || {};
@@ -74,5 +74,3 @@ function PackagePage() {
     </Page>
   );
 }
-
-export default PackagePage;

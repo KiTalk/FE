@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Page = styled.div`
   position: relative;
   width: 1440px;
-  min-height: 1024px;
+  height: 1024px;
   margin: 0 auto;
   background: #ffffff;
   padding-bottom: 1rem;
@@ -49,14 +49,14 @@ export const CartWidget = styled.button`
   width: 20.625rem;
   height: 6.875rem;
   background: #ffffff;
-  box-shadow: 3px 7px 10px rgba(0, 0, 0, 0.25);
+  box-shadow: 0.1875rem 0.4375rem 0.625rem rgba(0, 0, 0, 0.25);
   border-radius: 0.625rem;
 `;
 
 export const CartIcon = styled.img`
   position: absolute;
   top: 50%;
-  left: 1.88rem;
+  left: 1.875rem;
   transform: translateY(-50%);
   width: 3.5rem;
   height: 3.5rem;
@@ -80,8 +80,8 @@ export const CartBadgeWrap = styled.div`
   top: 52%;
   right: 3.2rem;
   transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
+  width: 2.25rem;
+  height: 2.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,8 +113,8 @@ export const CartBadgeCount = styled.div`
   line-height: 1;
   font-variant-numeric: tabular-nums;
   transform: translate(
-    var(--badge-count-offset-x, 0px),
-    var(--badge-count-offset-y, -2px)
+    var(--badge-count-offset-x, 0rem),
+    var(--badge-count-offset-y, -0.125rem)
   );
 `;
 
@@ -136,19 +136,18 @@ export const CartTextWrap = styled.div`
   display: inline-block;
 `;
 
-// Sections
 export const Section = styled.section`
   position: relative;
-  width: 1220px;
-  margin: 40px auto 40px auto;
+  width: 76.25rem;
+  margin: 2.5rem auto 2.5rem auto;
 `;
 
 export const SectionTitle = styled.h3`
   position: relative;
-  margin: 0 0 1.87rem 0;
-  padding-left: 34px;
-  font-size: 48px;
-  line-height: 57px;
+  margin: 0 0 1.875rem 0;
+  padding-left: 2.125rem;
+  font-size: 3rem;
+  line-height: 3.5625rem;
   font-weight: 700;
   letter-spacing: -0.015em;
   color: #272727;
@@ -157,10 +156,10 @@ export const SectionTitle = styled.h3`
     content: "";
     position: absolute;
     left: 0;
-    top: 8px;
-    width: 10px;
-    height: 42px;
-    border-radius: 2px;
+    top: 0.5rem;
+    width: 0.625rem;
+    height: 2.625rem;
+    border-radius: 0.125rem;
     background: #223770;
   }
 `;
@@ -168,5 +167,5 @@ export const SectionTitle = styled.h3`
 export const ProductRow = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 38px;
+  gap: 2.375rem;
 `;

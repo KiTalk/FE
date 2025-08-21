@@ -12,7 +12,7 @@ import {
   FingerGuide,
 } from "./VoiceOneTwo.styles";
 
-function VoiceOneTwo() {
+export default function VoiceOneTwo() {
   const navigate = useNavigate();
 
   function handleBack() {
@@ -43,5 +43,3 @@ function VoiceOneTwo() {
     </Page>
   );
 }
-
-export default VoiceOneTwo;

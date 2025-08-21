@@ -16,7 +16,7 @@ export const CategoryInner = styled.div`
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 1.125rem;
 `;
 
 const inactiveTab = css`
@@ -29,17 +29,17 @@ const activeTab = css`
   background: #ffffff;
   color: #272727;
   font-weight: 700;
-  box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.25);
+  box-shadow: 0.125rem 0.125rem 0.4375rem rgba(0, 0, 0, 0.25);
 `;
 
 export const CategoryTab = styled.button`
-  flex: 0 0 230px;
-  width: 230px;
+  flex: 0 0 14.375rem;
+  width: 14.375rem;
   height: 5.625rem;
   border: none;
-  border-radius: 20px 20px 0 0;
+  border-radius: 1.25rem 1.25rem 0 0;
   cursor: pointer;
-  font-size: 36px;
+  font-size: 2.25rem;
   letter-spacing: -0.015em;
   -webkit-tap-highlight-color: transparent;
   appearance: none;
@@ -49,18 +49,21 @@ export const CategoryTab = styled.button`
   &:hover {
     background: ${(p) => (p.$active ? "#ffffff" : "#53669d")};
     color: ${(p) => (p.$active ? "#272727" : "#ffffff")};
-    box-shadow: ${(p) => (p.$active ? "2px 2px 7px rgba(0,0,0,0.25)" : "none")};
+    box-shadow: ${(p) =>
+      p.$active ? "0.125rem 0.125rem 0.4375rem rgba(0,0,0,0.25)" : "none"};
   }
 
   &:active {
     background: ${(p) => (p.$active ? "#ffffff" : "#53669d")};
     color: ${(p) => (p.$active ? "#272727" : "#ffffff")};
-    box-shadow: ${(p) => (p.$active ? "2px 2px 7px rgba(0,0,0,0.25)" : "none")};
+    box-shadow: ${(p) =>
+      p.$active ? "0.125rem 0.125rem 0.4375rem rgba(0,0,0,0.25)" : "none"};
   }
 
   &:focus,
   &:focus-visible {
     outline: none;
-    box-shadow: ${(p) => (p.$active ? "2px 2px 7px rgba(0,0,0,0.25)" : "none")};
+    box-shadow: ${(p) =>
+      p.$active ? "0.125rem 0.125rem 0.4375rem rgba(0,0,0,0.25)" : "none"};
   }
 `;

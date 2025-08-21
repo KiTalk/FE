@@ -18,7 +18,7 @@ import {
 } from "./OrderMethod.styles";
 import { setMode } from "../utils/orderSpec";
 
-function OrderMethod() {
+export default function OrderMethod() {
   const navigate = useNavigate();
 
   function handleSelect(path) {
@@ -30,7 +30,6 @@ function OrderMethod() {
       <Title>주문 방법 선택</Title>
       <Subtitle>아래 방법 중 선택해 주세요</Subtitle>
 
-      {/* 윗줄 : 음성 주문 + 색깔 주문 */}
       <ButtonGroup>
         <Button
           type="button"
@@ -61,7 +60,6 @@ function OrderMethod() {
         </Button>
       </ButtonGroup>
 
-      {/* 아랫줄 : 손가락 주문 + 전화번호 간편주문 */}
       <ButtonGroup>
         <Button
           type="button"
@@ -96,5 +94,3 @@ function OrderMethod() {
     </Container>
   );
 }
-
-export default OrderMethod;

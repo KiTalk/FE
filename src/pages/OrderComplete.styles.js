@@ -16,7 +16,6 @@ export const Frame = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0px;
   width: 54.5625rem;
   height: 16.375rem;
 `;

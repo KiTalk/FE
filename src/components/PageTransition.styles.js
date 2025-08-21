@@ -1,4 +1,3 @@
-// 0.2초 페이드 전환 - 전체 앱에서 통일된 설정
 export const FADE_TRANSITION = {
   type: "tween",
   ease: "easeOut",
@@ -18,7 +17,6 @@ export const FADE_VARIANTS = {
   },
 };
 
-// 컨테이너 스타일
 export const CONTAINER_STYLE = {
   position: "absolute",
   width: "100%",
@@ -27,5 +25,5 @@ export const CONTAINER_STYLE = {
   left: 0,
   overflow: "visible",
   willChange: "transform, opacity",
-  backfaceVisibility: "hidden", // 깜빡임 방지
+  backfaceVisibility: "hidden",
 };

@@ -13,33 +13,27 @@ import {
 } from "./Home.styles";
 import logoImage from "../assets/images/logo.png";
 
-function Home() {
+export default function Home() {
   const navigate = useNavigate();
   function handleOrderClick() {
-    console.log("주문하기 버튼 클릭");
     navigate('/order-method');
   }
 
   return (
     <WaitingScreenContainer>
-      {/* 로고 영역 */}
       <LogoContainer>
         <LogoImage src={logoImage} alt="KiTalk 로고" />
       </LogoContainer>
 
-      {/* 메인 콘텐츠 */}
       <SubtitleText>키오스크 이젠 어렵지 않아요</SubtitleText>
       <TitleGroup>
         <TitleBlue>간편하게</TitleBlue>
         <TitleBlack>주문하세요</TitleBlack>
       </TitleGroup>
 
-      {/* 주문하기 버튼 */}
       <OrderButton onClick={handleOrderClick}>
         <OrderButtonText>주문하기</OrderButtonText>
       </OrderButton>
     </WaitingScreenContainer>
   );
 }
-
-export default Home;
