@@ -5,9 +5,9 @@ export const ProductCard = styled.div`
   width: 23.8125rem;
   height: 31.6875rem;
 
-  border: ${({ currentMode, productId }) => {
-    if (currentMode === "color") {
-      const id = String(productId || "").toLowerCase();
+  border: ${({ $currentMode, $productId }) => {
+    if ($currentMode === "color") {
+      const id = String($productId || "").toLowerCase();
       if (id.includes("americano")) return "0.4375rem solid #4D9E17";
       if (id.includes("latte")) return "0.4375rem solid #9F1FDA";
       return "0.4375rem solid #adadad";

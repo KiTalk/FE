@@ -12,6 +12,8 @@ export const Page = styled.div`
 
 export const GuideSection = styled.div`
   position: absolute;
+  display: flex;
+  flex-direction: column;
   gap: 2.5rem;
 `;
 
@@ -96,6 +98,8 @@ export const SpeakButton = styled.button`
 `;
 
 export const SpeakButtonContent = styled.div`
+  display: flex;
+  align-items: center;
   gap: 1.125rem;
 `;
 

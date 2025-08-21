@@ -2,9 +2,9 @@ import axios from "axios";
 import { API_BASE_URL, API_ENDPOINTS } from "../config/api.js";
 
 // Axios 인스턴스 생성
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, // 30초 타임아웃
+  timeout: 30000,
 });
 
 // 요청 인터셉터
@@ -209,5 +209,3 @@ export const orderService = {
     return response.data;
   },
 };
-
-export default apiClient;
