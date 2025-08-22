@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import {
   Card,
   ImageArea,
+  ProductImage,
   PopularTag,
   InfoArea,
   ProductName,
@@ -14,6 +15,7 @@ import {
   TemperatureBadge,
 } from "./CartProductCard.styles";
 import { getStorageKey, normalizeId } from "../utils/storage";
+import americanoIceImg from "../assets/images/americano-ice.png";
 
 /**
  * props:
@@ -87,7 +89,15 @@ export default function CartProductCard({
       ) : (
         isPopular && <PopularTag>인기</PopularTag>
       )}
-      <ImageArea />
+      <ImageArea $variant={temperatureVariant}>
+        {/* ✅ americano-ice 전용 이미지 */}
+        {product?.id === "americano-ice" && (
+          <ProductImage
+            src={americanoIceImg}
+            alt={product?.name || "아메리카노 아이스"}
+          />
+        )}
+      </ImageArea>
       <InfoArea>
         <NameRow>
           <ProductName>{product?.name}</ProductName>

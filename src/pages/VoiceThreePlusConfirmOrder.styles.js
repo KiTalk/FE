@@ -466,7 +466,7 @@ export const OrderDivider = styled.div`
   position: absolute;
   width: 0.125rem;
   height: 2.625rem;
-  left: 11.0625rem;
+  left: 10.0625rem;
   top: 0.25rem;
   background: #223770;
 `;

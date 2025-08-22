@@ -160,15 +160,27 @@ export default function VoiceThreePlusDetails() {
   // 동적 스크롤 공간 계산
   function calculateScrollSpace() {
     const totalCards = orderItems.length + additionalProducts.length;
-    const padding = 84 * 2; // 좌우 패딩
-    const availableWidth = 1440 - padding; // ProductsArea 실제 너비
 
-    // 카드 개수에 따라 적당한 스크롤 공간 제공
-    const baseSpace = availableWidth * 0.4; // 기본적으로 화면 너비의 40%
-    const cardBasedSpace = totalCards * 40; // 카드당 40px 추가
-    const dynamicSpace = baseSpace + cardBasedSpace;
+    // 상품이 없으면 스크롤 공간 불필요
+    if (totalCards === 0) {
+      return 0;
+    }
 
-    return Math.max(400, dynamicSpace); // 최소 400px 보장
+    // 카드가 3개 이상이면 항상 스크롤 가능하도록 설정
+    if (totalCards >= 3) {
+      const cardWidth = 381; // CartProductCard 실제 너비 (23.8125rem = 381px)
+      const cardOverlap = 65; // ProductCardContainer margin-right: -4.0625rem = -65px
+
+      // 총 카드들이 차지하는 실제 너비 (겹침을 고려)
+      const totalCardsWidth =
+        cardWidth + (cardWidth - cardOverlap) * (totalCards - 1);
+
+      // 3개 이상일 때는 항상 적절한 스크롤 공간 제공 (최소 200px)
+      return Math.max(200, totalCardsWidth * 0.3);
+    }
+
+    // 카드가 1-2개일 때는 스크롤 없음
+    return 0;
   }
 
   // 백엔드 주문 불러오기: 세션 시작 → 주문 전송 → 주문 목록/합계 반영
@@ -540,7 +552,6 @@ export default function VoiceThreePlusDetails() {
           <OrderDetails>
             <OrderQuantityRow>
               <OrderQuantityLabel>주문 수량</OrderQuantityLabel>
-              <OrderDivider />
               <OrderQuantityValue>
                 총 {orderSummary.totalQuantity}개
               </OrderQuantityValue>
