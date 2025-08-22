@@ -197,17 +197,31 @@ export default function VoiceThreePlusDetails() {
   useEffect(() => {
     let aborted = false;
     async function fetchOrders() {
-      if (!recognizedText) return;
       try {
-        const start = await orderService.startSession();
-        if (aborted) return;
-        const sid = start?.session_id || "";
+        // 기존 세션 ID 사용 (VoiceOrder.jsx에서 생성된 세션)
+        const sid = sessionStorage.getItem("currentSessionId") || "";
+        if (!sid) {
+          alert("다시 시작해주세요.");
+          navigate("/order/voice");
+          return;
+        }
         setSessionId(sid);
-        sessionStorage.setItem("currentSessionId", sid);
-        const ordered = await orderService.submitOrder(sid, recognizedText);
+
+        // recognizedText가 있으면 새 주문 처리 후 세션 조회, 없으면 바로 세션 조회
+        if (recognizedText) {
+          const ordered = await orderService.submitOrder(sid, recognizedText);
+          console.log("📤 submitOrder API 응답:", ordered);
+          if (aborted) return;
+        }
+
+        // 항상 getSession API로 최신 주문 내역 조회
+        console.log("📋 세션 주문 내역 조회:", sid);
+        const sessionData = await orderService.getSession(sid);
+        console.log("🧾 세션 주문 내역:", sessionData);
         if (aborted) return;
-        const mapped = Array.isArray(ordered?.orders)
-          ? ordered.orders.map((o) => ({
+
+        const mapped = Array.isArray(sessionData?.orders)
+          ? sessionData.orders.map((o) => ({
               id: o.menu_id,
               name: o.menu_item,
               original: o.original,
@@ -218,19 +232,12 @@ export default function VoiceThreePlusDetails() {
               menu_id: o.menu_id,
             }))
           : [];
+        console.log("🗂️ 매핑된 주문 항목들:", mapped);
         setOrderItems(mapped);
-
         orderStorage.saveOrders(sid, mapped);
 
-        const totalQuantity =
-          Number(ordered?.total_items ?? 0) ||
-          mapped.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
-        const totalPrice =
-          Number(ordered?.total_price ?? 0) ||
-          mapped.reduce(
-            (s, it) => s + (Number(it.price) || 0) * (Number(it.quantity) || 0),
-            0
-          );
+        const totalQuantity = Number(sessionData?.total_items ?? 0);
+        const totalPrice = Number(sessionData?.total_price ?? 0);
         setOrderSummary({ totalQuantity, totalPrice });
       } catch (e) {
         if (!aborted) {
@@ -242,7 +249,7 @@ export default function VoiceThreePlusDetails() {
     return () => {
       aborted = true;
     };
-  }, [recognizedText]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (timeLeft > 0) {
