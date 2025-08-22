@@ -25,7 +25,7 @@ export const Card = styled.div`
 
 export const ImageArea = styled.div`
   width: 100%;
-  height: 12.375rem; /* 47.62% of 26.25rem */
+  height: 12.375rem;
   background: ${(props) =>
     props.$variant === "cold"
       ? "#F2F6FB"
@@ -35,6 +35,12 @@ export const ImageArea = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+export const ProductImage = styled.img`
+  width: 14.3125rem;
+  height: 12.4375rem;
+  object-fit: contain;
 `;
 
 export const PopularTag = styled.div`

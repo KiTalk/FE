@@ -39,6 +39,7 @@ function loadFromStorage() {
         name: stored.name ?? base?.name,
         price: Number(stored.price ?? base?.price ?? 0),
         popular: !!base?.popular,
+        temp: base?.temp, // ✅ temp 속성 추가
         qty: Number(stored.qty ?? 0),
       };
       const prev = itemsById[productId];
