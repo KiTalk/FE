@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import AudioSpectrum from "../components/AudioSpectrum";
 import VoiceRecorder from "../components/VoiceRecorder";
+import { apiClient } from "../services/api";
 import {
   Page,
   Title,
@@ -62,10 +63,42 @@ export default function VoiceRecognize() {
             <BackButton onClick={() => navigate(-1)} />
             <DoneButton
               disabled={loading}
-              onClick={() => {
+              onClick={async () => {
                 if (isRecording) {
                   toggleRecording();
                 }
+
+                const sessionId = sessionStorage.getItem("currentSessionId");
+
+                // 세션 ID가 있고 인식된 텍스트가 있으면 한번에 주문 처리 API 호출
+                if (sessionId && recognizedText) {
+                  try {
+                    console.log(
+                      "🚀 한번에 주문 처리 API 호출:",
+                      sessionId,
+                      recognizedText
+                    );
+                    const response = await apiClient.post(
+                      `/order-at-once/process/${sessionId}`,
+                      null,
+                      { params: { text: recognizedText } }
+                    );
+                    console.log("✅ 한번에 주문 처리 완료:", response.data);
+
+                    // 주문 완료 후 VoiceCart 페이지로 이동
+                    navigate("/order/voice/cart", {
+                      state: { recognized: recognizedText },
+                    });
+                    return;
+                  } catch (error) {
+                    console.error("❌ 한번에 주문 처리 실패:", error);
+                    alert(
+                      "주문 처리 중 오류가 발생했습니다. 다시 시도해주세요."
+                    );
+                  }
+                }
+
+                // 기존 로직 (세션 ID가 없거나 인식된 텍스트가 없는 경우)
                 navigate("/order/voice/cart", {
                   state: { recognized: recognizedText },
                 });

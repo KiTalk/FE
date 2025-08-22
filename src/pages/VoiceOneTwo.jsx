@@ -35,8 +35,8 @@ export default function VoiceOneTwo() {
         주문할 메뉴를 말씀해주세요
       </Title>
       <Example>“아이스 아메리카노 1잔 포장”</Example>
-      <Example wide top="54.625rem">
-        “아이스 아메리카노 1잔, 따뜻한 카페라떼 1잔 포장”
+      <Example $wide $top="54.625rem">
+        "아이스 아메리카노 1잔, 따뜻한 카페라떼 1잔 포장"
       </Example>
 
       <BackButton onClick={handleBack} />

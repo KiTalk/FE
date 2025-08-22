@@ -31,10 +31,10 @@ export const Title = styled.h1`
 
 export const Example = styled.p`
   position: absolute;
-  width: ${(props) => (props.wide ? "43.9375rem" : "25.5625rem")};
+  width: ${(props) => (props.$wide ? "43.9375rem" : "25.5625rem")};
   height: 3.125rem;
-  left: ${(props) => (props.wide ? "23.0625rem" : "32.25rem")};
-  top: ${(props) => props.top || "50.875rem"};
+  left: ${(props) => (props.$wide ? "23.0625rem" : "32.25rem")};
+  top: ${(props) => props.$top || "50.875rem"};
   display: flex;
   justify-content: center;
   text-align: center;
