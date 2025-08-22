@@ -43,7 +43,7 @@ export default function VoiceOrder() {
     }
 
     createSession();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleBack() {
     navigate(-1);
