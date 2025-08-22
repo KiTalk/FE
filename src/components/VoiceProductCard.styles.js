@@ -48,7 +48,12 @@ export const ImageArea = styled.div`
   right: 0;
   top: 0;
   height: 12.5rem;
-  background: #f2f6fb;
+  background: ${(props) =>
+    props.$variant === "cold"
+      ? "#F2F6FB"
+      : props.$variant === "hot"
+      ? "#DBD1C9"
+      : "#f2f6fb"};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,16 +76,56 @@ export const InfoArea = styled.div`
   border-radius: 0 0 1.25rem 1.25rem;
 `;
 
-export const ProductName = styled.div`
+export const NameRow = styled.div`
   position: absolute;
   left: 1.8125rem;
   top: 2.1875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: calc(100% - 3.625rem);
+`;
+
+export const ProductName = styled.div`
   color: #272727;
   font-weight: 600;
   font-size: 2rem;
   line-height: 1.875rem;
   letter-spacing: -0.015em;
   white-space: nowrap;
+`;
+
+export const TemperatureBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.6rem;
+  min-width: 6rem;
+  height: 3rem;
+  border-radius: 8rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 3;
+  white-space: nowrap;
+  color: #0b1b2b;
+  background: #e7eef7;
+  border: 0.1875rem solid #c8d6ea;
+
+  ${(props) =>
+    props.$variant === "cold" &&
+    css`
+      color: #3191ff;
+      background: transparent;
+      border-color: #3191ff;
+    `}
+
+  ${(props) =>
+    props.$variant === "hot" &&
+    css`
+      color: #da2525;
+      background: transparent;
+      border-color: #da2525;
+    `}
 `;
 
 export const ProductPrice = styled.div`
