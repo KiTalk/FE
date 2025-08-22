@@ -25,7 +25,6 @@ import {
   OrderQuantityRow,
   OrderQuantityLabel,
   OrderQuantityValue,
-  OrderDivider,
   OrderTotal,
   OrderButton,
   RecognizedVoiceArea,
@@ -60,7 +59,6 @@ export default function VoiceThreePlusDetails() {
   const [showTopSection, setShowTopSection] = useState(false);
   const [sessionId, setSessionId] = useState("");
 
-  // 음성 인식 관련 상태
   const [voiceDetected, setVoiceDetected] = useState(false); // eslint-disable-line no-unused-vars
   const [timeLeft, setTimeLeft] = useState(3);
   const [autoStopTriggered, setAutoStopTriggered] = useState(false);
@@ -73,11 +71,9 @@ export default function VoiceThreePlusDetails() {
 
   const language = useMemo(() => getSettings().defaultLanguage || "ko", []);
 
-  // 간단한 주문 동기화 훅 (음성 인식 완료 시에만 사용)
   const { syncNow } = useOrderSync(sessionId);
 
   function handleStartVoice() {
-    // 음성 인식 시작 시 타이머 리셋 및 자동중지 플래그 초기화
     setTimeLeft(3);
     setAutoStopTriggered(false);
     setVoiceRecognizedText("");
@@ -86,13 +82,22 @@ export default function VoiceThreePlusDetails() {
     }
   }
 
-  function handleCancelAll() {
-    // 전체 취소
+  async function handleCancelAll() {
+    if (sessionId) {
+      try {
+        await orderService.clearAllOrders(sessionId);
+        orderStorage.clearOrders(sessionId);
+      } catch (error) {
+        console.error("❌ 전체 주문 삭제 실패:", error);
+      }
+    }
+
     setOrderItems([]);
     setOrderSummary({ totalQuantity: 0, totalPrice: 0 });
+
+    navigate("/order/voice");
   }
 
-  // Cart.jsx와 동일한 방식으로 총합 계산
   function calculateTotals(items) {
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = items.reduce(
@@ -102,11 +107,26 @@ export default function VoiceThreePlusDetails() {
     return { totalQuantity, totalPrice };
   }
 
-  function handleRemoveItem(itemId) {
+  async function handleRemoveItem(itemId) {
+    const itemToRemove = orderItems.find((item) => item.id === itemId);
+
+    if (itemToRemove && sessionId && itemToRemove.menu_id) {
+      try {
+        await orderService.removeOrder(sessionId, itemToRemove.menu_id);
+      } catch (error) {
+        console.error("❌ 주문 삭제 실패:", error);
+      }
+    }
+
     setOrderItems((prev) => {
       const newItems = prev.filter((item) => item.id !== itemId);
       const totals = calculateTotals(newItems);
       setOrderSummary(totals);
+
+      if (sessionId) {
+        orderStorage.saveOrders(sessionId, newItems);
+      }
+
       return newItems;
     });
   }
@@ -125,7 +145,6 @@ export default function VoiceThreePlusDetails() {
           item.id === itemId ? { ...item, quantity: newQuantity } : item
         );
       } else {
-        // 안전 장치: 정보가 없으면 최소 속성으로 추가
         const base = additionalProducts.find((p) => p.id === itemId);
         newItems = [
           ...prev,
@@ -137,9 +156,8 @@ export default function VoiceThreePlusDetails() {
       const totals = calculateTotals(newItems);
       setOrderSummary(totals);
 
-      // localStorage에 수량 변경 반영
       if (sessionId) {
-        orderStorage.updateQuantity(sessionId, itemId, newQuantity);
+        orderStorage.saveOrders(sessionId, newItems);
       }
 
       return newItems;
@@ -147,43 +165,34 @@ export default function VoiceThreePlusDetails() {
   }
 
   function handleCheckout() {
-    // 주문하기 - 다음 단계로 이동
     navigate("/order/package");
   }
 
-  // Cart.jsx와 동일한 통화 포맷팅
   function formatCurrency(value) {
     const n = Number(value ?? 0);
     return Number.isFinite(n) ? n.toLocaleString() : "0";
   }
 
-  // 동적 스크롤 공간 계산
   function calculateScrollSpace() {
     const totalCards = orderItems.length + additionalProducts.length;
 
-    // 상품이 없으면 스크롤 공간 불필요
     if (totalCards === 0) {
       return 0;
     }
 
-    // 카드가 3개 이상이면 항상 스크롤 가능하도록 설정
     if (totalCards >= 3) {
-      const cardWidth = 381; // CartProductCard 실제 너비 (23.8125rem = 381px)
-      const cardOverlap = 65; // ProductCardContainer margin-right: -4.0625rem = -65px
+      const cardWidth = 381;
+      const cardOverlap = 65;
 
-      // 총 카드들이 차지하는 실제 너비 (겹침을 고려)
       const totalCardsWidth =
         cardWidth + (cardWidth - cardOverlap) * (totalCards - 1);
 
-      // 3개 이상일 때는 항상 적절한 스크롤 공간 제공 (최소 200px)
       return Math.max(200, totalCardsWidth * 0.3);
     }
 
-    // 카드가 1-2개일 때는 스크롤 없음
     return 0;
   }
 
-  // 백엔드 주문 불러오기: 세션 시작 → 주문 전송 → 주문 목록/합계 반영
   useEffect(() => {
     let aborted = false;
     async function fetchOrders() {
@@ -193,27 +202,23 @@ export default function VoiceThreePlusDetails() {
         if (aborted) return;
         const sid = start?.session_id || "";
         setSessionId(sid);
-        // 세션 ID를 저장하여 다음 페이지에서 사용할 수 있도록 함
         sessionStorage.setItem("currentSessionId", sid);
         const ordered = await orderService.submitOrder(sid, recognizedText);
-        console.log("🧾 주문 응답:", ordered);
-        console.log("🧾 주문 응답 orders:", ordered?.orders);
         if (aborted) return;
         const mapped = Array.isArray(ordered?.orders)
           ? ordered.orders.map((o) => ({
-              id: o.menu_id || o.menu_item, // menu_id가 있으면 우선 사용
+              id: o.menu_id || o.menu_item,
               name: o.menu_item,
               original: o.original,
               price: Number(o.price || 0),
               quantity: Number(o.quantity || 0),
               popular: Boolean(o.popular),
               temp: o.temp,
-              menu_id: o.menu_id, // 새로 추가된 menu_id 필드 저장
+              menu_id: o.menu_id,
             }))
           : [];
         setOrderItems(mapped);
 
-        // localStorage에 주문 내역 저장
         orderStorage.saveOrders(sid, mapped);
 
         const totalQuantity =
@@ -226,17 +231,6 @@ export default function VoiceThreePlusDetails() {
             0
           );
         setOrderSummary({ totalQuantity, totalPrice });
-
-        // 새로 추가된 응답 필드들 로깅 및 활용
-        if (ordered?.packaging) {
-          console.log("📦 포장 정보:", ordered.packaging);
-        }
-        if (ordered?.next_step) {
-          console.log("➡️ 다음 단계:", ordered.next_step);
-        }
-        if (ordered?.message) {
-          console.log("💬 서버 메시지:", ordered.message);
-        }
       } catch (e) {
         if (!aborted) {
           console.error("주문 불러오기 실패:", e?.message || e);
@@ -249,7 +243,6 @@ export default function VoiceThreePlusDetails() {
     };
   }, [recognizedText]);
 
-  // 3초 타이머 관리
   useEffect(() => {
     if (timeLeft > 0) {
       timerRef.current = setTimeout(() => {
@@ -262,18 +255,14 @@ export default function VoiceThreePlusDetails() {
           ) {
             // 실제 '녹음 중'일 때만 자동 중지 수행
             if (!isRecordingRef.current) {
-              console.warn(
-                "⏱️ 카운트다운 종료 시 녹음 상태가 아님 - 자동 중지 스킵"
-              );
               return 0;
             }
             setAutoStopTriggered(true);
             setTimeout(() => {
               if (toggleRecordingRef.current && isRecordingRef.current) {
-                console.log("⏰ 3초 타이머 완료 - 자동 녹음 중지");
                 toggleRecordingRef.current();
               }
-            }, 100); // 약간의 지연을 두어 상태 동기화 시간 확보
+            }, 100);
           }
           return newTime;
         });
@@ -287,13 +276,11 @@ export default function VoiceThreePlusDetails() {
     };
   }, [timeLeft, autoStopTriggered]);
 
-  // 컴포넌트 마운트 시 타이머 시작
   useEffect(() => {
     setTimeLeft(3);
     setAutoStopTriggered(false);
   }, []);
 
-  // 컴포넌트 언마운트 시 타이머 정리
   useEffect(() => {
     return () => {
       if (transitionTimerRef.current) {
@@ -302,42 +289,32 @@ export default function VoiceThreePlusDetails() {
     };
   }, []);
 
-  // 음성 인식이 완료되면 1초 후 confirm API를 호출하고 결과에 따라 페이지 이동
   useEffect(() => {
     if (voiceRecognizedText && !isTransitioning) {
       setIsTransitioning(true);
       transitionTimerRef.current = setTimeout(async () => {
         try {
-          // 1단계: confirm API 호출 전에 변경사항 동기화
-          console.log("🔄 confirm API 호출 전 동기화 중...");
           await syncNow(); // 동기화
 
-          // 2단계: confirm API 호출
-          console.log("🔍 확인 응답 분석 중:", voiceRecognizedText);
           const confirmResult = await orderService.confirmResponse(
             voiceRecognizedText
           );
-          console.log("📋 확인 응답 결과:", confirmResult);
 
           if (confirmResult.confirmed) {
-            console.log("✅ 긍정 응답 - /order/voice/details/plus로 이동");
             navigate("/order/voice/details/plus", {
               state: { sessionId: sessionId },
             });
           } else {
-            console.log("❌ 부정 응답 - /order/package로 이동");
             navigate("/order/package");
           }
         } catch (error) {
           console.error("❌ 확인 응답 처리 실패:", error);
-          // 에러 발생 시 기본적으로 /order/package로 이동
           navigate("/order/package");
         }
-      }, 1000); // 1초 후 자동 전환
+      }, 1000);
     }
   }, [voiceRecognizedText, isTransitioning, navigate, sessionId, syncNow]);
 
-  // 페이지 로드 시 애니메이션 트리거
   useEffect(() => {
     const t1 = setTimeout(() => setShowTopSection(true), 100);
     const t2 = setTimeout(() => setShowOrderSection(true), 400);
@@ -356,20 +333,17 @@ export default function VoiceThreePlusDetails() {
         disableInterim={true}
         autoStart={false}
         onRecognized={(text) => {
-          // setState during parent render를 피하기 위해 콜백에서만 상태 변경
           if (text && text !== voiceRecognizedText) {
             setVoiceRecognizedText(text);
           }
         }}
       >
         {({ isRecording, loading, stream, toggleRecording }) => {
-          // toggleRecording / isRecording을 ref에 저장
           toggleRecordingRef.current = toggleRecording;
           isRecordingRef.current = isRecording;
 
           return (
             <>
-              {/* 안내 섹션 */}
               <GuideSection
                 style={{
                   transform: showTopSection
@@ -387,7 +361,6 @@ export default function VoiceThreePlusDetails() {
                 </MessageBubble>
               </GuideSection>
 
-              {/* 녹음 중이거나 변환 중일 때: 음성 인식 영역 */}
               {(isRecording || loading) && !voiceRecognizedText && (
                 <VoiceRecognitionArea
                   style={{
@@ -418,7 +391,6 @@ export default function VoiceThreePlusDetails() {
                 </VoiceRecognitionArea>
               )}
 
-              {/* 인식된 텍스트가 있을 때: 인식된 텍스트 표시 영역 */}
               {voiceRecognizedText && (
                 <RecognizedVoiceArea
                   style={{
@@ -436,7 +408,6 @@ export default function VoiceThreePlusDetails() {
                 </RecognizedVoiceArea>
               )}
 
-              {/* 녹음 중이 아니고 인식된 텍스트가 없을 때: 눌러서 말하기 버튼 */}
               {!isRecording && !voiceRecognizedText && !loading && (
                 <SpeakButton
                   onClick={handleStartVoice}
@@ -456,7 +427,6 @@ export default function VoiceThreePlusDetails() {
                 </SpeakButton>
               )}
 
-              {/* 손가락 가이드 - 음성인식 중이 아닐 때만 표시 */}
               {!isRecording && !loading && !voiceRecognizedText && (
                 <FingerGuide
                   style={{
@@ -476,7 +446,6 @@ export default function VoiceThreePlusDetails() {
         }}
       </VoiceRecorder>
 
-      {/* 하단 주문 내역 영역 */}
       <OrderSection
         style={{
           transform: showOrderSection ? "translateY(0)" : "translateY(100%)",
@@ -489,7 +458,6 @@ export default function VoiceThreePlusDetails() {
         </OrderHeader>
 
         <ProductsArea>
-          {/* 주문된 상품들 */}
           {orderItems.map((item, index) => (
             <ProductCardContainer
               key={item.id}
@@ -509,7 +477,6 @@ export default function VoiceThreePlusDetails() {
             </ProductCardContainer>
           ))}
 
-          {/* 추가 상품들 */}
           {additionalProducts.map((product, index) => {
             const existingItem = orderItems.find(
               (item) => item.id === product.id
@@ -537,11 +504,9 @@ export default function VoiceThreePlusDetails() {
             );
           })}
 
-          {/* 동적 스크롤 공간 */}
           <ScrollSpacer width={calculateScrollSpace()} />
         </ProductsArea>
 
-        {/* 우측 주문 요약 */}
         <OrderSummary
           style={{
             opacity: animateProducts ? 1 : 0,
