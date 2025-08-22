@@ -69,7 +69,7 @@ export const CardRight = styled(Card)`
 export const CardTitle = styled.div`
   position: absolute;
   height: 5.25rem;
-  top: 24.44rem;
+  top: 23.44rem;
   left: 50%;
   transform: translateX(-50%);
   font-weight: 650;
@@ -80,12 +80,13 @@ export const CardTitle = styled.div`
   text-align: center;
   letter-spacing: -0.015em;
   color: #272727;
+  white-space: nowrap;
 `;
 
 export const CardExample = styled.div`
   position: absolute;
   height: 3.125rem;
-  top: 30.62rem;
+  top: 29.62rem;
   left: 50%;
   margin-top: 0.94rem;
   transform: translateX(-50%);
@@ -104,7 +105,7 @@ export const CardImage = styled.img`
   position: absolute;
   inset: 0;
   top: 3.81rem;
-  left: 6.69rem;
+  left: 6.99rem;
   width: 18.75rem;
   height: 18.75rem;
   flex-shrink: 0;
