@@ -12,6 +12,7 @@ import {
 } from "./VoiceOrder.styles";
 import BackButton from "../components/BackButton";
 import { orderService, apiClient } from "../services/api";
+import { goToVoiceError } from "../utils/voiceErrorUtils";
 import drink1 from "../assets/images/drink1.png";
 import drink3 from "../assets/images/drink3.png";
 
@@ -37,11 +38,11 @@ export default function VoiceOrder() {
         navigate("/order/voice/one-two");
       } else {
         console.error("❌ 세션 ID를 받지 못했습니다:", response.data);
-        alert("주문 시작에 실패했습니다. 다시 시도해주세요.");
+        navigate("/voice-error");
       }
     } catch (error) {
       console.error("❌ 한번에 주문 세션 생성 실패:", error);
-      alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      goToVoiceError(navigate, { cause: error });
     }
   }
 
@@ -58,11 +59,11 @@ export default function VoiceOrder() {
         navigate("/order/voice/three-plus");
       } else {
         console.error("❌ 세션 ID를 받지 못했습니다:", sessionData);
-        alert("주문 시작에 실패했습니다. 다시 시도해주세요.");
+        navigate("/voice-error");
       }
     } catch (error) {
       console.error("❌ 음성 주문 세션 생성 실패:", error);
-      alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      goToVoiceError(navigate, { cause: error });
     } finally {
       setIsCreatingSession(false);
     }

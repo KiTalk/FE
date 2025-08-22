@@ -5,6 +5,7 @@ import AudioSpectrum from "../components/AudioSpectrum";
 import { getSettings } from "../utils/settingsUtils";
 import VoiceProductCard from "../components/VoiceProductCard";
 import { apiClient } from "../services/api";
+import { goToVoiceError } from "../utils/voiceErrorUtils";
 
 import drink1 from "../assets/images/drink1.png";
 import {
@@ -250,7 +251,7 @@ export default function VoiceCart() {
           }
         } catch (error) {
           console.error("❌ 확인 응답 처리 실패:", error);
-          alert("응답 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+          goToVoiceError(navigate, { cause: error });
         }
       }
     }

@@ -42,6 +42,7 @@ import profile from "../assets/images/profile.png";
 import { orderService } from "../services/api";
 import { getSettings } from "../utils/settingsUtils";
 import { orderStorage } from "../utils/storage";
+import { goToVoiceError } from "../utils/voiceErrorUtils";
 import { useOrderSync } from "../utils/orderSync";
 
 export default function VoiceThreePlusDetailsPlus() {
@@ -302,6 +303,7 @@ export default function VoiceThreePlusDetailsPlus() {
           });
         } catch (error) {
           console.error("❌ 추가 주문 요청 실패:", error);
+          goToVoiceError(navigate, { cause: error });
           setIsTransitioning(false);
         }
       }, 1000);
