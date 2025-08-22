@@ -91,12 +91,89 @@ export const OutlineButton = styled.button`
 `;
 
 export const OutlineButtonTop = styled(OutlineButton)`
-  bottom: 11.375rem;
+  bottom: 24.37rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.625rem;
   white-space: nowrap;
+  color: #ffffff;
+  background: ${(props) => {
+    if (props.tempType === "ice") return "#3191FF";
+    if (props.tempType === "hot") return "#D01919";
+    return "transparent";
+  }};
+  border-color: ${(props) => {
+    if (props.tempType === "ice") return "#3191FF";
+    if (props.tempType === "hot") return "#D01919";
+    return "#272727";
+  }};
+
+  &:active {
+    transform: none;
+    box-shadow: none;
+    outline: none;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &:hover {
+    transform: none;
+  }
+
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+`;
+
+export const PackagingButton = styled(OutlineButton)`
+  bottom: 16.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  white-space: nowrap;
+  color: #ffffff;
+  background: ${(props) => {
+    if (props.packagingType === "포장") return "#56BA97";
+    if (props.packagingType === "매장") return "#FFAA32";
+    return "transparent";
+  }};
+  border-color: ${(props) => {
+    if (props.packagingType === "포장") return "#56BA97";
+    if (props.packagingType === "매장") return "#FFAA32";
+    return "#272727";
+  }};
+
+  &:active {
+    transform: none;
+    box-shadow: none;
+    outline: none;
+    background: ${(props) => {
+      if (props.packagingType === "포장") return "#4A9F81";
+      if (props.packagingType === "매장") return "#E6962B";
+      return "transparent";
+    }};
+    border-color: ${(props) => {
+      if (props.packagingType === "포장") return "#4A9F81";
+      if (props.packagingType === "매장") return "#E6962B";
+      return "#272727";
+    }};
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &:hover {
+    transform: none;
+  }
+
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 `;
 
 export const PlusIcon = styled.span`
