@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import { saveOrderPoint } from "../utils/orderSpec";
+import { apiClient } from "../services/api";
 import {
   Page,
   BottomAccentBar,
@@ -21,8 +22,28 @@ export default function PointCheckPage() {
     navigate(-1);
   }
 
-  function handleSelect(save) {
+  async function handleSelect(save) {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+
     try {
+      // 세션 ID가 있으면 전화번호 선택 API 호출
+      if (sessionId) {
+        const response = await apiClient.post(
+          `/api/phone/choice/${sessionId}`,
+          { wants_phone: !!save }
+        );
+        console.log("✅ 전화번호 선택 API 응답:", response.data);
+
+        // API 응답에 따라 네비게이션
+        if (save) {
+          navigate("/order/point/phone");
+        } else {
+          navigate("/order/complete");
+        }
+        return;
+      }
+
+      // 기존 로직 (세션 ID가 없는 경우)
       saveOrderPoint({ enabled: !!save });
       if (!save) {
         navigate("/order/complete");
@@ -30,7 +51,18 @@ export default function PointCheckPage() {
         navigate("/order/point/phone");
       }
     } catch (err) {
-      console.error(err);
+      console.error("전화번호 선택 API 실패:", err);
+      // API 실패 시 기존 로직으로 폴백
+      try {
+        saveOrderPoint({ enabled: !!save });
+        if (!save) {
+          navigate("/order/complete");
+        } else {
+          navigate("/order/point/phone");
+        }
+      } catch (saveErr) {
+        console.error("orderSpec 저장 실패:", saveErr);
+      }
     }
   }
 

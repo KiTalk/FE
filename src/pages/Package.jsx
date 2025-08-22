@@ -1,6 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { saveOrderPackage } from "../utils/orderSpec";
+import { orderService } from "../services/api";
 import BackButton from "../components/BackButton";
 import packageIcon from "../assets/images/package.png";
 import dineinIcon from "../assets/images/dinein.png";
@@ -24,14 +25,39 @@ export default function PackagePage() {
     navigate(-1);
   }
 
-  function persistAndNext(type) {
+  async function persistAndNext(type) {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+
     try {
+      // 세션 ID가 있으면 포장 API 호출
+      if (sessionId) {
+        const packagingType = type === "takeout" ? "takeout" : "dinein";
+        const response = await orderService.selectPackaging(
+          sessionId,
+          packagingType
+        );
+        console.log("✅ 포장 방식 선택 완료:", response);
+
+        // 세션 완료 후 주문 완료 페이지로 이동
+        navigate("/order/point");
+        return;
+      }
+
+      // 기존 로직 (세션 ID가 없는 경우)
       const pkg = { type, totalPrice, totalQty };
       saveOrderPackage(pkg);
     } catch (err) {
-      console.error(err);
+      console.error("포장 방식 선택 API 실패:", err);
+      // API 실패 시 기존 로직으로 폴백
+      try {
+        const pkg = { type, totalPrice, totalQty };
+        saveOrderPackage(pkg);
+      } catch (saveErr) {
+        console.error("orderSpec 저장 실패:", saveErr);
+      }
     }
 
+    // 기존 네비게이션 로직
     try {
       const orderSpecStr = localStorage.getItem("order_spec");
       if (orderSpecStr) {

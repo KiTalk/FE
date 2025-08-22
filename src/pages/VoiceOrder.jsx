@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Page,
@@ -11,11 +11,37 @@ import {
   CardImage,
 } from "./VoiceOrder.styles";
 import BackButton from "../components/BackButton";
+import { orderService } from "../services/api";
 import drink1 from "../assets/images/drink1.png";
 import drink3 from "../assets/images/drink3.png";
 
 export default function VoiceOrder() {
   const navigate = useNavigate();
+  const [isCreatingSession, setIsCreatingSession] = useState(false); // eslint-disable-line no-unused-vars
+
+  // 컴포넌트 마운트 시 세션 생성
+  useEffect(() => {
+    async function createSession() {
+      try {
+        setIsCreatingSession(true);
+        const sessionData = await orderService.startSession();
+        const sessionId = sessionData?.session_id || "";
+
+        if (sessionId) {
+          sessionStorage.setItem("currentSessionId", sessionId);
+          console.log("✅ 음성 주문 세션 생성 완료:", sessionId);
+        } else {
+          console.warn("⚠️ 세션 ID가 없습니다:", sessionData);
+        }
+      } catch (error) {
+        console.error("❌ 세션 생성 실패:", error);
+      } finally {
+        setIsCreatingSession(false);
+      }
+    }
+
+    createSession();
+  }, []);
 
   function handleBack() {
     navigate(-1);

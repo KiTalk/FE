@@ -3,16 +3,39 @@ import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import PhoneInput from "../components/PhoneInput";
 import { saveOrderPoint } from "../utils/orderSpec";
+import { apiClient } from "../services/api";
 
 export default function PointPhone() {
   const navigate = useNavigate();
 
-  function handleSave(phoneDigits) {
+  async function handleSave(phoneDigits) {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+
     try {
+      // 세션 ID가 있으면 전화번호 입력 API 호출
+      if (sessionId) {
+        const response = await apiClient.post(`/api/phone/input/${sessionId}`, {
+          phone_number: phoneDigits,
+        });
+        console.log("✅ 전화번호 입력 API 응답:", response.data);
+
+        // 주문 완료 페이지로 이동
+        navigate("/order/complete", { replace: true });
+        return;
+      }
+
+      // 기존 로직 (세션 ID가 없는 경우)
       saveOrderPoint({ phone: phoneDigits });
       navigate("/order/complete", { replace: true });
     } catch (error) {
-      console.error(error);
+      console.error("전화번호 입력 API 실패:", error);
+      // API 실패 시 기존 로직으로 폴백
+      try {
+        saveOrderPoint({ phone: phoneDigits });
+        navigate("/order/complete", { replace: true });
+      } catch (saveError) {
+        console.error("orderSpec 저장 실패:", saveError);
+      }
     }
   }
 
