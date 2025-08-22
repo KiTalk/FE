@@ -115,6 +115,7 @@ export default function VoiceThreePlusDetailsPlus() {
         await orderService.removeOrder(sessionId, itemToRemove.menu_id);
       } catch (error) {
         console.error("❌ 주문 삭제 실패:", error);
+        return;
       }
     }
 
@@ -205,7 +206,7 @@ export default function VoiceThreePlusDetailsPlus() {
 
         const mapped = Array.isArray(sessionData?.orders)
           ? sessionData.orders.map((o) => ({
-              id: o.menu_item,
+              id: o.menu_id,
               name: o.menu_item,
               original: o.original,
               price: Number(o.price || 0),
