@@ -201,9 +201,8 @@ export default function VoiceThreePlusDetails() {
         // 기존 세션 ID 사용 (VoiceOrder.jsx에서 생성된 세션)
         const sid = sessionStorage.getItem("currentSessionId") || "";
         if (!sid) {
-          console.error(
-            "❌ 세션 ID가 없습니다. 음성 주문 페이지를 다시 시작해주세요."
-          );
+          alert("다시 시작해주세요.");
+          navigate("/order/voice");
           return;
         }
         setSessionId(sid);

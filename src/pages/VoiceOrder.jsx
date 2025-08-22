@@ -31,10 +31,12 @@ export default function VoiceOrder() {
           sessionStorage.setItem("currentSessionId", sessionId);
           console.log("✅ 음성 주문 세션 생성 완료:", sessionId);
         } else {
-          console.warn("⚠️ 세션 ID가 없습니다:", sessionData);
+          alert("주문 시작에 실패했습니다. 다시 시도해주세요.");
+          navigate(-1);
         }
-      } catch (error) {
-        console.error("❌ 세션 생성 실패:", error);
+      } catch {
+        alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        navigate(-1);
       } finally {
         setIsCreatingSession(false);
       }
