@@ -176,10 +176,10 @@ export const orderService = {
   },
 
   // 주문 수정
-  patchUpdate: async (sessionId, orders) => {
+  patchUpdate: async (sessionId, requestBody) => {
     const response = await apiClient.put(
       API_ENDPOINTS.ORDERS_PATCH_UPDATE(sessionId),
-      { orders }
+      requestBody
     );
     return response.data;
   },

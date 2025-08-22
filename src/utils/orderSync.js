@@ -27,9 +27,8 @@ export function useOrderSync(sessionId) {
         .filter((order) => order.quantity > 0) // 수량이 0인 항목 제거
         .map((order) => ({
           menu_item: order.menu_item || order.name,
-          price: Number(order.price || 0),
           quantity: Number(order.quantity || 0),
-          original: order.original || order.menu_item || order.name,
+          temp: order.temp || "ice", // 기본값은 ice로 설정
         }));
 
       if (apiOrders.length === 0) {
@@ -37,15 +36,25 @@ export function useOrderSync(sessionId) {
         return false;
       }
 
-      console.log("🔄 백엔드 동기화 시작:", apiOrders);
+      // 새로운 API 형식에 맞게 orders 키로 래핑
+      const requestBody = { orders: apiOrders };
+      console.log("🔄 백엔드 동기화 시작:");
+      console.log("  - Session ID:", sessionId);
+      console.log("  - Request Body:", JSON.stringify(requestBody, null, 2));
 
       // 백엔드에 동기화
-      const response = await orderService.patchUpdate(sessionId, apiOrders);
+      const response = await orderService.patchUpdate(sessionId, requestBody);
       console.log("✅ 백엔드 동기화 완료:", response);
 
       return true;
     } catch (error) {
       console.error("❌ 백엔드 동기화 실패:", error);
+      if (error.response?.data) {
+        console.error("  - 서버 응답 데이터:", error.response.data);
+      }
+      if (error.response?.status) {
+        console.error("  - HTTP 상태 코드:", error.response.status);
+      }
       return false;
     }
   }, [sessionId]);
@@ -76,16 +85,23 @@ export const syncUtils = {
         .filter((order) => order.quantity > 0)
         .map((order) => ({
           menu_item: order.menu_item || order.name,
-          price: Number(order.price || 0),
           quantity: Number(order.quantity || 0),
-          original: order.original || order.menu_item || order.name,
+          temp: order.temp || "ice", // 기본값은 ice로 설정
         }));
 
-      await orderService.patchUpdate(sessionId, apiOrders);
+      // 새로운 API 형식에 맞게 orders 키로 래핑
+      const requestBody = { orders: apiOrders };
+      await orderService.patchUpdate(sessionId, requestBody);
       console.log("✅ 강제 동기화 완료");
       return true;
     } catch (error) {
       console.error("❌ 강제 동기화 실패:", error);
+      if (error.response?.data) {
+        console.error("  - 서버 응답 데이터:", error.response.data);
+      }
+      if (error.response?.status) {
+        console.error("  - HTTP 상태 코드:", error.response.status);
+      }
       return false;
     }
   },
@@ -114,16 +130,23 @@ export const syncUtils = {
       // 백엔드 동기화
       const apiOrders = updatedOrders.map((order) => ({
         menu_item: order.menu_item || order.name,
-        price: Number(order.price || 0),
         quantity: Number(order.quantity || 0),
-        original: order.original || order.menu_item || order.name,
+        temp: order.temp || "ice", // 기본값은 ice로 설정
       }));
 
-      await orderService.patchUpdate(sessionId, apiOrders);
+      // 새로운 API 형식에 맞게 orders 키로 래핑
+      const requestBody = { orders: apiOrders };
+      await orderService.patchUpdate(sessionId, requestBody);
       console.log("✅ 개별 상품 동기화 완료");
       return true;
     } catch (error) {
       console.error("❌ 개별 상품 동기화 실패:", error);
+      if (error.response?.data) {
+        console.error("  - 서버 응답 데이터:", error.response.data);
+      }
+      if (error.response?.status) {
+        console.error("  - HTTP 상태 코드:", error.response.status);
+      }
       return false;
     }
   },

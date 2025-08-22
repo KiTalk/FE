@@ -184,17 +184,19 @@ export default function VoiceThreePlusDetails() {
         // 세션 ID를 저장하여 다음 페이지에서 사용할 수 있도록 함
         sessionStorage.setItem("currentSessionId", sid);
         const ordered = await orderService.submitOrder(sid, recognizedText);
+        console.log("🧾 주문 응답:", ordered);
         console.log("🧾 주문 응답 orders:", ordered?.orders);
         if (aborted) return;
         const mapped = Array.isArray(ordered?.orders)
           ? ordered.orders.map((o) => ({
-              id: o.menu_item,
+              id: o.menu_id || o.menu_item, // menu_id가 있으면 우선 사용
               name: o.menu_item,
               original: o.original,
               price: Number(o.price || 0),
               quantity: Number(o.quantity || 0),
               popular: Boolean(o.popular),
               temp: o.temp,
+              menu_id: o.menu_id, // 새로 추가된 menu_id 필드 저장
             }))
           : [];
         setOrderItems(mapped);
@@ -212,6 +214,17 @@ export default function VoiceThreePlusDetails() {
             0
           );
         setOrderSummary({ totalQuantity, totalPrice });
+
+        // 새로 추가된 응답 필드들 로깅 및 활용
+        if (ordered?.packaging) {
+          console.log("📦 포장 정보:", ordered.packaging);
+        }
+        if (ordered?.next_step) {
+          console.log("➡️ 다음 단계:", ordered.next_step);
+        }
+        if (ordered?.message) {
+          console.log("💬 서버 메시지:", ordered.message);
+        }
       } catch (e) {
         if (!aborted) {
           console.error("주문 불러오기 실패:", e?.message || e);
