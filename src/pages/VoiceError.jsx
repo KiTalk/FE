@@ -10,7 +10,9 @@ import {
   MainMessage,
   SubMessage,
   RetryButton,
+  RetryButtonContent,
   MicIcon,
+  RetryButtonText,
   FingerGuide,
 } from "./VoiceError.styles";
 
@@ -31,8 +33,8 @@ export default function VoiceError() {
       </MainContent>
 
       <RetryButton onClick={handleRetry}>
-        <MicIcon src={micIcon} />
-        다시 말하기
+        <MicIcon src={micIcon} alt="" aria-hidden="true" />
+        <RetryButtonText>다시 말하기</RetryButtonText>
       </RetryButton>
 
       <FingerGuide src={handIcon} />

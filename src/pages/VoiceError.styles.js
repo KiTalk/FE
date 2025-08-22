@@ -83,19 +83,6 @@ export const RetryButton = styled.button`
   border: none;
   cursor: pointer;
 
-  font-family: "Pretendard";
-  font-style: normal;
-  font-weight: 600;
-  font-size: 3rem;
-  line-height: 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
-  text-align: center;
-  letter-spacing: -0.015em;
-  color: #ffffff;
-
   &:hover {
     transform: translateY(-0.125rem);
     box-shadow: 0 0.25rem 1.25rem rgba(34, 55, 112, 0.3);
@@ -106,13 +93,36 @@ export const RetryButton = styled.button`
   }
 `;
 
+export const RetryButtonContent = styled.div`
+  gap: 1.125rem;
+`;
+
 export const MicIcon = styled.img`
+  position: absolute;
+  top: 2.5rem;
+  left: 2.36rem;
   width: 4.375rem;
   height: 4.375rem;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  filter: brightness(0) invert(1);
+`;
+
+export const RetryButtonText = styled.span`
+  position: absolute;
+  top: 3.125rem;
+  left: 7.16rem;
+  width: 13.5rem;
+  height: 3rem;
+
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 3rem;
+  line-height: 3rem;
+  color: #ffffff;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  text-align: center;
 `;
 
 export const FingerGuide = styled.img`
