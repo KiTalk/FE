@@ -18,6 +18,7 @@ import {
   AudioSpectrumContainer,
 } from "./VoiceThreePlusRecording.styles";
 import BackButton from "../components/BackButton";
+import { goToVoiceError } from "../utils/voiceErrorUtils";
 import VoiceRecorder from "../components/VoiceRecorder";
 import AudioSpectrum from "../components/AudioSpectrum";
 import { getSettings } from "../utils/settingsUtils";
@@ -35,6 +36,7 @@ export default function VoiceThreePlusRecording() {
   const toggleRecordingRef = useRef(null);
   const isRecordingRef = useRef(false);
   const transitionTimerRef = useRef(null);
+  const loadingRef = useRef(false);
 
   const language = useMemo(() => getSettings().defaultLanguage || "ko", []);
 
@@ -107,6 +109,18 @@ export default function VoiceThreePlusRecording() {
     }
   }, [recognizedText, isTransitioning, navigate]);
 
+  // 자동 종료 이후에도 인식된 텍스트가 없으면 에러 페이지로 이동
+  useEffect(() => {
+    if (autoStopTriggered) {
+      const t = setTimeout(() => {
+        if (!isRecordingRef.current && !loadingRef.current && !recognizedText) {
+          goToVoiceError(navigate);
+        }
+      }, 1200);
+      return () => clearTimeout(t);
+    }
+  }, [autoStopTriggered, recognizedText, navigate]);
+
   return (
     <Page>
       <VoiceRecorder
@@ -124,6 +138,7 @@ export default function VoiceThreePlusRecording() {
           // toggleRecording / isRecording을 ref에 저장
           toggleRecordingRef.current = toggleRecording;
           isRecordingRef.current = isRecording;
+          loadingRef.current = loading;
 
           // 상태 업데이트는 onRecognized 콜백에서 처리
 

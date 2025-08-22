@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import warningIcon from "../assets/images/warning.png";
 import micIcon from "../assets/images/mike-solid.png";
 import handIcon from "../assets/images/hand.png";
+import BackButton from "../components/BackButton";
 import {
   Page,
   MainContent,
@@ -19,12 +20,17 @@ import {
 export default function VoiceError() {
   const navigate = useNavigate();
 
-  const handleRetry = () => {
+  function handleBack() {
     navigate("/order-method");
+  }
+
+  const handleRetry = () => {
+    navigate(-1);
   };
 
   return (
     <Page>
+      <BackButton onClick={handleBack} />
       <WarningImage src={warningIcon} alt="경고" />
 
       <MainContent>

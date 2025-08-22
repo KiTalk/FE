@@ -43,6 +43,7 @@ import { orderService } from "../services/api";
 import { getSettings } from "../utils/settingsUtils";
 import { orderStorage } from "../utils/storage";
 import { useOrderSync } from "../utils/orderSync";
+import { goToVoiceError } from "../utils/voiceErrorUtils";
 
 export default function VoiceThreePlusConfirmOrder() {
   const navigate = useNavigate();
@@ -319,7 +320,7 @@ export default function VoiceThreePlusConfirmOrder() {
           }
         } catch (error) {
           console.error("❌ 확인 응답 처리 실패:", error);
-          navigate("/order/package");
+          goToVoiceError(navigate, { cause: error });
         }
       }, 1000);
     }

@@ -5,6 +5,10 @@ import AudioSpectrum from "../components/AudioSpectrum";
 import VoiceRecorder from "../components/VoiceRecorder";
 import { apiClient } from "../services/api";
 import {
+  goToVoiceError,
+  ensureRecognizedOrError,
+} from "../utils/voiceErrorUtils";
+import {
   Page,
   Title,
   RecognizedText,
@@ -92,13 +96,14 @@ export default function VoiceRecognize() {
                     return;
                   } catch (error) {
                     console.error("❌ 한번에 주문 처리 실패:", error);
-                    alert(
-                      "주문 처리 중 오류가 발생했습니다. 다시 시도해주세요."
-                    );
+                    goToVoiceError(navigate, { cause: error });
+                    return;
                   }
                 }
 
                 // 기존 로직 (세션 ID가 없거나 인식된 텍스트가 없는 경우)
+                if (ensureRecognizedOrError(navigate, recognizedText)) return;
+
                 navigate("/order/voice/cart", {
                   state: { recognized: recognizedText },
                 });

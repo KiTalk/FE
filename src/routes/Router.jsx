@@ -102,7 +102,7 @@ function AnimatedRoutes() {
         <Route path="/order/complete" element={<OrderCompletePage />} />
 
         {/* 에러 화면 */}
-        <Route path="/error" element={<VoiceError />} />
+        <Route path="/voice-error" element={<VoiceError />} />
       </Routes>
     </PageTransition>
   );
