@@ -192,12 +192,24 @@ export const orderService = {
     return response.data;
   },
 
-  // 주문 삭제
-  removeOrder: async (sessionId, menuItem) => {
+  // 주문 삭제 (숫자 menu_id 사용)
+  removeOrder: async (sessionId, menuId) => {
+    console.log(`🗑️ DELETE API 호출: sessionId=${sessionId}, menuId=${menuId}`);
     const response = await apiClient.delete(
       API_ENDPOINTS.ORDERS_REMOVE(sessionId),
-      { data: { menu_item: menuItem } }
+      { data: { menu_id: menuId } }
     );
+    console.log("✅ DELETE API 성공");
+    return response.data;
+  },
+
+  // 전체 주문 삭제
+  clearAllOrders: async (sessionId) => {
+    console.log(`🧹 전체 주문 삭제 API 호출: sessionId=${sessionId}`);
+    const response = await apiClient.delete(
+      API_ENDPOINTS.ORDERS_CLEAR(sessionId)
+    );
+    console.log("✅ 전체 주문 삭제 성공");
     return response.data;
   },
 

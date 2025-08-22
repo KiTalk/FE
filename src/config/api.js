@@ -16,6 +16,7 @@ export const API_ENDPOINTS = {
   ORDERS_PATCH_UPDATE: (sessionId) => `/orders/${sessionId}/patch-update`,
   ORDERS_ADD: (sessionId) => `/orders/${sessionId}/add`,
   ORDERS_REMOVE: (sessionId) => `/orders/${sessionId}/remove`,
+  ORDERS_CLEAR: (sessionId) => `/orders/${sessionId}/clear`,
 };
 
 // 지원 언어 목록
