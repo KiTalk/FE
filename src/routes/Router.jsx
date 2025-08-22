@@ -27,6 +27,7 @@ import PackagePage from "../pages/Package";
 import PointCheckPage from "../pages/PointCheck";
 import OrderCompletePage from "../pages/OrderComplete";
 import PointPhone from "../pages/PointPhone";
+import VoiceError from "../pages/VoiceError";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -99,6 +100,9 @@ function AnimatedRoutes() {
 
         {/* 주문 완료 */}
         <Route path="/order/complete" element={<OrderCompletePage />} />
+
+        {/* 에러 화면 */}
+        <Route path="/error" element={<VoiceError />} />
       </Routes>
     </PageTransition>
   );
