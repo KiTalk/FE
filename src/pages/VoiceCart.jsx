@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import VoiceRecorder from "../components/VoiceRecorder";
 import AudioSpectrum from "../components/AudioSpectrum";
@@ -25,7 +25,7 @@ export default function VoiceCart() {
   const { state } = useLocation();
   const recognizedText = useMemo(() => state?.recognized, [state]);
   const [quantity, setQuantity] = useState(1);
-  const [localQuantityChanged, setLocalQuantityChanged] = useState(false);
+
   const [orderData, setOrderData] = useState(null);
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState("4,000원");
@@ -62,7 +62,6 @@ export default function VoiceCart() {
             if (savedQuantity) {
               // 이미 저장된 수량이 있으면 사용
               setQuantity(parseInt(savedQuantity));
-              setLocalQuantityChanged(true);
             } else {
               // 처음이면 API에서 받은 수량을 localStorage에 저장
               localStorage.setItem(
@@ -126,12 +125,11 @@ export default function VoiceCart() {
     }
 
     autoConfirm();
-  }, [recognizedLive, navigate]);
+  }, [recognizedLive, navigate, updateQuantityForPoint]);
 
   function handleMinus() {
     const newQuantity = Math.max(1, quantity - 1);
     setQuantity(newQuantity);
-    setLocalQuantityChanged(true);
 
     // localStorage에 저장
     const sessionId = sessionStorage.getItem("currentSessionId");
@@ -144,7 +142,6 @@ export default function VoiceCart() {
   function handlePlus() {
     const newQuantity = quantity + 1;
     setQuantity(newQuantity);
-    setLocalQuantityChanged(true);
 
     // localStorage에 저장
     const sessionId = sessionStorage.getItem("currentSessionId");
@@ -154,40 +151,8 @@ export default function VoiceCart() {
     }
   }
 
-  // 수량이 변경되었으면 API 업데이트
-  async function updateQuantityIfChanged() {
-    const sessionId = sessionStorage.getItem("currentSessionId");
-
-    if (!sessionId || !orderData?.order || !localQuantityChanged) {
-      return;
-    }
-
-    try {
-      console.log("🔄 수량 업데이트 API 호출:", sessionId, quantity);
-      const response = await apiClient.put(
-        `/orders/${sessionId}/patch-update`,
-        {
-          orders: [
-            {
-              menu_id: orderData.order.menu_id,
-              quantity: quantity,
-            },
-          ],
-        }
-      );
-      console.log("✅ 수량 업데이트 완료:", response.data);
-
-      // localStorage 정리
-      localStorage.removeItem(`quantity_${sessionId}`);
-      setLocalQuantityChanged(false);
-    } catch (error) {
-      console.error("❌ 수량 업데이트 실패:", error);
-      // 실패해도 페이지 이동은 진행 (사용자 경험 향상)
-    }
-  }
-
   // /order/point 이동 시 수량 업데이트 (localStorage 기반)
-  async function updateQuantityForPoint() {
+  const updateQuantityForPoint = useCallback(async () => {
     const sessionId = sessionStorage.getItem("currentSessionId");
 
     if (!sessionId || !orderData?.order) {
@@ -226,7 +191,6 @@ export default function VoiceCart() {
 
       // localStorage 정리
       localStorage.removeItem(`quantity_${sessionId}`);
-      setLocalQuantityChanged(false);
     } catch (error) {
       console.error("❌ 포인트 이동 수량 업데이트 실패:", error);
       console.error("❌ 에러 응답 상세:", error.response?.data);
@@ -236,7 +200,7 @@ export default function VoiceCart() {
       });
       // 실패해도 페이지 이동은 진행 (사용자 경험 향상)
     }
-  }
+  }, [orderData, quantity]);
 
   function handleAddMore() {
     navigate(-1);
@@ -254,7 +218,7 @@ export default function VoiceCart() {
 
     // 수동 주문하기 - 수량 업데이트 후 Package 페이지로 이동
     if (orderData) {
-      await updateQuantityIfChanged();
+      await updateQuantityForPoint();
 
       const totalPrice =
         orderData.order?.price * quantity || orderData.total_price || 0;
