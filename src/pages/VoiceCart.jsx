@@ -32,6 +32,57 @@ export default function VoiceCart() {
   const language = useMemo(() => getSettings().defaultLanguage || "ko", []);
   const [recognizedLive, setRecognizedLive] = useState("");
 
+  // /order/point 이동 시 수량 업데이트 (localStorage 기반)
+  const updateQuantityForPoint = useCallback(async () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+
+    if (!sessionId || !orderData?.order) {
+      return;
+    }
+
+    // localStorage에서 현재 저장된 수량 가져오기
+    const savedQuantity = localStorage.getItem(`quantity_${sessionId}`);
+    const currentQuantity = savedQuantity ? parseInt(savedQuantity) : quantity;
+
+    try {
+      console.log(
+        "📞 포인트 페이지 이동 - 수량 업데이트 API 호출:",
+        sessionId,
+        currentQuantity
+      );
+      console.log("📞 orderData.order:", orderData.order);
+
+      const updateData = {
+        orders: [
+          {
+            menu_item: orderData.order.menu_item,
+            quantity: currentQuantity,
+            temp: orderData.order.temp,
+          },
+        ],
+      };
+
+      console.log("📞 업데이트 요청 데이터:", updateData);
+
+      const response = await apiClient.put(
+        `/orders/${sessionId}/patch-update`,
+        updateData
+      );
+      console.log("✅ 포인트 이동 수량 업데이트 완료:", response.data);
+
+      // localStorage 정리
+      localStorage.removeItem(`quantity_${sessionId}`);
+    } catch (error) {
+      console.error("❌ 포인트 이동 수량 업데이트 실패:", error);
+      console.error("❌ 에러 응답 상세:", error.response?.data);
+      console.error("❌ 요청 데이터:", {
+        menu_id: orderData.order.menu_id,
+        quantity: currentQuantity,
+      });
+      // 실패해도 페이지 이동은 진행 (사용자 경험 향상)
+    }
+  }, [orderData, quantity]);
+
   // 세션 조회 API 호출
   useEffect(() => {
     async function fetchOrderData() {
@@ -150,57 +201,6 @@ export default function VoiceCart() {
       console.log("💾 수량 증가 localStorage 저장:", newQuantity);
     }
   }
-
-  // /order/point 이동 시 수량 업데이트 (localStorage 기반)
-  const updateQuantityForPoint = useCallback(async () => {
-    const sessionId = sessionStorage.getItem("currentSessionId");
-
-    if (!sessionId || !orderData?.order) {
-      return;
-    }
-
-    // localStorage에서 현재 저장된 수량 가져오기
-    const savedQuantity = localStorage.getItem(`quantity_${sessionId}`);
-    const currentQuantity = savedQuantity ? parseInt(savedQuantity) : quantity;
-
-    try {
-      console.log(
-        "📞 포인트 페이지 이동 - 수량 업데이트 API 호출:",
-        sessionId,
-        currentQuantity
-      );
-      console.log("📞 orderData.order:", orderData.order);
-
-      const updateData = {
-        orders: [
-          {
-            menu_item: orderData.order.menu_item,
-            quantity: currentQuantity,
-            temp: orderData.order.temp,
-          },
-        ],
-      };
-
-      console.log("📞 업데이트 요청 데이터:", updateData);
-
-      const response = await apiClient.put(
-        `/orders/${sessionId}/patch-update`,
-        updateData
-      );
-      console.log("✅ 포인트 이동 수량 업데이트 완료:", response.data);
-
-      // localStorage 정리
-      localStorage.removeItem(`quantity_${sessionId}`);
-    } catch (error) {
-      console.error("❌ 포인트 이동 수량 업데이트 실패:", error);
-      console.error("❌ 에러 응답 상세:", error.response?.data);
-      console.error("❌ 요청 데이터:", {
-        menu_id: orderData.order.menu_id,
-        quantity: currentQuantity,
-      });
-      // 실패해도 페이지 이동은 진행 (사용자 경험 향상)
-    }
-  }, [orderData, quantity]);
 
   function handleAddMore() {
     navigate(-1);
