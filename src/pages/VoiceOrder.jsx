@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Page,
@@ -11,7 +11,7 @@ import {
   CardImage,
 } from "./VoiceOrder.styles";
 import BackButton from "../components/BackButton";
-import { orderService } from "../services/api";
+import { orderService, apiClient } from "../services/api";
 import drink1 from "../assets/images/drink1.png";
 import drink3 from "../assets/images/drink3.png";
 
@@ -19,42 +19,53 @@ export default function VoiceOrder() {
   const navigate = useNavigate();
   const [isCreatingSession, setIsCreatingSession] = useState(false); // eslint-disable-line no-unused-vars
 
-  // 컴포넌트 마운트 시 세션 생성
-  useEffect(() => {
-    async function createSession() {
-      try {
-        setIsCreatingSession(true);
-        const sessionData = await orderService.startSession();
-        const sessionId = sessionData?.session_id || "";
-
-        if (sessionId) {
-          sessionStorage.setItem("currentSessionId", sessionId);
-          console.log("✅ 음성 주문 세션 생성 완료:", sessionId);
-        } else {
-          alert("주문 시작에 실패했습니다. 다시 시도해주세요.");
-          navigate(-1);
-        }
-      } catch {
-        alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-        navigate(-1);
-      } finally {
-        setIsCreatingSession(false);
-      }
-    }
-
-    createSession();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // 세션 생성은 각 카드 클릭 시에 수행
 
   function handleBack() {
     navigate(-1);
   }
 
-  function handleOneTwo() {
-    navigate("/order/voice/one-two");
+  async function handleOneTwo() {
+    try {
+      console.log("🚀 한번에 주문 세션 생성 시작");
+      const response = await apiClient.post("/order-at-once/start");
+      const sessionId = response.data?.session_id || "";
+
+      if (sessionId) {
+        sessionStorage.setItem("currentSessionId", sessionId);
+        console.log("✅ 한번에 주문 세션 생성 완료:", sessionId);
+        navigate("/order/voice/one-two");
+      } else {
+        console.error("❌ 세션 ID를 받지 못했습니다:", response.data);
+        alert("주문 시작에 실패했습니다. 다시 시도해주세요.");
+      }
+    } catch (error) {
+      console.error("❌ 한번에 주문 세션 생성 실패:", error);
+      alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    }
   }
 
-  function handleThreePlus() {
-    navigate("/order/voice/three-plus");
+  async function handleThreePlus() {
+    try {
+      console.log("🚀 음성 주문 세션 생성 시작");
+      setIsCreatingSession(true);
+      const sessionData = await orderService.startSession();
+      const sessionId = sessionData?.session_id || "";
+
+      if (sessionId) {
+        sessionStorage.setItem("currentSessionId", sessionId);
+        console.log("✅ 음성 주문 세션 생성 완료:", sessionId);
+        navigate("/order/voice/three-plus");
+      } else {
+        console.error("❌ 세션 ID를 받지 못했습니다:", sessionData);
+        alert("주문 시작에 실패했습니다. 다시 시도해주세요.");
+      }
+    } catch (error) {
+      console.error("❌ 음성 주문 세션 생성 실패:", error);
+      alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setIsCreatingSession(false);
+    }
   }
 
   return (
