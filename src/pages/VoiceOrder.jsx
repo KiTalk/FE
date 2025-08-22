@@ -76,14 +76,14 @@ export default function VoiceOrder() {
       <Title>주문할 음료 종류가 많으신가요?</Title>
 
       <CardLeft onClick={handleOneTwo}>
-        <CardImage src={drink1} alt="1~2개 예시" />
-        <CardTitle>1~2개</CardTitle>
-        <CardExample>Ex) 아메리카노, 라떼</CardExample>
+        <CardImage src={drink1} alt="단일 예시" />
+        <CardTitle>단일 주문</CardTitle>
+        <CardExample>Ex) 아메리카노</CardExample>
       </CardLeft>
 
       <CardRight onClick={handleThreePlus}>
-        <CardImage src={drink3} alt="3개 이상 예시" />
-        <CardTitle>3개 이상</CardTitle>
+        <CardImage src={drink3} alt="복합 예시" />
+        <CardTitle>복합 주문</CardTitle>
         <CardExample>Ex) 아메리카노, 라떼, 아이스티</CardExample>
       </CardRight>
 
