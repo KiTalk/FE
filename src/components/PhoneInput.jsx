@@ -60,9 +60,9 @@ export default function PhoneInput({
 
           <PhoneRow>
             <Segment slot="head">{formatted.head}</Segment>
-            <Hyphen index={1} />
+            <Hyphen $index={1} />
             <Segment slot="mid">{formatted.mid || ""}</Segment>
-            <Hyphen index={2} />
+            <Hyphen $index={2} />
             <Segment slot="tail">{formatted.tail || ""}</Segment>
             <BottomAccent />
           </PhoneRow>
@@ -77,7 +77,7 @@ export default function PhoneInput({
             </KeyButton>
           ))}
           <KeyButton
-            variant="action"
+            $variant="action"
             data-action="backspace"
             onClick={handleKeypadClick}
           >

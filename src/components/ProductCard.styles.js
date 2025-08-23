@@ -1,16 +1,34 @@
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
+
+const glowGreen = keyframes`
+  0%, 100% {
+    box-shadow: 0 0 0.5rem rgba(77, 158, 23, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 1.5rem rgba(77, 158, 23, 0.6);
+  }
+`;
+
+const glowPurple = keyframes`
+  0%, 100% {
+    box-shadow: 0 0 0.5rem rgba(159, 31, 218, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 1.5rem rgba(159, 31, 218, 0.6);
+  }
+`;
 
 export const ProductCard = styled.div`
   position: relative;
   width: 23.8125rem;
   height: 31.6875rem;
 
-  border: ${({ $currentMode, $productId }) => {
+  border: ${({ $currentMode, $productName }) => {
     if ($currentMode === "color") {
-      const id = String($productId || "").toLowerCase();
-      if (id.includes("americano")) return "0.4375rem solid #4D9E17";
-      if (id.includes("latte")) return "0.4375rem solid #9F1FDA";
-      return "0.4375rem solid #adadad";
+      const name = String($productName || "");
+      if (name.includes("아메리카노")) return "0.2375rem solid #4D9E17";
+      if (name.includes("라떼")) return "0.2375rem solid #9F1FDA";
+      return "0.0625rem solid #adadad";
     }
     return "0.0625rem solid #adadad";
   }};
@@ -19,6 +37,52 @@ export const ProductCard = styled.div`
   box-sizing: border-box;
   overflow: hidden;
   background: #ffffff;
+
+  ${({ $currentMode, $productName, $selectedMenuType }) => {
+    if ($currentMode === "color") {
+      const name = String($productName || "");
+
+      // 선택된 메뉴 타입에 따라 애니메이션 적용
+      if ($selectedMenuType === "americano" && name.includes("아메리카노")) {
+        return css`
+          animation: ${glowGreen} 2s ease-in-out infinite;
+        `;
+      }
+      if ($selectedMenuType === "latte" && name.includes("라떼")) {
+        return css`
+          animation: ${glowPurple} 2s ease-in-out infinite;
+        `;
+      }
+
+      // 선택되지 않은 메뉴는 애니메이션 없음
+      return "";
+    }
+    return "";
+  }}
+
+  &:hover {
+    ${({ $currentMode, $productName, $selectedMenuType }) => {
+      if ($currentMode === "color") {
+        const name = String($productName || "");
+
+        // 선택된 메뉴 타입에 따라 호버 애니메이션 적용
+        if ($selectedMenuType === "americano" && name.includes("아메리카노")) {
+          return css`
+            animation: ${glowGreen} 1s ease-in-out infinite;
+          `;
+        }
+        if ($selectedMenuType === "latte" && name.includes("라떼")) {
+          return css`
+            animation: ${glowPurple} 1s ease-in-out infinite;
+          `;
+        }
+
+        // 선택되지 않은 메뉴는 호버 애니메이션도 없음
+        return "";
+      }
+      return "";
+    }}
+  }
 `;
 
 export const PopularTag = styled.div`

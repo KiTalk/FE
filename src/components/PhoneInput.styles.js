@@ -129,7 +129,7 @@ export const Hyphen = styled.span`
   width: 2.25rem;
   height: 2.25rem;
   top: 0.8rem;
-  left: ${(p) => (p.index === 2 ? "23.2rem" : "9.7rem")};
+  left: ${(p) => (p.$index === 2 ? "23.2rem" : "9.7rem")};
   display: block;
   &::after {
     content: "";
@@ -175,7 +175,7 @@ export const KeyButton = styled.button`
   }
 
   ${(p) =>
-    p.variant === "action" &&
+    p.$variant === "action" &&
     css`
       font-size: 2rem;
       font-weight: 500;

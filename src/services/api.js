@@ -544,11 +544,22 @@ export const touchOrderService = {
     try {
       // cartItems: { menuId: quantity, ... } 형태의 객체
       const orders = Object.entries(cartItems)
-        .filter(([, quantity]) => quantity > 0) // 수량이 0보다 큰 항목만
+        .filter(([, quantity]) => Number(quantity) > 0) // 수량이 0보다 큰 항목만
         .map(([menuId, quantity]) => ({
-          menu_id: parseInt(menuId),
-          quantity: parseInt(quantity),
+          menu_id: parseInt(menuId, 10),
+          quantity: parseInt(quantity, 10),
         }));
+
+      console.log("bulkUpdateTouchCart - 처리할 주문 수:", orders.length);
+      console.log("bulkUpdateTouchCart - orders:", orders);
+
+      // 빈 배열이면 API 호출 생략
+      if (orders.length === 0) {
+        console.log(
+          "터치주문 장바구니 일괄 업데이트: 빈 주문 목록, API 호출 생략"
+        );
+        return { success: true, message: "빈 주문 목록으로 인한 호출 생략" };
+      }
 
       const response = await touchOrderApiClient.put(
         API_ENDPOINTS.TOUCH_CART_UPDATE(sessionId),
