@@ -265,7 +265,7 @@ function TouchOrderContent() {
             />
           </div>
 
-          {activeMenu?.sections.map(function (section) {
+          {(activeMenu?.sections || []).map(function (section) {
             return (
               <Section key={section.id}>
                 <SectionTitle>{section.title}</SectionTitle>
