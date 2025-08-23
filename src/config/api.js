@@ -30,6 +30,9 @@ export const API_ENDPOINTS = {
   TOUCH_CART_CLEAR: (sessionId) => `/api/touch/cart/${sessionId}/clear`,
   TOUCH_CART_UPDATE: (sessionId) => `/api/touch/cart/${sessionId}/update`,
   TOUCH_CART_REMOVE: (sessionId) => `/api/touch/cart/${sessionId}/remove`,
+  TOUCH_CART_PACKAGING: (sessionId) => `/api/touch/cart/${sessionId}/packaging`,
+  TOUCH_PHONE_CHOICE: (sessionId) => `/api/touch/phone/${sessionId}/choice`,
+  TOUCH_PHONE_INPUT: (sessionId) => `/api/touch/phone/${sessionId}/input`,
 };
 
 // 지원 언어 목록

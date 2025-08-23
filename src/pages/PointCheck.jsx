@@ -1,8 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
-import { saveOrderPoint } from "../utils/orderSpec";
-import { voiceOrderService } from "../services/api";
+import { voiceOrderService, touchOrderService } from "../services/api";
 import {
   Page,
   BottomAccentBar,
@@ -22,17 +21,40 @@ export default function PointCheckPage() {
     navigate(-1);
   }
 
+  // 터치주문에서 온 경우인지 확인하는 함수
+  const isFromTouchOrder = () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    const orderSpec = localStorage.getItem("order_spec");
+
+    if (sessionId && orderSpec) {
+      try {
+        const spec = JSON.parse(orderSpec);
+        // 터치주문 모드인 경우
+        return spec.mode === "touch" || spec.mode === "color";
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  };
+
   async function handleSelect(save) {
     const sessionId = sessionStorage.getItem("currentSessionId");
 
+    if (!sessionId) {
+      console.error("세션 ID가 없습니다.");
+      navigate("/order-method");
+      return;
+    }
+
     try {
-      // 세션 ID가 있으면 전화번호 선택 API 호출
-      if (sessionId) {
-        const response = await voiceOrderService.submitPhoneChoice(
+      // 터치주문에서 온 경우 터치주문 전화번호 선택 API 사용
+      if (isFromTouchOrder()) {
+        const response = await touchOrderService.submitTouchPhoneChoice(
           sessionId,
           save
         );
-        console.log("✅ 전화번호 선택 API 응답:", response);
+        console.log("✅ 터치주문 전화번호 선택 완료:", response);
 
         // API 응답에 따라 네비게이션
         if (save) {
@@ -43,26 +65,22 @@ export default function PointCheckPage() {
         return;
       }
 
-      // 기존 로직 (세션 ID가 없는 경우)
-      saveOrderPoint({ enabled: !!save });
-      if (!save) {
-        navigate("/order/complete");
-      } else {
+      // 음성주문에서 온 경우 기존 음성주문 API 사용
+      const response = await voiceOrderService.submitPhoneChoice(
+        sessionId,
+        save
+      );
+      console.log("✅ 음성주문 전화번호 선택 완료:", response);
+
+      // API 응답에 따라 네비게이션
+      if (save) {
         navigate("/order/point/phone");
+      } else {
+        navigate("/order/complete");
       }
     } catch (err) {
       console.error("전화번호 선택 API 실패:", err);
-      // API 실패 시 기존 로직으로 폴백
-      try {
-        saveOrderPoint({ enabled: !!save });
-        if (!save) {
-          navigate("/order/complete");
-        } else {
-          navigate("/order/point/phone");
-        }
-      } catch (saveErr) {
-        console.error("orderSpec 저장 실패:", saveErr);
-      }
+      navigate("/order-method");
     }
   }
 
