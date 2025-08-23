@@ -177,3 +177,32 @@ export const ProductRow = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 2.375rem;
 `;
+
+export const PageViewport = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+
+  &::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+  }
+  &::-webkit-scrollbar-track {
+    display: none !important;
+  }
+  &::-webkit-scrollbar-thumb {
+    display: none !important;
+  }
+  &::-webkit-scrollbar-corner {
+    display: none !important;
+  }
+  scrollbar-width: none !important;
+  scrollbar-color: transparent transparent !important;
+  -ms-overflow-style: none !important;
+`;
+
+export const ContentWrapper = styled.div``;

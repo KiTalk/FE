@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Page,
+  PageViewport,
+  ContentWrapper,
   Hero,
   HeroInner,
   HeroTitle,
@@ -23,6 +25,7 @@ import badgeImage from "../assets/images/badge.png";
 import { menuService, touchOrderService } from "../services/api.js";
 import CategoryTabs from "../components/CategoryTabs";
 import ProductCard from "../components/ProductCard";
+import CustomScrollbar from "../components/CustomScrollbar";
 
 export default function TouchOrderPage() {
   return <TouchOrderContent />;
@@ -192,6 +195,14 @@ function TouchOrderContent() {
     return menu.id === activeTabId;
   });
 
+  // 커스텀 스크롤바를 위한 고정 요소들 반환
+  const getFixedElements = () => {
+    return {
+      hero: document.querySelector("[data-hero='touch']"),
+      tabs: document.querySelector("[data-tabs='touch']"),
+    };
+  };
+
   // 로딩 상태 처리
   if (loading) {
     return (
@@ -225,53 +236,70 @@ function TouchOrderContent() {
 
   return (
     <Page>
-      <Hero>
-        <HeroInner>
-          <HeroTitle>무엇을 드시겠어요?</HeroTitle>
-          <CartWidget onClick={handleCartClick}>
-            <CartTextWrap>
-              <CartText>장바구니</CartText>
-            </CartTextWrap>
-            <CartIcon src={marketImage} alt="장바구니" />
-            <CartBadgeWrap>
-              <CartBadge src={badgeImage} alt="배지" />
-              <CartBadgeCount>{cartCount}</CartBadgeCount>
-            </CartBadgeWrap>
-            <CartArrow src={arrowImage} alt="열기" />
-          </CartWidget>
-        </HeroInner>
-      </Hero>
+      <PageViewport data-viewport="touch" style={{ paddingRight: 24 }}>
+        <ContentWrapper data-content="touch">
+          <Hero data-hero="touch">
+            <HeroInner>
+              <HeroTitle>무엇을 드시겠어요?</HeroTitle>
+              <CartWidget onClick={handleCartClick}>
+                <CartTextWrap>
+                  <CartText>장바구니</CartText>
+                </CartTextWrap>
+                <CartIcon src={marketImage} alt="장바구니" />
+                <CartBadgeWrap>
+                  <CartBadge src={badgeImage} alt="배지" />
+                  <CartBadgeCount>{cartCount}</CartBadgeCount>
+                </CartBadgeWrap>
+                <CartArrow src={arrowImage} alt="열기" />
+              </CartWidget>
+            </HeroInner>
+          </Hero>
 
-      <CategoryTabs
-        tabs={menuData.map(function ({ id, label }) {
-          return { id, label };
-        })}
-        activeId={activeTabId}
-        onChange={setActiveTabId}
-      />
-
-      {activeMenu?.sections.map(function (section) {
-        return (
-          <Section key={section.id}>
-            <SectionTitle>{section.title}</SectionTitle>
-            <ProductRow>
-              {section.products.map(function (item) {
-                const cartQuantity = getCartQuantity(item);
-                return (
-                  <ProductCard
-                    key={item.id}
-                    product={item}
-                    cartQty={cartQuantity}
-                    onAdd={makeOnAddHandler(item)}
-                    currentMode="touch"
-                    selectedMenuType={activeTabId}
-                  />
-                );
+          <div data-tabs="touch">
+            <CategoryTabs
+              tabs={menuData.map(function ({ id, label }) {
+                return { id, label };
               })}
-            </ProductRow>
-          </Section>
-        );
-      })}
+              activeId={activeTabId}
+              onChange={setActiveTabId}
+            />
+          </div>
+
+          {activeMenu?.sections.map(function (section) {
+            return (
+              <Section key={section.id}>
+                <SectionTitle>{section.title}</SectionTitle>
+                <ProductRow>
+                  {section.products.map(function (item) {
+                    const cartQuantity = getCartQuantity(item);
+                    return (
+                      <ProductCard
+                        key={item.id}
+                        product={item}
+                        cartQty={cartQuantity}
+                        onAdd={makeOnAddHandler(item)}
+                        currentMode="touch"
+                        selectedMenuType={activeTabId}
+                      />
+                    );
+                  })}
+                </ProductRow>
+              </Section>
+            );
+          })}
+        </ContentWrapper>
+      </PageViewport>
+      <CustomScrollbar
+        viewportSelector="[data-viewport='touch']"
+        contentSelector="[data-content='touch']"
+        getFixedElements={getFixedElements}
+        positioning={{
+          topExtraOffset: 40,
+          bottomOffset: 70,
+          rightOffset: 65,
+        }}
+        minThumbHeight={40}
+      />
     </Page>
   );
 }

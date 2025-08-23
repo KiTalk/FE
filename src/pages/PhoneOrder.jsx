@@ -28,9 +28,6 @@ import {
   HistoryNavIcon,
   // 페이지 전체 커스텀 스크롤
   PageViewport,
-  PageScrollbar,
-  PageTrack,
-  PageThumb,
   // '자주 시킨 메뉴' 영역
   FavWrap,
   FavViewport,
@@ -72,6 +69,7 @@ import { useCart } from "../components/CartContext";
 /* 컴포넌트 */
 import LastFourDigits from "../components/LastFourDigits";
 import OrderHistory from "../components/OrderHistory.jsx";
+import CustomScrollbar from "../components/CustomScrollbar";
 
 export default function TouchOrderPage() {
   return (
@@ -204,168 +202,13 @@ function TouchOrderContent() {
   const orderSpec = getOrderSpec();
   const phoneNumber = orderSpec?.point?.phone || "";
 
-  // 유틸: 현재 transform에서 translateY(px) 안전 추출
-  function getCurrentTranslateY(elem) {
-    if (!elem) return 0;
-
-    // 1) 인라인 transform 우선, 없으면 computedStyle로
-    let transform = (elem.style && elem.style.transform) || "";
-    if (!transform && typeof window !== "undefined") {
-      const cs = window.getComputedStyle(elem);
-      transform = cs.transform || cs.webkitTransform || "";
-    }
-
-    // 2) matrix3d(a1..a16) → translateY는 14번째(0-based 13)
-    if (transform.startsWith("matrix3d(")) {
-      const v = transform.slice(9, -1).split(",");
-      return parseFloat(v[13]) || 0;
-    }
-
-    // 3) matrix(a,b,c,d,tx,ty) → translateY는 6번째(0-based 5)
-    if (transform.startsWith("matrix(")) {
-      const v = transform.slice(7, -1).split(",");
-      return parseFloat(v[5]) || 0;
-    }
-
-    // 4) translateY(...) 또는 translate(x, y)
-    const m =
-      /translateY\(([-\d.]+)px\)/.exec(transform) ||
-      /translate\([^,]+,\s*([-\d.]+)px\)/.exec(transform);
-    return m ? parseFloat(m[1]) : 0;
-  }
-
-  // 페이지 전체 커스텀 스크롤바 동기화
-  useEffect(function syncPageScrollbar() {
-    const viewport = document.querySelector("[data-viewport='page']");
-    const content = document.querySelector("[data-content='page']");
-    const hero = document.querySelector("[data-hero='page']");
-    const tabsBar = document.querySelector("[data-tabs='page']");
-    const scrollbar = document.querySelector("[data-scrollbar='page']");
-    const thumb = document.querySelector("[data-thumb='page']");
-    if (!viewport || !thumb) return;
-
-    let pointerMoveHandler = null;
-    let pointerUpHandler = null;
-    let resizeObserver = null;
-
-    function updateThumb() {
-      const { scrollHeight, clientHeight, scrollTop } = viewport;
-      const track = thumb.parentElement;
-      const trackHeight = track ? track.offsetHeight : clientHeight || 420;
-      const visibleRatio = clientHeight / (scrollHeight || 1);
-      const thumbHeight = Math.max(
-        40,
-        Math.round(trackHeight * Math.min(1, visibleRatio))
-      );
-      const maxThumbOffset = Math.max(0, trackHeight - thumbHeight);
-      const maxScrollTop = Math.max(0, scrollHeight - clientHeight);
-      const top =
-        maxScrollTop > 0
-          ? Math.round((scrollTop / maxScrollTop) * maxThumbOffset)
-          : 0;
-      thumb.style.height = `${thumbHeight}px`;
-      thumb.style.transform = `translateY(${top}px)`;
-    }
-
-    // 페이지 레이아웃(히어로+탭) 높이에 맞춰 커스텀 스크롤바 위치/높이 보정
-    function updateScrollbarGeometry() {
-      if (!scrollbar) return;
-      const heroH = hero ? hero.offsetHeight : 0;
-      const tabsH = tabsBar ? tabsBar.offsetHeight : 0;
-      const topExtraOffset = 40;
-      const topOffset = heroH + tabsH + 16 + topExtraOffset; // 상단 여백
-      const bottomOffset = 70; // 하단 여백
-      const height = Math.max(0, window.innerHeight - topOffset - bottomOffset);
-      scrollbar.style.top = `${topOffset}px`;
-      scrollbar.style.height = `${height}px`;
-    }
-
-    // 초기 설정 - 약간의 지연으로 DOM 완전 렌더 후 계산
-    setTimeout(() => {
-      updateScrollbarGeometry();
-      updateThumb();
-    }, 50);
-
-    updateScrollbarGeometry();
-    updateThumb();
-    viewport.addEventListener("scroll", updateThumb, { passive: true });
-
-    // 드래그로 썸을 움직여 페이지 스크롤 조작
-    let isDragging = false;
-    let startY = 0;
-    let startTop = 0;
-
-    function onPointerDown(e) {
-      isDragging = true;
-      e.preventDefault();
-      startY = e.clientY || (e.touches && e.touches[0]?.clientY) || 0;
-      startTop = getCurrentTranslateY(thumb);
-      pointerMoveHandler = onPointerMove;
-      pointerUpHandler = onPointerUp;
-      document.addEventListener("pointermove", pointerMoveHandler);
-      document.addEventListener("pointerup", pointerUpHandler);
-    }
-
-    function onPointerMove(e) {
-      if (!isDragging) return;
-      const track = thumb.parentElement;
-      const trackHeight = track
-        ? track.offsetHeight
-        : viewport.clientHeight || 420;
-      const { scrollHeight, clientHeight } = viewport;
-      const visibleRatio = clientHeight / (scrollHeight || 1);
-      const thumbHeight = Math.max(
-        40,
-        Math.round(trackHeight * Math.min(1, visibleRatio))
-      );
-      const maxThumbOffset = Math.max(0, trackHeight - thumbHeight);
-      const currentY = e.clientY || (e.touches && e.touches[0]?.clientY) || 0;
-      const delta = currentY - startY;
-      const nextTop = Math.max(0, Math.min(maxThumbOffset, startTop + delta));
-      const maxScrollTop = Math.max(0, scrollHeight - clientHeight);
-      const scrollTop = (nextTop / (maxThumbOffset || 1)) * maxScrollTop;
-      viewport.scrollTop = Number.isFinite(scrollTop) ? scrollTop : 0;
-      thumb.style.transform = `translateY(${nextTop}px)`;
-    }
-
-    function onPointerUp() {
-      isDragging = false;
-      if (pointerMoveHandler)
-        document.removeEventListener("pointermove", pointerMoveHandler);
-      if (pointerUpHandler)
-        document.removeEventListener("pointerup", pointerUpHandler);
-      pointerMoveHandler = null;
-      pointerUpHandler = null;
-    }
-
-    thumb.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("resize", updateThumb);
-    window.addEventListener("resize", updateScrollbarGeometry);
-    // 콘텐츠 높이 변화에 반응 (세로 커스텀바 전용)
-    try {
-      resizeObserver = new ResizeObserver(function () {
-        updateScrollbarGeometry();
-        updateThumb();
-      });
-      if (content) resizeObserver.observe(content);
-      window.addEventListener("load", updateThumb);
-    } catch (e) {
-      void e;
-    }
-
-    return function cleanup() {
-      viewport.removeEventListener("scroll", updateThumb);
-      thumb.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("resize", updateThumb);
-      window.removeEventListener("resize", updateScrollbarGeometry);
-      window.removeEventListener("load", updateThumb);
-      if (resizeObserver) resizeObserver.disconnect();
-      if (pointerMoveHandler)
-        document.removeEventListener("pointermove", pointerMoveHandler);
-      if (pointerUpHandler)
-        document.removeEventListener("pointerup", pointerUpHandler);
+  // 커스텀 스크롤바를 위한 고정 요소들 반환
+  const getFixedElements = () => {
+    return {
+      hero: document.querySelector("[data-hero='page']"),
+      tabs: document.querySelector("[data-tabs='page']"),
     };
-  }, []);
+  };
 
   const activeMenu = menuData.find(function (menu) {
     return menu.id === activeTabId;
@@ -506,7 +349,6 @@ function TouchOrderContent() {
 
                   return (
                     <>
-                      {/* 자주 시킨 메뉴: 세로 스크롤 */}
                       <SubSectionTitle>자주 시킨 메뉴</SubSectionTitle>
                       <FavWrap>
                         <FavViewport aria-label="자주 시킨 메뉴 목록">
@@ -693,14 +535,17 @@ function TouchOrderContent() {
           )}
         </ContentWrapper>
       </PageViewport>
-      <PageScrollbar
-        data-scrollbar="page"
-        role="scrollbar"
-        aria-orientation="vertical"
-      >
-        <PageTrack />
-        <PageThumb data-thumb="page" tabIndex="0" aria-label="페이지 스크롤" />
-      </PageScrollbar>
+      <CustomScrollbar
+        viewportSelector="[data-viewport='page']"
+        contentSelector="[data-content='page']"
+        getFixedElements={getFixedElements}
+        positioning={{
+          topExtraOffset: 40,
+          bottomOffset: 70,
+          rightOffset: 65,
+        }}
+        minThumbHeight={40}
+      />
     </Page>
   );
 }
