@@ -216,6 +216,7 @@ export default function VoiceThreePlusConfirmOrder() {
                     quantity: Number(o.quantity || 0),
                     popular: Boolean(o.popular),
                     temp: o.temp,
+                    profileImage: o.profile,
                     menu_id: o.menu_id,
                   }))
                 : [];

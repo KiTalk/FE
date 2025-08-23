@@ -214,6 +214,7 @@ export default function VoiceThreePlusDetailsPlus() {
               quantity: Number(o.quantity || 0),
               popular: Boolean(o.popular),
               temp: o.temp,
+              profileImage: o.profile,
               menu_id: o.menu_id,
             }))
           : [];
@@ -352,7 +353,7 @@ export default function VoiceThreePlusDetailsPlus() {
                 <ProfileIcon src={profile} alt="프로필" />
                 <MessageBubble>
                   <MainTitle>추가하실 메뉴를 말씀해주세요</MainTitle>
-                  <ExampleText>예시) 아이스티 1잔</ExampleText>
+                  <ExampleText>예시) 레몬티 1잔</ExampleText>
                 </MessageBubble>
               </GuideSection>
 

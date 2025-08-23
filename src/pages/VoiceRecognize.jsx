@@ -38,7 +38,7 @@ export default function VoiceRecognize() {
           <>
             <Title>
               {loading
-                ? "변환 중..."
+                ? "잠시만 기다려주세요..."
                 : isRecording
                 ? "인식 중..."
                 : "음성 주문"}

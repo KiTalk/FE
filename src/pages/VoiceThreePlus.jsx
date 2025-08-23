@@ -39,9 +39,7 @@ export default function VoiceThreePlus() {
 
         <MessageBubble>
           <MainTitle>주문하실 메뉴를 말씀해 주세요</MainTitle>
-          <ExampleText>
-            예시) 아이스 아메리카노 2잔, 핫 카페라떼 3잔
-          </ExampleText>
+          <ExampleText>예시) 아이스 아메리카노 2잔, 유자차 3잔</ExampleText>
         </MessageBubble>
       </GuideSection>
 
