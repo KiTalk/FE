@@ -561,4 +561,49 @@ export const touchOrderService = {
       throw error;
     }
   },
+
+  // 터치주문 포장 방식 설정
+  setTouchCartPackaging: async (sessionId, packagingType) => {
+    try {
+      const response = await touchOrderApiClient.post(
+        API_ENDPOINTS.TOUCH_CART_PACKAGING(sessionId),
+        { packagingType }
+      );
+      console.log("터치주문 포장 방식 설정 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("터치주문 포장 방식 설정 실패:", error);
+      throw error;
+    }
+  },
+
+  // 터치주문 전화번호 선택
+  submitTouchPhoneChoice: async (sessionId, wantsPhone) => {
+    try {
+      const response = await touchOrderApiClient.post(
+        API_ENDPOINTS.TOUCH_PHONE_CHOICE(sessionId),
+        { wants_phone: wantsPhone }
+      );
+      console.log("터치주문 전화번호 선택 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("터치주문 전화번호 선택 실패:", error);
+      throw error;
+    }
+  },
+
+  // 터치주문 전화번호 입력
+  submitTouchPhoneNumber: async (sessionId, phoneNumber) => {
+    try {
+      const response = await touchOrderApiClient.post(
+        API_ENDPOINTS.TOUCH_PHONE_INPUT(sessionId),
+        { phone_number: phoneNumber }
+      );
+      console.log("터치주문 전화번호 입력 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("터치주문 전화번호 입력 실패:", error);
+      throw error;
+    }
+  },
 };

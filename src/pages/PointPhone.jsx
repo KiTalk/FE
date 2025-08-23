@@ -2,41 +2,59 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import PhoneInput from "../components/PhoneInput";
-import { saveOrderPoint } from "../utils/orderSpec";
-import { voiceOrderService } from "../services/api";
+import { voiceOrderService, touchOrderService } from "../services/api";
 
 export default function PointPhone() {
   const navigate = useNavigate();
 
+  // 터치주문에서 온 경우인지 확인하는 함수
+  const isFromTouchOrder = () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    const orderSpec = localStorage.getItem("order_spec");
+
+    if (sessionId && orderSpec) {
+      try {
+        const spec = JSON.parse(orderSpec);
+        // 터치주문 모드인 경우
+        return spec.mode === "touch" || spec.mode === "color";
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  };
+
   async function handleSave(phoneDigits) {
     const sessionId = sessionStorage.getItem("currentSessionId");
 
+    if (!sessionId) {
+      console.error("세션 ID가 없습니다.");
+      navigate("/order-method");
+      return;
+    }
+
     try {
-      // 세션 ID가 있으면 전화번호 입력 API 호출
-      if (sessionId) {
-        const response = await voiceOrderService.submitPhoneNumber(
+      // 터치주문에서 온 경우 터치주문 전화번호 입력 API 사용
+      if (isFromTouchOrder()) {
+        const response = await touchOrderService.submitTouchPhoneNumber(
           sessionId,
           phoneDigits
         );
-        console.log("✅ 전화번호 입력 API 응답:", response);
-
-        // 주문 완료 페이지로 이동
+        console.log("✅ 터치주문 전화번호 입력 완료:", response);
         navigate("/order/complete", { replace: true });
         return;
       }
 
-      // 기존 로직 (세션 ID가 없는 경우)
-      saveOrderPoint({ phone: phoneDigits });
+      // 음성주문에서 온 경우 기존 음성주문 API 사용
+      const response = await voiceOrderService.submitPhoneNumber(
+        sessionId,
+        phoneDigits
+      );
+      console.log("✅ 음성주문 전화번호 입력 완료:", response);
       navigate("/order/complete", { replace: true });
     } catch (error) {
       console.error("전화번호 입력 API 실패:", error);
-      // API 실패 시 기존 로직으로 폴백
-      try {
-        saveOrderPoint({ phone: phoneDigits });
-        navigate("/order/complete", { replace: true });
-      } catch (saveError) {
-        console.error("orderSpec 저장 실패:", saveError);
-      }
+      navigate("/order-method");
     }
   }
 

@@ -1,7 +1,6 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { saveOrderPackage } from "../utils/orderSpec";
-import { orderService } from "../services/api";
+import { useNavigate } from "react-router-dom";
+import { orderService, touchOrderService } from "../services/api";
 import BackButton from "../components/BackButton";
 import packageIcon from "../assets/images/package.png";
 import dineinIcon from "../assets/images/dinein.png";
@@ -18,8 +17,24 @@ import {
 
 export default function PackagePage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { totalPrice = 0, totalQty = 0 } = location.state || {};
+
+  // 이전 페이지가 Cart.jsx인지 확인하는 함수
+  const isFromTouchCart = () => {
+    // 현재 sessionStorage에 터치주문 세션이 있고, Cart에서 온 경우
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    const orderSpec = localStorage.getItem("order_spec");
+
+    if (sessionId && orderSpec) {
+      try {
+        const spec = JSON.parse(orderSpec);
+        // 터치주문 모드인 경우
+        return spec.mode === "touch" || spec.mode === "color";
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  };
 
   function handleBack() {
     navigate(-1);
@@ -28,53 +43,36 @@ export default function PackagePage() {
   async function persistAndNext(type) {
     const sessionId = sessionStorage.getItem("currentSessionId");
 
+    if (!sessionId) {
+      console.error("세션 ID가 없습니다.");
+      navigate("/order-method");
+      return;
+    }
+
     try {
-      // 세션 ID가 있으면 포장 API 호출
-      if (sessionId) {
-        const packagingType = type === "takeout" ? "takeout" : "dinein";
-        const response = await orderService.selectPackaging(
+      // 터치주문에서 온 경우 터치주문 포장 API 사용
+      if (isFromTouchCart()) {
+        const packagingType = type === "takeout" ? "포장" : "매장";
+        const response = await touchOrderService.setTouchCartPackaging(
           sessionId,
           packagingType
         );
-        console.log("✅ 포장 방식 선택 완료:", response);
-
-        // 세션 완료 후 주문 완료 페이지로 이동
+        console.log("✅ 터치주문 포장 방식 설정 완료:", response);
         navigate("/order/point");
         return;
       }
 
-      // 기존 로직 (세션 ID가 없는 경우)
-      const pkg = { type, totalPrice, totalQty };
-      saveOrderPackage(pkg);
+      // 음성주문에서 온 경우 기존 음성주문 API 사용
+      const packagingType = type === "takeout" ? "takeout" : "dinein";
+      const response = await orderService.selectPackaging(
+        sessionId,
+        packagingType
+      );
+      console.log("✅ 음성주문 포장 방식 선택 완료:", response);
+      navigate("/order/point");
     } catch (err) {
       console.error("포장 방식 선택 API 실패:", err);
-      // API 실패 시 기존 로직으로 폴백
-      try {
-        const pkg = { type, totalPrice, totalQty };
-        saveOrderPackage(pkg);
-      } catch (saveErr) {
-        console.error("orderSpec 저장 실패:", saveErr);
-      }
-    }
-
-    // 기존 네비게이션 로직
-    try {
-      const orderSpecStr = localStorage.getItem("order_spec");
-      if (orderSpecStr) {
-        const orderSpec = JSON.parse(orderSpecStr);
-        const point = orderSpec.point;
-
-        if (point && point.enabled && point.phone) {
-          navigate("/order/complete");
-        } else {
-          navigate("/order/point");
-        }
-      } else {
-        navigate("/order/point");
-      }
-    } catch (err) {
-      console.error("Error checking order_spec:", err);
-      navigate("/order/point");
+      navigate("/order-method");
     }
   }
 
