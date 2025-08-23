@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Page,
   CartPageContainer,
@@ -24,92 +24,115 @@ import {
   FooterMetaLabel,
   FooterMetaValue,
 } from "./Cart.styles";
-import CartProvider from "../components/CartProvider.jsx";
-import { useCart } from "../components/CartContext";
 import CartProductCard from "../components/CartProductCard";
 import CancelImage from "../assets/images/cancel.png";
 import { useNavigate } from "react-router-dom";
-import { getStorageKey, normalizeId } from "../utils/storage";
+import { touchOrderService } from "../services/api.js";
 
 export default function CartPage(props) {
   return (
-    <CartProvider>
-      <Page>
-        <CartHydrator initialItems={props.initialCart} />
-        <CartContent {...props} />
-      </Page>
-    </CartProvider>
+    <Page>
+      <CartContent {...props} />
+    </Page>
   );
-}
-
-function CartHydrator({ initialItems }) {
-  const { addItem } = useCart();
-  useEffect(
-    function hydrate() {
-      if (Array.isArray(initialItems) && initialItems.length > 0) {
-        initialItems.forEach(function (it) {
-          const qty = Number(it.qty ?? 1);
-          if (it?.id && qty > 0) {
-            addItem(
-              {
-                id: it.id,
-                name: it.name,
-                price: it.price,
-                popular: !!it.popular,
-                temp: it.temp,
-              },
-              qty
-            );
-          }
-        });
-      }
-    },
-    [initialItems, addItem]
-  );
-  return null;
 }
 
 function CartContent(props) {
   const navigate = useNavigate();
-  const { items, totalQty, totalPrice, increase, decrease } = useCart();
+  const [cartData, setCartData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [localCart, setLocalCart] = useState({}); // localStorage 기반 장바구니
+
+  // localStorage에 장바구니 데이터 저장
+  const saveLocalCart = (cart) => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) return;
+
+    try {
+      const cartKey = `touchCart_${sessionId}`;
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+    } catch (error) {
+      console.error("장바구니 저장 실패:", error);
+    }
+  };
+
+  // 서버에서 장바구니 데이터 로드 (최초 마운트 시에만)
+  const loadServerCartData = useCallback(async () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) {
+      navigate("/order-method");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await touchOrderService.getTouchCart(sessionId);
+      setCartData(data);
+
+      // 서버 데이터를 localStorage에도 동기화
+      const cart = {};
+      data.orders?.forEach((order) => {
+        cart[order.menu_id] = order.quantity;
+      });
+      setLocalCart(cart);
+      saveLocalCart(cart);
+    } catch (err) {
+      setError(err.message);
+      navigate("/order-method");
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    loadServerCartData();
+  }, [loadServerCartData]);
 
   function formatCurrency(value) {
     const n = Number(value ?? 0);
     return Number.isFinite(n) ? n.toLocaleString() : "0";
   }
 
-  // ✅ 전체 취소: localStorage의 각 상품 수량을 "0"으로, 컨텍스트 수량도 0으로
-  function handleCancel() {
+  // 전체 취소: localStorage와 서버 장바구니 모두 삭제 후 이전 페이지로 이동
+  async function handleCancel() {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) {
+      navigate("/order-method");
+      return;
+    }
+
     try {
-      const LS = window.localStorage;
+      // localStorage 장바구니 초기화
+      setLocalCart({});
+      saveLocalCart({});
 
-      // 1) localStorage 'added_total_{id}'를 모두 "0"으로 설정
-      items.forEach((it) => {
-        const normId = normalizeId(it?.id);
-        if (!normId) return;
-        const key = getStorageKey(normId);
-        LS.setItem(key, "0"); // 요구사항: 삭제가 아니라 0으로 설정
-      });
+      // 서버 장바구니도 초기화
+      await touchOrderService.clearTouchCart(sessionId);
 
-      // 2) 화면상의 장바구니 수량도 0이 되도록 감소 호출
-      items.forEach((it) => {
-        const count = Number(it?.qty ?? 0);
-        for (let i = 0; i < count; i++) {
-          decrease(it.id); // 항목 수량만큼 감소
-        }
-      });
+      // cartData도 초기화
+      setCartData({ orders: [], total_items: 0, total_price: 0 });
 
-      // 3) 기존 onCancelClick prop이 있으면 추가로 호출(기능 유지)
+      // 기존 onCancelClick prop이 있으면 추가로 호출(기능 유지)
       if (typeof props.onCancelClick === "function") {
         props.onCancelClick();
       }
+
+      // 이전 페이지로 이동
+      navigate(-1);
     } catch (err) {
       console.error("Cancel error:", err);
+      navigate("/order-method");
     }
   }
 
-  function handleContinue() {
+  // 더 담기: localStorage를 서버에 동기화 후 이동
+  async function handleContinue() {
     try {
+      // localStorage 데이터를 서버에 동기화
+      await syncCartToServer();
+
       const raw = localStorage.getItem("order_spec");
       if (!raw) {
         return navigate("/order/touch"); // 기본은 터치 주문
@@ -131,109 +154,267 @@ function CartContent(props) {
       // ✅ 기본은 터치 주문
       navigate("/order/touch");
     } catch (err) {
-      console.error("Error checking order_spec:", err);
-      navigate("/order/touch");
+      console.error("더 담기 동기화 실패:", err);
+      navigate("/order-method");
     }
   }
 
-  function handleCheckout() {
-    if (items.length === 0) {
+  // 주문하기: localStorage를 서버에 동기화 후 이동
+  async function handleCheckout() {
+    // localStorage 기반으로 빈 장바구니 체크
+    const hasItems = Object.values(localCart).some((quantity) => quantity > 0);
+    if (!hasItems) {
       alert("장바구니가 비어있습니다.");
       return;
     }
-    navigate("/order/package", {
-      state: { totalPrice, totalQty },
-    });
+
+    try {
+      // localStorage 데이터를 서버에 동기화
+      await syncCartToServer();
+
+      // 총 가격과 수량 계산 (localStorage 기반)
+      let totalPrice = 0;
+      let totalQty = 0;
+
+      for (const [menuId, quantity] of Object.entries(localCart)) {
+        if (quantity > 0) {
+          totalQty += quantity;
+          // cartData에서 해당 메뉴의 가격 찾기
+          const orderItem = cartData?.orders?.find(
+            (order) => order.menu_id === parseInt(menuId)
+          );
+          if (orderItem) {
+            totalPrice += orderItem.price * quantity;
+          }
+        }
+      }
+
+      navigate("/order/package", {
+        state: {
+          totalPrice: totalPrice,
+          totalQty: totalQty,
+        },
+      });
+    } catch (err) {
+      console.error("주문하기 동기화 실패:", err);
+      navigate("/order-method");
+    }
+  }
+
+  // localStorage 장바구니를 서버에 동기화
+  const syncCartToServer = async () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) return;
+
+    try {
+      // 기존 서버 장바구니 초기화
+      await touchOrderService.clearTouchCart(sessionId);
+
+      // localStorage의 각 상품을 처리
+      for (const [menuId, quantity] of Object.entries(localCart)) {
+        if (quantity > 0) {
+          // 수량이 0보다 크면 서버에 추가
+          await touchOrderService.addToTouchCart(
+            sessionId,
+            parseInt(menuId),
+            quantity
+          );
+        } else if (quantity === 0) {
+          // 수량이 0이면 서버에서 제거 (이미 clearTouchCart로 전체 삭제했으므로 별도 처리 불필요)
+          // 필요시 개별 제거 API 호출: await touchOrderService.removeTouchCartItem(sessionId, parseInt(menuId));
+        }
+      }
+    } catch (error) {
+      console.error("서버 동기화 실패:", error);
+      throw error;
+    }
+  };
+
+  // 수량 증가 (localStorage만 업데이트)
+  function handleIncrease(menuId) {
+    const currentQuantity = localCart[menuId] || 0;
+    const newQuantity = currentQuantity + 1;
+
+    const updatedCart = {
+      ...localCart,
+      [menuId]: newQuantity,
+    };
+
+    setLocalCart(updatedCart);
+    saveLocalCart(updatedCart);
+  }
+
+  // 수량 감소 (localStorage만 업데이트, 0개가 되면 0으로 저장)
+  function handleDecrease(menuId) {
+    const currentQuantity = localCart[menuId] || 0;
+    if (currentQuantity <= 0) return;
+
+    const newQuantity = currentQuantity - 1;
+
+    const updatedCart = {
+      ...localCart,
+      [menuId]: newQuantity,
+    };
+
+    setLocalCart(updatedCart);
+    saveLocalCart(updatedCart);
   }
 
   // 커스텀 스크롤바 동기화
-  useEffect(function syncCustomScrollbar() {
-    const viewport = document.getElementById("cards-viewport");
-    const thumb = document.getElementById("cards-thumb");
-    if (!viewport || !thumb) return;
+  useEffect(
+    function syncCustomScrollbar() {
+      const viewport = document.getElementById("cards-viewport");
+      const thumb = document.getElementById("cards-thumb");
+      if (!viewport || !thumb) return;
 
-    let pointerMoveHandler = null;
-    let pointerUpHandler = null;
+      let pointerMoveHandler = null;
+      let pointerUpHandler = null;
 
-    function updateThumb() {
-      const { scrollWidth, clientWidth, scrollLeft } = viewport;
-      const track = thumb.parentElement;
-      const trackWidth = track ? track.offsetWidth : 1222;
-      const visibleRatio = clientWidth / scrollWidth;
-      const thumbWidth = Math.max(80, Math.round(trackWidth * visibleRatio));
-      const maxThumbOffset = trackWidth - thumbWidth;
-      const maxScrollLeft = scrollWidth - clientWidth;
-      const left =
-        maxScrollLeft > 0
-          ? Math.round((scrollLeft / maxScrollLeft) * maxThumbOffset)
-          : 0;
-      thumb.style.width = `${thumbWidth}px`;
-      thumb.style.transform = `translateX(${left}px)`;
-    }
+      function updateThumb() {
+        const { scrollWidth, clientWidth, scrollLeft } = viewport;
+        const track = thumb.parentElement;
+        if (!track) return;
 
-    updateThumb();
-    viewport.addEventListener("scroll", updateThumb, { passive: true });
+        const trackWidth = track.offsetWidth;
 
-    // 드래그로 썸을 움직여 스크롤 조작
-    let isDragging = false;
-    let startX = 0;
-    let startLeft = 0;
+        // 항상 스크롤바 표시 (UI 일관성을 위해)
+        thumb.style.display = "block";
 
-    function onPointerDown(e) {
-      isDragging = true;
-      e.preventDefault();
-      startX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
-      const matrix = new DOMMatrixReadOnly(getComputedStyle(thumb).transform);
-      startLeft = matrix.m41 || 0;
-      pointerMoveHandler = onPointerMove;
-      pointerUpHandler = onPointerUp;
-      document.addEventListener("pointermove", pointerMoveHandler);
-      document.addEventListener("pointerup", pointerUpHandler);
-    }
+        const visibleRatio = clientWidth / scrollWidth;
+        const thumbWidth = Math.max(80, Math.round(trackWidth * visibleRatio));
+        const maxThumbOffset = trackWidth - thumbWidth;
+        const maxScrollLeft = Math.max(0, scrollWidth - clientWidth);
 
-    function onPointerMove(e) {
-      if (!isDragging) return;
-      const track = thumb.parentElement;
-      const trackWidth = track ? track.offsetWidth : 1222;
-      const { scrollWidth, clientWidth } = viewport;
-      const visibleRatio = clientWidth / scrollWidth;
-      const thumbWidth = Math.max(80, Math.round(trackWidth * visibleRatio));
-      const maxThumbOffset = trackWidth - thumbWidth;
-      const currentX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
-      const delta = currentX - startX;
-      const nextLeft = Math.max(0, Math.min(maxThumbOffset, startLeft + delta));
-      const maxScrollLeft = scrollWidth - clientWidth;
-      const scrollLeft = (nextLeft / maxThumbOffset) * maxScrollLeft;
-      viewport.scrollLeft = isFinite(scrollLeft) ? scrollLeft : 0;
-    }
-
-    function onPointerUp() {
-      isDragging = false;
-      if (pointerMoveHandler) {
-        document.removeEventListener("pointermove", pointerMoveHandler);
-        pointerMoveHandler = null;
+        // 스크롤이 필요하지 않으면 thumb을 전체 너비로 표시
+        const finalThumbWidth = maxScrollLeft <= 0 ? trackWidth : thumbWidth;
+        const left =
+          maxScrollLeft > 0
+            ? Math.round((scrollLeft / maxScrollLeft) * maxThumbOffset)
+            : 0;
+        thumb.style.width = `${finalThumbWidth}px`;
+        thumb.style.transform = `translateX(${left}px)`;
       }
-      if (pointerUpHandler) {
-        document.removeEventListener("pointerup", pointerUpHandler);
-        pointerUpHandler = null;
+
+      // 초기 업데이트는 지연 실행 (DOM 렌더링 완료 후)
+      const timer = setTimeout(updateThumb, 100);
+      viewport.addEventListener("scroll", updateThumb, { passive: true });
+
+      // 드래그로 썸을 움직여 스크롤 조작
+      let isDragging = false;
+      let startX = 0;
+      let startLeft = 0;
+
+      function onPointerDown(e) {
+        isDragging = true;
+        e.preventDefault();
+        startX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
+        const matrix = new DOMMatrixReadOnly(getComputedStyle(thumb).transform);
+        startLeft = matrix.m41 || 0;
+        pointerMoveHandler = onPointerMove;
+        pointerUpHandler = onPointerUp;
+        document.addEventListener("pointermove", pointerMoveHandler);
+        document.addEventListener("pointerup", pointerUpHandler);
+      }
+
+      function onPointerMove(e) {
+        if (!isDragging) return;
+        const track = thumb.parentElement;
+        if (!track) return;
+
+        const trackWidth = track.offsetWidth;
+        const { scrollWidth, clientWidth } = viewport;
+        const visibleRatio = clientWidth / scrollWidth;
+        const thumbWidth = Math.max(80, Math.round(trackWidth * visibleRatio));
+        const maxThumbOffset = trackWidth - thumbWidth;
+        const currentX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
+        const delta = currentX - startX;
+        const nextLeft = Math.max(
+          0,
+          Math.min(maxThumbOffset, startLeft + delta)
+        );
+        const maxScrollLeft = Math.max(0, scrollWidth - clientWidth);
+        const scrollLeft =
+          maxThumbOffset > 0 && maxScrollLeft > 0
+            ? (nextLeft / maxThumbOffset) * maxScrollLeft
+            : 0;
+        viewport.scrollLeft = isFinite(scrollLeft) ? scrollLeft : 0;
+      }
+
+      function onPointerUp() {
+        isDragging = false;
+        if (pointerMoveHandler) {
+          document.removeEventListener("pointermove", pointerMoveHandler);
+          pointerMoveHandler = null;
+        }
+        if (pointerUpHandler) {
+          document.removeEventListener("pointerup", pointerUpHandler);
+          pointerUpHandler = null;
+        }
+      }
+
+      thumb.addEventListener("pointerdown", onPointerDown);
+      window.addEventListener("resize", updateThumb);
+
+      return function cleanup() {
+        clearTimeout(timer);
+        viewport.removeEventListener("scroll", updateThumb);
+        thumb.removeEventListener("pointerdown", onPointerDown);
+        window.removeEventListener("resize", updateThumb);
+        if (pointerMoveHandler) {
+          document.removeEventListener("pointermove", pointerMoveHandler);
+        }
+        if (pointerUpHandler) {
+          document.removeEventListener("pointerup", pointerUpHandler);
+        }
+      };
+    },
+    [localCart, cartData]
+  ); // 의존성 배열에 localCart와 cartData 추가
+
+  // 로딩 상태
+  if (loading) {
+    return (
+      <CartPageContainer>
+        <HeaderContainer>
+          <HeaderTitle>장바구니</HeaderTitle>
+          <HeaderSubtitle>장바구니를 불러오는 중...</HeaderSubtitle>
+        </HeaderContainer>
+      </CartPageContainer>
+    );
+  }
+
+  // 에러 상태
+  if (error) {
+    return (
+      <CartPageContainer>
+        <HeaderContainer>
+          <HeaderTitle>장바구니</HeaderTitle>
+          <HeaderSubtitle>장바구니를 불러올 수 없습니다.</HeaderSubtitle>
+        </HeaderContainer>
+      </CartPageContainer>
+    );
+  }
+
+  // localStorage 기반으로 화면 데이터 구성 (0개 상품 제외)
+  const orders =
+    cartData?.orders?.filter((order) => (localCart[order.menu_id] || 0) > 0) ||
+    [];
+
+  // localStorage 기반으로 총 수량과 가격 계산
+  let totalQty = 0;
+  let totalPrice = 0;
+
+  for (const [menuId, quantity] of Object.entries(localCart)) {
+    if (quantity > 0) {
+      totalQty += quantity;
+      const orderItem = cartData?.orders?.find(
+        (order) => order.menu_id === parseInt(menuId)
+      );
+      if (orderItem) {
+        totalPrice += orderItem.price * quantity;
       }
     }
-
-    thumb.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("resize", updateThumb);
-
-    return function cleanup() {
-      viewport.removeEventListener("scroll", updateThumb);
-      thumb.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("resize", updateThumb);
-      if (pointerMoveHandler) {
-        document.removeEventListener("pointermove", pointerMoveHandler);
-      }
-      if (pointerUpHandler) {
-        document.removeEventListener("pointerup", pointerUpHandler);
-      }
-    };
-  }, []);
+  }
 
   return (
     <CartPageContainer>
@@ -241,7 +422,6 @@ function CartContent(props) {
         <HeaderTitle>장바구니</HeaderTitle>
         <HeaderSubtitle>주문하신 음료들이 여기에 담겨있습니다.</HeaderSubtitle>
         <CancelButton type="button" onClick={handleCancel}>
-          {/* ✅ 취소 시 수량 0으로 초기화 */}
           <CancelIcon src={CancelImage} alt="전체취소" />
           전체 취소
         </CancelButton>
@@ -249,14 +429,23 @@ function CartContent(props) {
 
       <CardsViewport id="cards-viewport" style={{ outline: "none" }}>
         <CardsScrollArea aria-label="장바구니 항목 목록">
-          {items.map(function (it) {
+          {orders.map(function (order) {
+            const product = {
+              id: order.menu_id,
+              name: order.menu_item,
+              price: order.price,
+              popular: order.popular,
+              temp: order.temp,
+            };
+            // localStorage 기반 수량 사용
+            const currentQuantity = localCart[order.menu_id] || 0;
             return (
               <CartProductCard
-                key={it.id}
-                product={it}
-                qty={it.qty}
-                onIncrease={increase}
-                onDecrease={decrease}
+                key={order.menu_id}
+                product={product}
+                qty={currentQuantity}
+                onIncrease={() => handleIncrease(order.menu_id)}
+                onDecrease={() => handleDecrease(order.menu_id)}
               />
             );
           })}
@@ -272,7 +461,11 @@ function CartContent(props) {
         aria-valuenow="0"
       >
         <CustomTrack />
-        <CustomThumb id="cards-thumb" tabIndex="0" aria-label="장바구니 스크롤" />
+        <CustomThumb
+          id="cards-thumb"
+          tabIndex="0"
+          aria-label="장바구니 스크롤"
+        />
       </CustomScrollbar>
 
       <FooterBar>

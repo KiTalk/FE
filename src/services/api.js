@@ -241,7 +241,6 @@ export const menuService = {
       const response = await touchOrderApiClient.get(API_ENDPOINTS.MENU_LIST, {
         params,
       });
-      console.log("메뉴 API 호출 성공:", response.data);
       return response.data;
     } catch (error) {
       console.error("메뉴 API 호출 실패:", error);
@@ -254,12 +253,6 @@ export const menuService = {
     if (!apiResponse?.success || !Array.isArray(apiResponse.data)) {
       throw new Error("잘못된 API 응답 형식입니다.");
     }
-
-    console.log(
-      "🔄 API 데이터 변환 시작:",
-      apiResponse.data.length,
-      "개 아이템"
-    );
 
     // API 데이터를 카테고리별로 그룹화
     const menuItems = apiResponse.data;
@@ -287,12 +280,11 @@ export const menuService = {
             ? "ice"
             : "none",
         originalId: item.id, // 원본 API ID 보존
+        profileImage: item.profile, // profile 이미지 URL (null일 수 있음)
       };
 
       categoryGroups[apiCategory].push(transformedItem);
     });
-
-    console.log("📊 카테고리별 그룹화 결과:", Object.keys(categoryGroups));
 
     // API 카테고리를 프론트엔드 구조로 매핑
     const categoryToFrontendMapping = {
@@ -381,7 +373,6 @@ export const menuService = {
       }
     });
 
-    console.log("✅ 데이터 변환 완료:", transformedData.length, "개 탭");
     return transformedData;
   },
 
@@ -421,48 +412,129 @@ export const menuService = {
   },
 };
 
-// 터치주문 처리 시스템 API
-export const touchOrderService = {
-  // 터치주문 세션 시작
+// 음성주문 처리 시스템 API (API_BASE_URL 사용)
+export const voiceOrderService = {
+  // 음성주문 세션 시작 (ORDER_AT_ONCE_START)
   startOrderAtOnce: async () => {
     try {
-      const response = await touchOrderApiClient.post(
-        API_ENDPOINTS.ORDER_AT_ONCE_START
-      );
-      console.log("터치주문 세션 시작 성공:", response.data);
+      const response = await apiClient.post(API_ENDPOINTS.ORDER_AT_ONCE_START);
+      console.log("음성주문 세션 시작 성공:", response.data);
       return response.data;
     } catch (error) {
-      console.error("터치주문 세션 시작 실패:", error);
+      console.error("음성주문 세션 시작 실패:", error);
       throw error;
     }
   },
 
-  // 전화번호 입력
+  // 음성주문 전화번호 입력
   submitPhoneNumber: async (sessionId, phoneNumber) => {
     try {
-      const response = await touchOrderApiClient.post(
+      const response = await apiClient.post(
         API_ENDPOINTS.PHONE_INPUT(sessionId),
         { phone_number: phoneNumber }
       );
-      console.log("전화번호 입력 성공:", response.data);
+      console.log("음성주문 전화번호 입력 성공:", response.data);
       return response.data;
     } catch (error) {
-      console.error("전화번호 입력 실패:", error);
+      console.error("음성주문 전화번호 입력 실패:", error);
       throw error;
     }
   },
 
-  // 전화번호 선택 (저장 여부)
+  // 음성주문 전화번호 저장 선택
   submitPhoneChoice: async (sessionId, wantsPhone) => {
     try {
-      const response = await touchOrderApiClient.post(
+      const response = await apiClient.post(
         API_ENDPOINTS.PHONE_CHOICE(sessionId),
         { wants_phone: !!wantsPhone }
       );
-      console.log("전화번호 선택 성공:", response.data);
+      console.log("음성주문 전화번호 선택 성공:", response.data);
       return response.data;
     } catch (error) {
-      console.error("전화번호 선택 실패:", error);
+      console.error("음성주문 전화번호 선택 실패:", error);
+      throw error;
+    }
+  },
+};
+
+// 터치주문 처리 시스템 API (TOUCH_ORDER_API_BASE_URL 사용)
+export const touchOrderService = {
+  // 터치주문 장바구니에 메뉴 추가
+  addToTouchCart: async (sessionId, menuId, quantity) => {
+    try {
+      const response = await touchOrderApiClient.post(
+        API_ENDPOINTS.TOUCH_CART_ADD(sessionId),
+        { menuId: menuId, quantity: quantity }
+      );
+      console.log("터치주문 장바구니 추가 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("터치주문 장바구니 추가 실패:", error);
+      throw error;
+    }
+  },
+
+  // 터치주문 장바구니 조회
+  getTouchCart: async (sessionId) => {
+    try {
+      const response = await touchOrderApiClient.get(
+        API_ENDPOINTS.TOUCH_CART_GET(sessionId)
+      );
+      console.log("터치주문 장바구니 조회 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("터치주문 장바구니 조회 실패:", error);
+      throw error;
+    }
+  },
+
+  // 터치주문 장바구니 전체 삭제
+  clearTouchCart: async (sessionId) => {
+    try {
+      const response = await touchOrderApiClient.delete(
+        API_ENDPOINTS.TOUCH_CART_CLEAR(sessionId)
+      );
+      console.log("터치주문 장바구니 전체 삭제 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("터치주문 장바구니 전체 삭제 실패:", error);
+      throw error;
+    }
+  },
+
+  // 터치주문 장바구니 수량 변경
+  updateTouchCartQuantity: async (sessionId, menuId, quantity) => {
+    try {
+      const response = await touchOrderApiClient.put(
+        API_ENDPOINTS.TOUCH_CART_UPDATE(sessionId),
+        {
+          orders: [
+            {
+              menu_id: menuId,
+              quantity: quantity,
+            },
+          ],
+        }
+      );
+      console.log("터치주문 장바구니 수량 변경 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("터치주문 장바구니 수량 변경 실패:", error);
+      throw error;
+    }
+  },
+
+  // 터치주문 장바구니 상품 제거
+  removeTouchCartItem: async (sessionId, menuId) => {
+    try {
+      const response = await touchOrderApiClient.delete(
+        API_ENDPOINTS.TOUCH_CART_REMOVE(sessionId),
+        { data: { menuId: menuId } }
+      );
+      console.log("터치주문 장바구니 상품 제거 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("터치주문 장바구니 상품 제거 실패:", error);
       throw error;
     }
   },

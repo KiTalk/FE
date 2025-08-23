@@ -20,30 +20,12 @@ import {
 import marketImage from "../assets/images/market.png";
 import arrowImage from "../assets/images/arrow.png";
 import badgeImage from "../assets/images/badge.png";
-import { menuService } from "../services/api.js";
+import { menuService, touchOrderService } from "../services/api.js";
 import CategoryTabs from "../components/CategoryTabs";
 import ProductCard from "../components/ProductCard";
 
-import CartProvider from "../components/CartProvider.jsx";
-import { useCart } from "../components/CartContext";
-
-function clearAllAddedTotals() {
-  if (typeof window === "undefined" || !window.localStorage) return;
-  const ls = window.localStorage;
-  for (let i = ls.length - 1; i >= 0; i--) {
-    const key = ls.key(i);
-    if (key && key.startsWith("added_total_")) {
-      ls.removeItem(key);
-    }
-  }
-}
-
 export default function TouchOrderPage() {
-  return (
-    <CartProvider>
-      <TouchOrderContent />
-    </CartProvider>
-  );
+  return <TouchOrderContent />;
 }
 
 function TouchOrderContent() {
@@ -52,7 +34,8 @@ function TouchOrderContent() {
   const [menuData, setMenuData] = useState([]); // 빈 배열로 초기화
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { addItem, totalQty } = useCart();
+  const [cartCount, setCartCount] = useState(0);
+  const [localCart, setLocalCart] = useState({}); // localStorage 기반 장바구니
 
   // 메뉴 데이터 로드
   useEffect(() => {
@@ -64,13 +47,10 @@ function TouchOrderContent() {
 
         if (apiMenuData && apiMenuData.length > 0) {
           setMenuData(apiMenuData);
-          console.log("API에서 메뉴 데이터 로드 성공:", apiMenuData);
         } else {
-          console.warn("API에서 메뉴 데이터를 가져오지 못했습니다.");
           setMenuData([]);
         }
       } catch (err) {
-        console.error("메뉴 데이터 로드 실패:", err);
         setError(err.message);
         // API 실패 시 빈 배열 사용
         setMenuData([]);
@@ -82,29 +62,135 @@ function TouchOrderContent() {
     loadMenuData();
   }, []);
 
-  useEffect(() => {
-    if (Number(totalQty ?? 0) === 0) {
-      clearAllAddedTotals();
+  // localStorage에서 장바구니 데이터 로드
+  const loadLocalCart = () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) {
+      setLocalCart({});
+      setCartCount(0);
+      return;
     }
-  }, [totalQty]);
 
-  function handleCartClick() {
-    navigate("/order/cart");
+    try {
+      const cartKey = `touchCart_${sessionId}`;
+      const stored = localStorage.getItem(cartKey);
+      const cart = stored ? JSON.parse(stored) : {};
+
+      // 총 개수 계산
+      const totalQuantity = Object.values(cart).reduce(
+        (sum, quantity) => sum + quantity,
+        0
+      );
+
+      setLocalCart(cart);
+      setCartCount(totalQuantity);
+    } catch {
+      setLocalCart({});
+      setCartCount(0);
+    }
+  };
+
+  // localStorage에 장바구니 데이터 저장
+  const saveLocalCart = (cart) => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) return;
+
+    try {
+      const cartKey = `touchCart_${sessionId}`;
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+    } catch {
+      // 장바구니 저장 실패 시 무시
+    }
+  };
+
+  // 컴포넌트 마운트 시 로컬 장바구니 데이터 로드
+  useEffect(() => {
+    loadLocalCart();
+  }, []);
+
+  // 장바구니 버튼 클릭 시 서버에 동기화 후 이동
+  async function handleCartClick() {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) {
+      navigate("/order-method");
+      return;
+    }
+
+    try {
+      // localStorage의 장바구니 데이터를 서버에 동기화
+      await syncCartToServer();
+      navigate("/order/cart");
+    } catch {
+      navigate("/order-method");
+    }
+  }
+
+  // localStorage 장바구니를 서버에 동기화
+  const syncCartToServer = async () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) return;
+
+    // 기존 서버 장바구니 초기화
+    await touchOrderService.clearTouchCart(sessionId);
+
+    // localStorage의 각 상품을 서버에 추가
+    for (const [menuId, quantity] of Object.entries(localCart)) {
+      if (quantity > 0) {
+        await touchOrderService.addToTouchCart(
+          sessionId,
+          parseInt(menuId),
+          quantity
+        );
+      }
+    }
+  };
+
+  // 특정 제품의 장바구니 수량 조회 (localStorage 기반)
+  function getCartQuantity(product) {
+    if (!product?.originalId) return 0;
+    return localCart[product.originalId] || 0;
   }
 
   function handleAddToCart(product, quantity) {
     const qty = Number(quantity ?? 1);
     if (!product?.id || qty <= 0) return;
-    addItem(
-      {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        popular: !!product.popular,
-        temp: product.temp,
-      },
-      qty
+
+    const sessionId = sessionStorage.getItem("currentSessionId");
+
+    // 세션 ID가 없으면 주문 방법 선택 페이지로 이동
+    if (!sessionId) {
+      navigate("/order-method");
+      return;
+    }
+
+    // originalId가 없으면 주문 방법 선택 페이지로 이동
+    if (!product.originalId) {
+      navigate("/order-method");
+      return;
+    }
+
+    // localStorage에 장바구니 정보 저장
+    const menuId = product.originalId;
+    const currentQuantity = localCart[menuId] || 0;
+    const newQuantity = currentQuantity + qty;
+
+    const updatedCart = {
+      ...localCart,
+      [menuId]: newQuantity,
+    };
+
+    // 상태 업데이트
+    setLocalCart(updatedCart);
+
+    // localStorage에 저장
+    saveLocalCart(updatedCart);
+
+    // 총 개수 업데이트
+    const totalQuantity = Object.values(updatedCart).reduce(
+      (sum, quantity) => sum + quantity,
+      0
     );
+    setCartCount(totalQuantity);
   }
 
   function makeOnAddHandler(product) {
@@ -160,7 +246,7 @@ function TouchOrderContent() {
             <CartIcon src={marketImage} alt="장바구니" />
             <CartBadgeWrap>
               <CartBadge src={badgeImage} alt="배지" />
-              <CartBadgeCount>{totalQty}</CartBadgeCount>
+              <CartBadgeCount>{cartCount}</CartBadgeCount>
             </CartBadgeWrap>
             <CartArrow src={arrowImage} alt="열기" />
           </CartWidget>
@@ -181,10 +267,12 @@ function TouchOrderContent() {
             <SectionTitle>{section.title}</SectionTitle>
             <ProductRow>
               {section.products.map(function (item) {
+                const cartQuantity = getCartQuantity(item);
                 return (
                   <ProductCard
                     key={item.id}
                     product={item}
+                    cartQty={cartQuantity}
                     onAdd={makeOnAddHandler(item)}
                   />
                 );

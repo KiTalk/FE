@@ -408,14 +408,16 @@ export default function VoiceCart() {
 
             <OutlineButtonTop
               onClick={handleTempChange}
-              tempType={getCurrentTemp() === "hot" ? "ice" : "hot"}
+              $tempType={getCurrentTemp() === "hot" ? "ice" : "hot"}
             >
               {getCurrentTemp() === "hot" ? "ICE 변경" : "HOT 변경"}
             </OutlineButtonTop>
 
             <PackagingButton
               onClick={handlePackagingChange}
-              packagingType={getCurrentPackaging() === "포장" ? "매장" : "포장"}
+              $packagingType={
+                getCurrentPackaging() === "포장" ? "매장" : "포장"
+              }
             >
               {getCurrentPackaging() === "포장"
                 ? "매장주문 변경"

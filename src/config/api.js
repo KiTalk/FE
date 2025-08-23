@@ -6,12 +6,10 @@ export const API_BASE_URL =
 export const TOUCH_ORDER_API_BASE_URL = "http://localhost:8080";
 
 export const API_ENDPOINTS = {
-  // 공통 처리 시스템
-  ORDER_COMPLETE: "/order/complete",
+  // API_BASE_URL 사용
   LOGIC_START: "/logic/start",
   PHONE_INPUT: (sessionId) => `/api/phone/input/${sessionId}`,
   PHONE_CHOICE: (sessionId) => `/api/phone/choice/${sessionId}`,
-  // 음성주문 처리 시스템
   STT: "/stt",
   HEALTH: "/health",
   LANGUAGES: "/languages",
@@ -24,8 +22,14 @@ export const API_ENDPOINTS = {
   ORDERS_ADD: (sessionId) => `/orders/${sessionId}/add`,
   ORDERS_REMOVE: (sessionId) => `/orders/${sessionId}/remove`,
   ORDERS_CLEAR: (sessionId) => `/orders/${sessionId}/clear`,
-  // 터치주문 처리 시스템
+
+  // TOUCH_ORDER_API_BASE_URL 사용
   MENU_LIST: "/api/menu/list",
+  TOUCH_CART_ADD: (sessionId) => `/api/touch/cart/${sessionId}/add`,
+  TOUCH_CART_GET: (sessionId) => `/api/touch/cart/${sessionId}`,
+  TOUCH_CART_CLEAR: (sessionId) => `/api/touch/cart/${sessionId}/clear`,
+  TOUCH_CART_UPDATE: (sessionId) => `/api/touch/cart/${sessionId}/update`,
+  TOUCH_CART_REMOVE: (sessionId) => `/api/touch/cart/${sessionId}/remove`,
 };
 
 // 지원 언어 목록

@@ -128,6 +128,10 @@ export const CustomScrollbar = styled.div`
   top: 45.5625rem;
   height: 0.875rem;
   z-index: 6;
+
+  @media (min-width: 1441px) {
+    top: calc(45.5625rem - 4.5rem);
+  }
 `;
 
 export const CustomTrack = styled.div`

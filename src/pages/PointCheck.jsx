@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import { saveOrderPoint } from "../utils/orderSpec";
-import { touchOrderService } from "../services/api";
+import { voiceOrderService } from "../services/api";
 import {
   Page,
   BottomAccentBar,
@@ -28,7 +28,7 @@ export default function PointCheckPage() {
     try {
       // 세션 ID가 있으면 전화번호 선택 API 호출
       if (sessionId) {
-        const response = await touchOrderService.submitPhoneChoice(
+        const response = await voiceOrderService.submitPhoneChoice(
           sessionId,
           save
         );

@@ -17,12 +17,30 @@ import {
   BottomAccentBar,
 } from "./OrderMethod.styles";
 import { setMode } from "../utils/orderSpec";
+import { orderService } from "../services/api";
 
 export default function OrderMethod() {
   const navigate = useNavigate();
 
   function handleSelect(path) {
     navigate(path);
+  }
+
+  async function handleTouchOrder() {
+    try {
+      const sessionData = await orderService.startSession();
+      const sessionId = sessionData?.session_id || "";
+
+      if (sessionId) {
+        sessionStorage.setItem("currentSessionId", sessionId);
+        setMode("touch");
+        navigate("/order/touch");
+      } else {
+        return;
+      }
+    } catch {
+      return;
+    }
   }
 
   return (
@@ -61,13 +79,7 @@ export default function OrderMethod() {
       </ButtonGroup>
 
       <ButtonGroup>
-        <Button
-          type="button"
-          onClick={() => {
-            setMode("touch");
-            handleSelect("/order/touch");
-          }}
-        >
+        <Button type="button" onClick={handleTouchOrder}>
           <Icon src={fingerImg} alt="손가락 주문 아이콘" />
           <TextGroup>
             <ItemName>손가락 주문</ItemName>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import PhoneInput from "../components/PhoneInput";
 import { saveOrderPoint } from "../utils/orderSpec";
-import { touchOrderService } from "../services/api";
+import { voiceOrderService } from "../services/api";
 
 export default function PointPhone() {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ export default function PointPhone() {
     try {
       // 세션 ID가 있으면 전화번호 입력 API 호출
       if (sessionId) {
-        const response = await touchOrderService.submitPhoneNumber(
+        const response = await voiceOrderService.submitPhoneNumber(
           sessionId,
           phoneDigits
         );
