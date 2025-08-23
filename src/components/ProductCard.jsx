@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import {
   ProductCard as ProductCardBox,
   PopularTag,
@@ -15,8 +15,6 @@ import {
   TemperatureBadge,
   AddedOverlay,
 } from "./ProductCard.styles";
-import { getStorageKey, normalizeId } from "../utils/storage";
-import americanoIceImg from "../assets/images/americano-ice.png";
 
 export default function ProductCard({
   product,
@@ -29,16 +27,8 @@ export default function ProductCard({
   currentMode,
   productId,
 }) {
-  const LS = typeof window !== "undefined" ? window.localStorage : null;
-  const normId = normalizeId(product?.id);
-
   const [quantity, setQuantity] = useState(0);
-  const [addedTotal, setAddedTotal] = useState(() => {
-    if (!normId || !LS) return 0;
-    const raw = LS.getItem(getStorageKey(normId));
-    const n = raw != null ? Number(raw) : 0;
-    return Number.isFinite(n) ? n : 0;
-  });
+  const [addedTotal, setAddedTotal] = useState(0);
 
   function getTemperatureLabel(temp) {
     if (temp === "ice") return "시원한";
@@ -63,11 +53,8 @@ export default function ProductCard({
 
   function handleAdd() {
     if (quantity <= 0) return;
-    const nextTotal = addedTotal + quantity;
-    setAddedTotal(nextTotal);
-    if (normId && LS) LS.setItem(getStorageKey(normId), String(nextTotal));
     if (typeof onAdd === "function")
-      onAdd({ product, quantity, total: nextTotal });
+      onAdd({ product, quantity, total: addedTotal + quantity });
     setQuantity(0);
   }
 
@@ -79,56 +66,10 @@ export default function ProductCard({
   }
 
   useLayoutEffect(() => {
-    if (!normId) {
-      setAddedTotal(0);
-      return;
-    }
-    const key = getStorageKey(normId);
-
-    if (mode === "cart") {
-      const q = Number(cartQty ?? 0);
-      setAddedTotal(q);
-      if (!LS) return;
-      if (q > 0) LS.setItem(key, String(q));
-      else LS.removeItem(key);
-    } else {
-      if (!LS) {
-        setAddedTotal(0);
-        return;
-      }
-      const raw = LS.getItem(key);
-      const n = raw != null ? Number(raw) : 0;
-      setAddedTotal(Number.isFinite(n) ? n : 0);
-    }
-  }, [mode, cartQty, normId, LS]);
-
-  useEffect(() => {
-    if (mode !== "order" || !normId) return;
-    const key = getStorageKey(normId);
-
-    const sync = () => {
-      if (!LS) {
-        setAddedTotal(0);
-        return;
-      }
-      const raw = LS.getItem(key);
-      const n = raw != null ? Number(raw) : 0;
-      setAddedTotal(Number.isFinite(n) ? n : 0);
-    };
-
-    sync();
-    const onFocus = () => sync();
-    const onVis = () => {
-      if (!document.hidden) sync();
-    };
-
-    window.addEventListener("focus", onFocus);
-    document.addEventListener("visibilitychange", onVis);
-    return () => {
-      window.removeEventListener("focus", onFocus);
-      document.removeEventListener("visibilitychange", onVis);
-    };
-  }, [mode, normId, LS]);
+    // 서버 장바구니 수량 사용 (cartQty prop 기반)
+    const q = Number(cartQty ?? 0);
+    setAddedTotal(q);
+  }, [cartQty]);
 
   const displayedQty = mode === "cart" ? Number(cartQty ?? 0) : quantity;
   const overlayCount = addedTotal;
@@ -143,11 +84,11 @@ export default function ProductCard({
         product?.popular && <PopularTag>인기</PopularTag>
       )}
       <ImageArea $variant={temperatureVariant}>
-        {/* ✅ americano-ice 전용 이미지 */}
-        {product?.id === "americano-ice" && (
+        {/* profile 이미지가 있을 때만 표시 */}
+        {product?.profileImage && (
           <ProductImage
-            src={americanoIceImg}
-            alt={product?.name || "아메리카노 아이스"}
+            src={product.profileImage}
+            alt={product?.name || "상품 이미지"}
           />
         )}
       </ImageArea>

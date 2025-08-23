@@ -99,13 +99,13 @@ export const OutlineButtonTop = styled(OutlineButton)`
   white-space: nowrap;
   color: #ffffff;
   background: ${(props) => {
-    if (props.tempType === "ice") return "#3191FF";
-    if (props.tempType === "hot") return "#D01919";
+    if (props.$tempType === "ice") return "#3191FF";
+    if (props.$tempType === "hot") return "#D01919";
     return "transparent";
   }};
   border-color: ${(props) => {
-    if (props.tempType === "ice") return "#3191FF";
-    if (props.tempType === "hot") return "#D01919";
+    if (props.$tempType === "ice") return "#3191FF";
+    if (props.$tempType === "hot") return "#D01919";
     return "#272727";
   }};
 
@@ -137,13 +137,13 @@ export const PackagingButton = styled(OutlineButton)`
   white-space: nowrap;
   color: #ffffff;
   background: ${(props) => {
-    if (props.packagingType === "포장") return "#56BA97";
-    if (props.packagingType === "매장") return "#FFAA32";
+    if (props.$packagingType === "포장") return "#56BA97";
+    if (props.$packagingType === "매장") return "#FFAA32";
     return "transparent";
   }};
   border-color: ${(props) => {
-    if (props.packagingType === "포장") return "#56BA97";
-    if (props.packagingType === "매장") return "#FFAA32";
+    if (props.$packagingType === "포장") return "#56BA97";
+    if (props.$packagingType === "매장") return "#FFAA32";
     return "#272727";
   }};
 
@@ -152,13 +152,13 @@ export const PackagingButton = styled(OutlineButton)`
     box-shadow: none;
     outline: none;
     background: ${(props) => {
-      if (props.packagingType === "포장") return "#4A9F81";
-      if (props.packagingType === "매장") return "#E6962B";
+      if (props.$packagingType === "포장") return "#4A9F81";
+      if (props.$packagingType === "매장") return "#E6962B";
       return "transparent";
     }};
     border-color: ${(props) => {
-      if (props.packagingType === "포장") return "#4A9F81";
-      if (props.packagingType === "매장") return "#E6962B";
+      if (props.$packagingType === "포장") return "#4A9F81";
+      if (props.$packagingType === "매장") return "#E6962B";
       return "#272727";
     }};
   }

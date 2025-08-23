@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   Card,
   ImageArea,
@@ -14,8 +14,6 @@ import {
   NameRow,
   TemperatureBadge,
 } from "./CartProductCard.styles";
-import { getStorageKey, normalizeId } from "../utils/storage";
-import americanoIceImg from "../assets/images/americano-ice.png";
 
 /**
  * props:
@@ -31,30 +29,18 @@ export default function CartProductCard({
   onDecrease,
   tagLabel,
 }) {
-  const LS = typeof window !== "undefined" ? window.localStorage : null;
-  const normId = useMemo(() => normalizeId(product?.id), [product?.id]);
-
   // ✅ 현재 모드 읽기 (order_spec.mode)
   const currentMode = useMemo(() => {
     try {
-      if (!LS) return null;
-      const raw = LS.getItem("order_spec");
+      if (typeof window === "undefined") return null;
+      const raw = window.localStorage.getItem("order_spec");
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       return parsed?.mode ?? null;
     } catch {
       return null;
     }
-  }, [LS]);
-
-  // qty 변경 시 localStorage('added_total_{normId}') 동기화 (0이면 삭제)
-  useEffect(() => {
-    if (!LS || !normId) return;
-    const key = getStorageKey(normId);
-    const n = Number(qty ?? 0);
-    if (n > 0) LS.setItem(key, String(n));
-    else LS.removeItem(key);
-  }, [LS, normId, qty]);
+  }, []);
 
   const handleMinus = () => {
     if (typeof onDecrease === "function" && product?.id != null)
@@ -90,11 +76,11 @@ export default function CartProductCard({
         isPopular && <PopularTag>인기</PopularTag>
       )}
       <ImageArea $variant={temperatureVariant}>
-        {/* ✅ americano-ice 전용 이미지 */}
-        {product?.id === "americano-ice" && (
+        {/* profile 이미지가 있을 때만 표시 */}
+        {product?.profileImage && (
           <ProductImage
-            src={americanoIceImg}
-            alt={product?.name || "아메리카노 아이스"}
+            src={product.profileImage}
+            alt={product?.name || "상품 이미지"}
           />
         )}
       </ImageArea>

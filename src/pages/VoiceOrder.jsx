@@ -11,7 +11,7 @@ import {
   CardImage,
 } from "./VoiceOrder.styles";
 import BackButton from "../components/BackButton";
-import { orderService, touchOrderService } from "../services/api";
+import { orderService, voiceOrderService } from "../services/api";
 import { goToVoiceError } from "../utils/voiceErrorUtils";
 import drink1 from "../assets/images/drink1.png";
 import drink3 from "../assets/images/drink3.png";
@@ -29,7 +29,7 @@ export default function VoiceOrder() {
   async function handleOneTwo() {
     try {
       console.log("🚀 한번에 주문 세션 생성 시작");
-      const response = await touchOrderService.startOrderAtOnce();
+      const response = await voiceOrderService.startOrderAtOnce();
       const sessionId = response?.session_id || "";
 
       if (sessionId) {
