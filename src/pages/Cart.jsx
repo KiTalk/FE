@@ -305,8 +305,21 @@ function CartContent(props) {
         isDragging = true;
         e.preventDefault();
         startX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
-        const matrix = new DOMMatrixReadOnly(getComputedStyle(thumb).transform);
-        startLeft = matrix.m41 || 0;
+
+        // transform 파싱을 안전하게 처리
+        try {
+          const transform = getComputedStyle(thumb).transform;
+          if (transform && transform !== "none") {
+            const matrix = new DOMMatrixReadOnly(transform);
+            startLeft = matrix.m41 || 0;
+          } else {
+            startLeft = 0;
+          }
+        } catch (error) {
+          console.warn("Transform 파싱 실패, 기본값 0 사용:", error);
+          startLeft = 0;
+        }
+
         pointerMoveHandler = onPointerMove;
         pointerUpHandler = onPointerUp;
         document.addEventListener("pointermove", pointerMoveHandler);

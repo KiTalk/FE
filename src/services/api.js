@@ -464,7 +464,7 @@ export const touchOrderService = {
     try {
       const response = await touchOrderApiClient.post(
         API_ENDPOINTS.TOUCH_CART_ADD(sessionId),
-        { menuId: menuId, quantity: quantity }
+        { menu_id: menuId, quantity: quantity }
       );
       console.log("터치주문 장바구니 추가 성공:", response.data);
       return response.data;
@@ -529,7 +529,7 @@ export const touchOrderService = {
     try {
       const response = await touchOrderApiClient.delete(
         API_ENDPOINTS.TOUCH_CART_REMOVE(sessionId),
-        { data: { menuId: menuId } }
+        { data: { menu_id: menuId } }
       );
       console.log("터치주문 장바구니 상품 제거 성공:", response.data);
       return response.data;
