@@ -36,9 +36,13 @@ export default function OrderMethod() {
         setMode("touch");
         navigate("/order/touch");
       } else {
+        alert("세션을 시작할 수 없습니다. 잠시 후 다시 시도해 주세요.");
         return;
       }
     } catch {
+      alert(
+        "세션 생성에 실패했습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요."
+      );
       return;
     }
   }

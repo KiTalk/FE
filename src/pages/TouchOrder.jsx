@@ -125,24 +125,13 @@ function TouchOrderContent() {
     }
   }
 
-  // localStorage 장바구니를 서버에 동기화
+  // localStorage 장바구니를 서버에 동기화 (원자성 보장)
   const syncCartToServer = async () => {
     const sessionId = sessionStorage.getItem("currentSessionId");
     if (!sessionId) return;
 
-    // 기존 서버 장바구니 초기화
-    await touchOrderService.clearTouchCart(sessionId);
-
-    // localStorage의 각 상품을 서버에 추가
-    for (const [menuId, quantity] of Object.entries(localCart)) {
-      if (quantity > 0) {
-        await touchOrderService.addToTouchCart(
-          sessionId,
-          parseInt(menuId),
-          quantity
-        );
-      }
-    }
+    // 일괄 업데이트로 원자성 보장
+    await touchOrderService.bulkUpdateTouchCart(sessionId, localCart);
   };
 
   // 특정 제품의 장바구니 수량 조회 (localStorage 기반)

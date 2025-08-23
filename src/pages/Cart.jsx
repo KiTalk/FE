@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   Page,
   CartPageContainer,
@@ -39,10 +39,14 @@ export default function CartPage(props) {
 
 function CartContent(props) {
   const navigate = useNavigate();
+  const navigateRef = useRef(navigate);
+  navigateRef.current = navigate; // 최신 navigate 참조 유지
+
   const [cartData, setCartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [localCart, setLocalCart] = useState({}); // localStorage 기반 장바구니
+  const loadedRef = useRef(false); // 중복 호출 방지
 
   // localStorage에 장바구니 데이터 저장
   const saveLocalCart = (cart) => {
@@ -59,9 +63,15 @@ function CartContent(props) {
 
   // 서버에서 장바구니 데이터 로드 (최초 마운트 시에만)
   const loadServerCartData = useCallback(async () => {
+    // 이미 로드된 경우 중복 호출 방지
+    if (loadedRef.current) {
+      setLoading(false);
+      return;
+    }
+
     const sessionId = sessionStorage.getItem("currentSessionId");
     if (!sessionId) {
-      navigate("/order-method");
+      navigateRef.current("/order-method");
       return;
     }
 
@@ -78,13 +88,15 @@ function CartContent(props) {
       });
       setLocalCart(cart);
       saveLocalCart(cart);
+
+      loadedRef.current = true; // 로드 완료 표시
     } catch (err) {
       setError(err.message);
-      navigate("/order-method");
+      navigateRef.current("/order-method");
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     loadServerCartData();
@@ -201,29 +213,14 @@ function CartContent(props) {
     }
   }
 
-  // localStorage 장바구니를 서버에 동기화
+  // localStorage 장바구니를 서버에 동기화 (원자성 보장)
   const syncCartToServer = async () => {
     const sessionId = sessionStorage.getItem("currentSessionId");
     if (!sessionId) return;
 
     try {
-      // 기존 서버 장바구니 초기화
-      await touchOrderService.clearTouchCart(sessionId);
-
-      // localStorage의 각 상품을 처리
-      for (const [menuId, quantity] of Object.entries(localCart)) {
-        if (quantity > 0) {
-          // 수량이 0보다 크면 서버에 추가
-          await touchOrderService.addToTouchCart(
-            sessionId,
-            parseInt(menuId),
-            quantity
-          );
-        } else if (quantity === 0) {
-          // 수량이 0이면 서버에서 제거 (이미 clearTouchCart로 전체 삭제했으므로 별도 처리 불필요)
-          // 필요시 개별 제거 API 호출: await touchOrderService.removeTouchCartItem(sessionId, parseInt(menuId));
-        }
-      }
+      // 일괄 업데이트로 원자성 보장
+      await touchOrderService.bulkUpdateTouchCart(sessionId, localCart);
     } catch (error) {
       console.error("서버 동기화 실패:", error);
       throw error;
@@ -436,6 +433,7 @@ function CartContent(props) {
               price: order.price,
               popular: order.popular,
               temp: order.temp,
+              profileImage: order.profile, // profile 이미지 추가
             };
             // localStorage 기반 수량 사용
             const currentQuantity = localCart[order.menu_id] || 0;

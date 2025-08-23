@@ -538,4 +538,27 @@ export const touchOrderService = {
       throw error;
     }
   },
+
+  // 터치주문 장바구니 일괄 업데이트 (원자성 보장)
+  bulkUpdateTouchCart: async (sessionId, cartItems) => {
+    try {
+      // cartItems: { menuId: quantity, ... } 형태의 객체
+      const orders = Object.entries(cartItems)
+        .filter(([, quantity]) => quantity > 0) // 수량이 0보다 큰 항목만
+        .map(([menuId, quantity]) => ({
+          menu_id: parseInt(menuId),
+          quantity: parseInt(quantity),
+        }));
+
+      const response = await touchOrderApiClient.put(
+        API_ENDPOINTS.TOUCH_CART_UPDATE(sessionId),
+        { orders }
+      );
+      console.log("터치주문 장바구니 일괄 업데이트 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("터치주문 장바구니 일괄 업데이트 실패:", error);
+      throw error;
+    }
+  },
 };
