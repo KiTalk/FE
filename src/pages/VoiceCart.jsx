@@ -4,7 +4,7 @@ import VoiceRecorder from "../components/VoiceRecorder";
 import AudioSpectrum from "../components/AudioSpectrum";
 import { getSettings } from "../utils/settingsUtils";
 import VoiceProductCard from "../components/VoiceProductCard";
-import { apiClient } from "../services/api";
+import { apiClient, orderRetryService } from "../services/api";
 import { goToVoiceError } from "../utils/voiceErrorUtils";
 
 import drink1 from "../assets/images/drink1.png";
@@ -90,67 +90,50 @@ export default function VoiceCart() {
       );
       console.log("📞 orderData:", orderData);
 
-      // 온도가 변경되었다면 온도 업데이트 API 호출
-      if (savedTemp && savedTemp !== orderData.order.temp) {
+      // 온도 업데이트 필요 시 API 호출 (localStorage에 값이 있으면 무조건 업데이트)
+      if (savedTemp) {
         console.log("🌡️ 온도 변경 감지 - 온도 업데이트 API 호출:", savedTemp);
 
         try {
-          const tempResponse = await apiClient.post(
-            `/order-retry/update-temp/${sessionId}`,
-            {
-              temp: savedTemp,
-            }
+          const tempResponse = await orderRetryService.updateTemp(
+            sessionId,
+            savedTemp
           );
-          console.log("✅ 온도 업데이트 완료:", tempResponse.data);
+          console.log("✅ 온도 업데이트 완료:", tempResponse);
+          // 서버 응답을 반영하여 UI 상태를 최신으로 유지
+          setOrderData((prev) => ({
+            ...prev,
+            order: {
+              ...prev.order,
+              temp: tempResponse?.temp || savedTemp,
+            },
+          }));
         } catch (tempError) {
           console.error("❌ 온도 업데이트 실패:", tempError);
           // 온도 업데이트 실패해도 다음 단계 진행
         }
       }
 
-      // 포장이 변경되었다면 포장 업데이트 API 호출
-      if (savedPackaging && savedPackaging !== orderData.packaging) {
+      // 포장 업데이트 필요 시 API 호출 (localStorage에 값이 있으면 무조건 업데이트)
+      if (savedPackaging) {
         console.log(
           "📦 포장 변경 감지 - 포장 업데이트 API 호출:",
           savedPackaging
         );
 
         try {
-          const packagingResponse = await apiClient.post(
-            `/order-retry/update-packaging/${sessionId}`,
-            {
-              packaging:
-                savedPackaging === "매장" ? "매장식사" : savedPackaging,
-            }
+          const packagingResponse = await orderRetryService.updatePackaging(
+            sessionId,
+            savedPackaging === "매장" ? "매장식사" : savedPackaging
           );
-          console.log("✅ 포장 업데이트 완료:", packagingResponse.data);
+          console.log("✅ 포장 업데이트 완료:", packagingResponse);
         } catch (packagingError) {
           console.error("❌ 포장 업데이트 실패:", packagingError);
           // 포장 업데이트 실패해도 다음 단계 진행
         }
       }
 
-      // 수량 업데이트 API 호출
-      const updateData = {
-        orders: [
-          {
-            menu_item: orderData.order.menu_item,
-            quantity: currentQuantity,
-            temp: currentTemp,
-          },
-        ],
-      };
-
-      console.log("📞 수량 업데이트 요청 데이터:", updateData);
-
-      const response = await apiClient.put(
-        `/orders/${sessionId}/patch-update`,
-        updateData
-      );
-      console.log("✅ 포인트 이동 수량 업데이트 완료:", response.data);
-
-      // localStorage 정리
-      localStorage.removeItem(`quantity_${sessionId}`);
+      // 변경사항 반영 후 임시 저장값 정리 (수량은 서버에 별도 단계에서 처리될 수 있어 유지)
       localStorage.removeItem(`temp_${sessionId}`);
       localStorage.removeItem(`packaging_${sessionId}`);
     } catch (error) {
@@ -403,6 +386,7 @@ export default function VoiceCart() {
               product={{
                 ...orderData?.order,
                 temp: getCurrentTemp(),
+                profileImage: orderData?.order?.profile,
               }}
             />
 

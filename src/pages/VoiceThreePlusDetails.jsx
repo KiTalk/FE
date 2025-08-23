@@ -230,6 +230,7 @@ export default function VoiceThreePlusDetails() {
               quantity: Number(o.quantity || 0),
               popular: Boolean(o.popular),
               temp: o.temp,
+              profileImage: o.profile,
               menu_id: o.menu_id,
             }))
           : [];
@@ -366,7 +367,7 @@ export default function VoiceThreePlusDetails() {
                 <ProfileIcon src={profile} alt="프로필" />
                 <MessageBubble>
                   <MainTitle>다른 음료도 주문하시겠어요?</MainTitle>
-                  <ExampleText>예시) "응", "아니"</ExampleText>
+                  <ExampleText>예시) "그래", "아니"</ExampleText>
                 </MessageBubble>
               </GuideSection>
 

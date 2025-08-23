@@ -22,6 +22,10 @@ export const API_ENDPOINTS = {
   ORDERS_ADD: (sessionId) => `/orders/${sessionId}/add`,
   ORDERS_REMOVE: (sessionId) => `/orders/${sessionId}/remove`,
   ORDERS_CLEAR: (sessionId) => `/orders/${sessionId}/clear`,
+  ORDER_RETRY_UPDATE_PACKAGING: (sessionId) =>
+    `/order-retry/update-packaging/${sessionId}`,
+  ORDER_RETRY_UPDATE_TEMP: (sessionId) =>
+    `/order-retry/update-temp/${sessionId}`,
 
   // TOUCH_ORDER_API_BASE_URL 사용
   MENU_LIST: "/api/menu/list",

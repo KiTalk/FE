@@ -457,6 +457,37 @@ export const voiceOrderService = {
   },
 };
 
+// 음성 주문 재시도/세부 업데이트 API (API_BASE_URL 사용)
+export const orderRetryService = {
+  // 포장/매장 업데이트
+  updatePackaging: async (sessionId, packaging) => {
+    try {
+      const response = await apiClient.post(
+        API_ENDPOINTS.ORDER_RETRY_UPDATE_PACKAGING(sessionId),
+        { packaging }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("포장/매장 업데이트 실패:", error);
+      throw error;
+    }
+  },
+
+  // 온도 업데이트 (hot/ice)
+  updateTemp: async (sessionId, temp) => {
+    try {
+      const response = await apiClient.post(
+        API_ENDPOINTS.ORDER_RETRY_UPDATE_TEMP(sessionId),
+        { temp }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("온도 업데이트 실패:", error);
+      throw error;
+    }
+  },
+};
+
 // 터치주문 처리 시스템 API (TOUCH_ORDER_API_BASE_URL 사용)
 export const touchOrderService = {
   // 터치주문 장바구니에 메뉴 추가

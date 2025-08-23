@@ -13,10 +13,9 @@ import {
   QuantityButton,
   QuantityValue,
 } from "./VoiceProductCard.styles";
-import americanoIceImg from "../assets/images/americano-ice.png";
+// CartProductCard와 동일한 이미지 렌더링 정책 적용: profileImage만 표시
 
 export default function VoiceProductCard({
-  imageSrc,
   productName,
   productPrice,
   quantity,
@@ -42,15 +41,12 @@ export default function VoiceProductCard({
     <ItemCard>
       <OrderTypeTag>{orderType}</OrderTypeTag>
       <ImageArea $variant={temperatureVariant}>
-        {/* ✅ americano-ice 전용 이미지 */}
-        {product?.id === "americano-ice" && (
+        {/* profile 이미지가 있을 때만 표시 (CartProductCard.jsx와 동일) */}
+        {product?.profileImage && (
           <ProductImage
-            src={americanoIceImg}
-            alt={product?.name || "아메리카노 아이스"}
+            src={product.profileImage}
+            alt={product?.name || "상품 이미지"}
           />
-        )}
-        {product?.id !== "americano-ice" && (
-          <ProductImage src={imageSrc} alt={productName} />
         )}
       </ImageArea>
       <InfoArea>
