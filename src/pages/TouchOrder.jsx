@@ -263,6 +263,8 @@ function TouchOrderContent() {
                     product={item}
                     cartQty={cartQuantity}
                     onAdd={makeOnAddHandler(item)}
+                    currentMode="touch"
+                    selectedMenuType={activeTabId}
                   />
                 );
               })}

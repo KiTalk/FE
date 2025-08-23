@@ -33,7 +33,6 @@ export default function OrderMethod() {
 
       if (sessionId) {
         sessionStorage.setItem("currentSessionId", sessionId);
-        setMode("touch");
         navigate(path);
       } else {
         alert("세션을 시작할 수 없습니다. 잠시 후 다시 시도해 주세요.");
