@@ -544,11 +544,20 @@ export const touchOrderService = {
     try {
       // cartItems: { menuId: quantity, ... } 형태의 객체
       const orders = Object.entries(cartItems)
-        .filter(([, quantity]) => quantity > 0) // 수량이 0보다 큰 항목만
-        .map(([menuId, quantity]) => ({
-          menu_id: parseInt(menuId),
-          quantity: parseInt(quantity),
-        }));
+        .map(([menuId, quantity]) => [Number(menuId), Number(quantity)])
+        .filter(
+          ([id, qty]) =>
+            Number.isInteger(id) && id > 0 && Number.isInteger(qty) && qty > 0
+        )
+        .map(([id, qty]) => ({ menu_id: id, quantity: qty }));
+
+      // 빈 배열이면 서버 장바구니 비우기 호출
+      if (orders.length === 0) {
+        const clearRes = await touchOrderApiClient.delete(
+          API_ENDPOINTS.TOUCH_CART_CLEAR(sessionId)
+        );
+        return clearRes.data ?? { success: true };
+      }
 
       const response = await touchOrderApiClient.put(
         API_ENDPOINTS.TOUCH_CART_UPDATE(sessionId),

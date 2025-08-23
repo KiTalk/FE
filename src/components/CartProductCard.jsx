@@ -42,6 +42,16 @@ export default function CartProductCard({
     }
   }, []);
 
+  // ✅ ColorIntro에서 선택한 메뉴 타입 읽기
+  const selectedMenuType = useMemo(() => {
+    try {
+      if (typeof window === "undefined") return null;
+      return window.localStorage.getItem("selectedMenuType");
+    } catch {
+      return null;
+    }
+  }, []);
+
   const handleMinus = () => {
     if (typeof onDecrease === "function" && product?.id != null)
       onDecrease(product.id);
@@ -69,7 +79,11 @@ export default function CartProductCard({
   const priceText = Number(product?.price ?? 0).toLocaleString();
 
   return (
-    <Card $currentMode={currentMode} $productId={product?.id}>
+    <Card
+      $currentMode={currentMode}
+      $productName={product?.name}
+      $selectedMenuType={selectedMenuType}
+    >
       {tagLabel ? (
         <PopularTag>{tagLabel}</PopularTag>
       ) : (

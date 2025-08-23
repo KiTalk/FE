@@ -26,15 +26,14 @@ export default function OrderMethod() {
     navigate(path);
   }
 
-  async function handleTouchOrder() {
+  async function handleTouchOrder(path) {
     try {
       const sessionData = await orderService.startSession();
       const sessionId = sessionData?.session_id || "";
 
       if (sessionId) {
         sessionStorage.setItem("currentSessionId", sessionId);
-        setMode("touch");
-        navigate("/order/touch");
+        navigate(path);
       } else {
         alert("세션을 시작할 수 없습니다. 잠시 후 다시 시도해 주세요.");
         return;
@@ -71,7 +70,7 @@ export default function OrderMethod() {
           type="button"
           onClick={() => {
             setMode("color");
-            handleSelect("/order/color/intro");
+            handleTouchOrder("/order/color/intro");
           }}
         >
           <Icon src={colorImg} alt="색깔 주문 아이콘" />
@@ -83,7 +82,13 @@ export default function OrderMethod() {
       </ButtonGroup>
 
       <ButtonGroup>
-        <Button type="button" onClick={handleTouchOrder}>
+        <Button
+          type="button"
+          onClick={() => {
+            setMode("touch");
+            handleTouchOrder("/order/touch");
+          }}
+        >
           <Icon src={fingerImg} alt="손가락 주문 아이콘" />
           <TextGroup>
             <ItemName>손가락 주문</ItemName>
@@ -95,7 +100,7 @@ export default function OrderMethod() {
           type="button"
           onClick={() => {
             setMode("phone");
-            handleSelect("/order/phone/number");
+            handleTouchOrder("/order/phone/number");
           }}
         >
           <Icon src={phoneImg} alt="전화번호 간편주문 아이콘" />

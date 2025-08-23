@@ -25,7 +25,7 @@ export default function ProductCard({
   onDecrease,
   tagLabel,
   currentMode,
-  productId,
+  selectedMenuType,
 }) {
   const [quantity, setQuantity] = useState(0);
   const [addedTotal, setAddedTotal] = useState(0);
@@ -77,7 +77,11 @@ export default function ProductCard({
   const addDisabled = mode !== "cart" && quantity <= 0;
 
   return (
-    <ProductCardBox currentMode={currentMode} productId={productId}>
+    <ProductCardBox
+      $currentMode={currentMode}
+      $productName={product?.name}
+      $selectedMenuType={selectedMenuType}
+    >
       {tagLabel ? (
         <PopularTag>{tagLabel}</PopularTag>
       ) : (

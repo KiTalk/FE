@@ -520,6 +520,8 @@ function TouchOrderContent() {
                                   product={item}
                                   onAdd={makeOnAddHandler(item)}
                                   tagLabel={rankLabel}
+                                  currentMode="phone"
+                                  selectedMenuType={activeTabId}
                                 />
                               );
                             })}
@@ -679,6 +681,8 @@ function TouchOrderContent() {
                           key={item.id}
                           product={item}
                           onAdd={makeOnAddHandler(item)}
+                          currentMode="phone"
+                          selectedMenuType={activeTabId}
                         />
                       );
                     })}

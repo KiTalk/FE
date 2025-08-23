@@ -23,21 +23,14 @@ import marketImage from "../assets/images/market.png";
 import arrowImage from "../assets/images/arrow.png";
 import badgeImage from "../assets/images/badge.png";
 
-import { menuService } from "../services/api.js";
+import { menuService, touchOrderService } from "../services/api.js";
 import CategoryTabs from "../components/CategoryTabs";
 
 import ProductCard from "../components/ProductCard";
-
-import CartProvider from "../components/CartProvider.jsx";
-import { useCart } from "../components/CartContext";
 import { clearAllAddedTotals } from "../utils/storage";
 
 export default function ColorOrderPage() {
-  return (
-    <CartProvider>
-      <ColorOrderContent />
-    </CartProvider>
-  );
+  return <ColorOrderContent />;
 }
 
 function ColorOrderContent() {
@@ -46,9 +39,13 @@ function ColorOrderContent() {
   const [menuData, setMenuData] = useState([]); // 빈 배열로 초기화
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { addItem, totalQty } = useCart();
+  const [cartCount, setCartCount] = useState(0);
+  const [localCart, setLocalCart] = useState({}); // localStorage 기반 장바구니
 
   const currentMode = "color";
+
+  // ColorIntro에서 선택한 메뉴 타입 확인
+  const selectedMenuType = localStorage.getItem("selectedMenuType");
 
   // 메뉴 데이터 로드
   useEffect(() => {
@@ -83,30 +80,131 @@ function ColorOrderContent() {
     loadMenuData();
   }, []);
 
+  // localStorage에서 장바구니 데이터 로드
+  const loadLocalCart = () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) {
+      setLocalCart({});
+      setCartCount(0);
+      return;
+    }
+
+    try {
+      const cartKey = `touchCart_${sessionId}`;
+      const stored = localStorage.getItem(cartKey);
+      const cart = stored ? JSON.parse(stored) : {};
+
+      // 총 개수 계산
+      const totalQuantity = Object.values(cart).reduce(
+        (sum, quantity) => sum + quantity,
+        0
+      );
+
+      setLocalCart(cart);
+      setCartCount(totalQuantity);
+    } catch {
+      setLocalCart({});
+      setCartCount(0);
+    }
+  };
+
+  // localStorage에 장바구니 데이터 저장
+  const saveLocalCart = (cart) => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) return;
+
+    try {
+      const cartKey = `touchCart_${sessionId}`;
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+    } catch {
+      // 장바구니 저장 실패 시 무시
+    }
+  };
+
+  // 컴포넌트 마운트 시 로컬 장바구니 데이터 로드
+  useEffect(() => {
+    loadLocalCart();
+  }, []);
+
   useEffect(() => {
     setMode("color");
-    if (Number(totalQty ?? 0) === 0) {
+    if (Number(cartCount ?? 0) === 0) {
       clearAllAddedTotals();
     }
-  }, [totalQty]);
+  }, [cartCount]);
 
-  function handleCartClick() {
-    navigate("/order/cart");
+  // 장바구니 버튼 클릭 시 서버에 동기화 후 이동
+  async function handleCartClick() {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) {
+      navigate("/order-method");
+      return;
+    }
+
+    try {
+      // localStorage의 장바구니 데이터를 서버에 동기화
+      await syncCartToServer();
+      navigate("/order/cart");
+    } catch {
+      navigate("/order-method");
+    }
+  }
+
+  // localStorage 장바구니를 서버에 동기화 (원자성 보장)
+  const syncCartToServer = async () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) return;
+
+    // 일괄 업데이트로 원자성 보장
+    await touchOrderService.bulkUpdateTouchCart(sessionId, localCart);
+  };
+
+  // 특정 제품의 장바구니 수량 조회 (localStorage 기반)
+  function getCartQuantity(product) {
+    if (!product?.originalId) return 0;
+    return localCart[product.originalId] || 0;
   }
 
   function handleAddToCart(product, quantity) {
     const qty = Number(quantity ?? 1);
     if (!product?.id || qty <= 0) return;
-    addItem(
-      {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        popular: !!product.popular,
-        temp: product.temp,
-      },
-      qty
+
+    const sessionId = sessionStorage.getItem("currentSessionId");
+
+    // 세션 ID가 없으면 주문 방법 선택 페이지로 이동
+    if (!sessionId) {
+      navigate("/order-method");
+      return;
+    }
+
+    // originalId가 없으면 주문 방법 선택 페이지로 이동
+    if (!product.originalId) {
+      navigate("/order-method");
+      return;
+    }
+
+    // localStorage에 장바구니 정보 저장
+    const menuId = product.originalId;
+    const currentQuantity = localCart[menuId] || 0;
+    const newQuantity = currentQuantity + qty;
+
+    const updatedCart = {
+      ...localCart,
+      [menuId]: newQuantity,
+    };
+
+    // 상태 업데이트
+    setLocalCart(updatedCart);
+
+    // localStorage에 저장
+    saveLocalCart(updatedCart);
+
+    // 총 개수 업데이트
+    const totalQuantity = Object.values(updatedCart).reduce(
+      (sum, q) => sum + q,
+      0
     );
+    setCartCount(totalQuantity);
   }
 
   function makeOnAddHandler(product) {
@@ -161,7 +259,7 @@ function ColorOrderContent() {
             <CartIcon src={marketImage} alt="장바구니" />
             <CartBadgeWrap>
               <CartBadge src={badgeImage} alt="배지" />
-              <CartBadgeCount>{totalQty}</CartBadgeCount>
+              <CartBadgeCount>{cartCount}</CartBadgeCount>
             </CartBadgeWrap>
             <CartArrow src={arrowImage} alt="열기" />
           </CartWidget>
@@ -182,9 +280,10 @@ function ColorOrderContent() {
             {section.products.map((item) => (
               <ProductCard
                 currentMode={currentMode}
-                productId={item.id}
+                selectedMenuType={selectedMenuType}
                 key={item.id}
                 product={item}
+                cartQty={getCartQuantity(item)}
                 onAdd={makeOnAddHandler(item)}
               />
             ))}
