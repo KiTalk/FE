@@ -23,7 +23,7 @@ import marketImage from "../assets/images/market.png";
 import arrowImage from "../assets/images/arrow.png";
 import badgeImage from "../assets/images/badge.png";
 
-import { MENU_DATA } from "../data/TouchOrder.data.js";
+import { menuService } from "../services/api.js";
 import CategoryTabs from "../components/CategoryTabs";
 
 import ProductCard from "../components/ProductCard";
@@ -43,9 +43,45 @@ export default function ColorOrderPage() {
 function ColorOrderContent() {
   const navigate = useNavigate();
   const [activeTabId, setActiveTabId] = useState("all");
+  const [menuData, setMenuData] = useState([]); // 빈 배열로 초기화
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { addItem, totalQty } = useCart();
 
   const currentMode = "color";
+
+  // 메뉴 데이터 로드
+  useEffect(() => {
+    const loadMenuData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const apiMenuData = await menuService.getTransformedMenuData();
+
+        if (apiMenuData && apiMenuData.length > 0) {
+          setMenuData(apiMenuData);
+          console.log(
+            "ColorOrder - API에서 메뉴 데이터 로드 성공:",
+            apiMenuData
+          );
+        } else {
+          console.warn(
+            "ColorOrder - API에서 메뉴 데이터를 가져오지 못했습니다."
+          );
+          setMenuData([]);
+        }
+      } catch (err) {
+        console.error("ColorOrder - 메뉴 데이터 로드 실패:", err);
+        setError(err.message);
+        // API 실패 시 빈 배열 사용
+        setMenuData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMenuData();
+  }, []);
 
   useEffect(() => {
     setMode("color");
@@ -79,7 +115,38 @@ function ColorOrderContent() {
     };
   }
 
-  const activeMenu = MENU_DATA.find((menu) => menu.id === activeTabId);
+  const activeMenu = menuData.find((menu) => menu.id === activeTabId);
+
+  // 로딩 상태 처리
+  if (loading) {
+    return (
+      <Page>
+        <Hero>
+          <HeroInner>
+            <HeroTitle>메뉴를 불러오는 중...</HeroTitle>
+          </HeroInner>
+        </Hero>
+      </Page>
+    );
+  }
+
+  // 에러 상태 처리
+  if (error && menuData.length === 0) {
+    return (
+      <Page>
+        <Hero>
+          <HeroInner>
+            <HeroTitle>메뉴를 불러올 수 없습니다</HeroTitle>
+            <div
+              style={{ textAlign: "center", marginTop: "20px", color: "#666" }}
+            >
+              서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.
+            </div>
+          </HeroInner>
+        </Hero>
+      </Page>
+    );
+  }
 
   return (
     <Page>
@@ -102,7 +169,7 @@ function ColorOrderContent() {
       </Hero>
 
       <CategoryTabs
-        tabs={MENU_DATA.map(({ id, label }) => ({ id, label }))}
+        tabs={menuData.map(({ id, label }) => ({ id, label }))}
         activeId={activeTabId}
         onChange={setActiveTabId}
       />

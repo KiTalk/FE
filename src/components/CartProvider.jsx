@@ -2,13 +2,12 @@
 import React, { useMemo, useReducer, useEffect } from "react";
 import { CartContext } from "./CartContext.jsx";
 import { loadOrderSpec, saveCartItems } from "../utils/orderSpec";
-import { MENU_DATA } from "../data/TouchOrder.data.js";
 
-/** 로컬스토리지 로드 */
-function buildProductLookupByNameAndPrice() {
+/** 제품 조회를 위한 동적 룩업 생성 */
+function buildProductLookupByNameAndPrice(menuData = []) {
   const lookup = {};
   try {
-    (MENU_DATA || []).forEach(function (category) {
+    menuData.forEach(function (category) {
       (category.sections || []).forEach(function (section) {
         (section.products || []).forEach(function (product) {
           const key = `${product.name}|${product.price}`;
@@ -22,8 +21,6 @@ function buildProductLookupByNameAndPrice() {
   return lookup;
 }
 
-const PRODUCT_LOOKUP = buildProductLookupByNameAndPrice();
-
 function loadFromStorage() {
   try {
     const spec = loadOrderSpec();
@@ -32,14 +29,13 @@ function loadFromStorage() {
     cartArray.forEach(function (stored) {
       if (!stored || typeof stored !== "object") return;
       const key = `${stored.name}|${stored.price}`;
-      const base = PRODUCT_LOOKUP[key];
-      const productId = base?.id || key; // fallback key if not found
+      const productId = stored.id || key; // fallback key if not found
       const merged = {
         id: productId,
-        name: stored.name ?? base?.name,
-        price: Number(stored.price ?? base?.price ?? 0),
-        popular: !!base?.popular,
-        temp: base?.temp, // ✅ temp 속성 추가
+        name: stored.name,
+        price: Number(stored.price ?? 0),
+        popular: !!stored.popular,
+        temp: stored.temp || "ice", // 기본값 설정
         qty: Number(stored.qty ?? 0),
       };
       const prev = itemsById[productId];

@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import { saveOrderPoint } from "../utils/orderSpec";
-import { apiClient } from "../services/api";
+import { touchOrderService } from "../services/api";
 import {
   Page,
   BottomAccentBar,
@@ -28,11 +28,11 @@ export default function PointCheckPage() {
     try {
       // 세션 ID가 있으면 전화번호 선택 API 호출
       if (sessionId) {
-        const response = await apiClient.post(
-          `/api/phone/choice/${sessionId}`,
-          { wants_phone: !!save }
+        const response = await touchOrderService.submitPhoneChoice(
+          sessionId,
+          save
         );
-        console.log("✅ 전화번호 선택 API 응답:", response.data);
+        console.log("✅ 전화번호 선택 API 응답:", response);
 
         // API 응답에 따라 네비게이션
         if (save) {

@@ -61,7 +61,7 @@ import arrowImage from "../assets/images/arrow.png";
 import badgeImage from "../assets/images/badge.png";
 import backIcon from "../assets/images/button-back.png";
 import nextIcon from "../assets/images/button-next.png";
-import { MENU_DATA } from "../data/TouchOrder.data.js";
+import { menuService } from "../services/api.js";
 import CategoryTabs from "../components/CategoryTabs";
 import ProductCard from "../components/ProductCard";
 
@@ -85,19 +85,59 @@ export default function TouchOrderPage() {
 function TouchOrderContent() {
   const navigate = useNavigate();
   const [activeTabId, setActiveTabId] = useState("orders"); // 주문 내역을 기본 탭으로 시작
+  const [menuData, setMenuData] = useState([]); // 메뉴 데이터 상태
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { addItem, totalQty: _totalQty } = useCart();
   const totalQty = Number.isFinite(_totalQty) ? _totalQty : 0;
 
-  /* 이 페이지에서만 '커피' 탭 숨김 */
-  const HIDDEN_TAB_IDS = React.useMemo(function () {
-    return new Set(
-      MENU_DATA.filter(function ({ label }) {
-        return label === "커피";
-      }).map(function ({ id }) {
-        return id;
-      })
-    );
+  // 메뉴 데이터 로드
+  useEffect(() => {
+    const loadMenuData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const apiMenuData = await menuService.getTransformedMenuData();
+
+        if (apiMenuData && apiMenuData.length > 0) {
+          setMenuData(apiMenuData);
+          console.log(
+            "PhoneOrder - API에서 메뉴 데이터 로드 성공:",
+            apiMenuData
+          );
+        } else {
+          console.warn(
+            "PhoneOrder - API에서 메뉴 데이터를 가져오지 못했습니다."
+          );
+          setMenuData([]);
+        }
+      } catch (err) {
+        console.error("PhoneOrder - 메뉴 데이터 로드 실패:", err);
+        setError(err.message);
+        setMenuData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMenuData();
   }, []);
+
+  /* 이 페이지에서만 '커피' 탭 숨김 */
+  const HIDDEN_TAB_IDS = React.useMemo(
+    function () {
+      return new Set(
+        menuData
+          .filter(function ({ label }) {
+            return label === "커피";
+          })
+          .map(function ({ id }) {
+            return id;
+          })
+      );
+    },
+    [menuData]
+  );
 
   /* 숨김 탭이 활성화되면 기본 탭으로 */
   React.useEffect(
@@ -327,9 +367,51 @@ function TouchOrderContent() {
     };
   }, []);
 
-  const activeMenu = MENU_DATA.find(function (menu) {
+  const activeMenu = menuData.find(function (menu) {
     return menu.id === activeTabId;
   });
+
+  // 메뉴 탭 활성화 시 로딩/에러 처리
+  if (activeTabId !== "orders" && loading) {
+    return (
+      <Page>
+        <PageViewport data-viewport="page" style={{ paddingRight: 24 }}>
+          <ContentWrapper data-content="page">
+            <Hero>
+              <HeroInner>
+                <HeroTitle>메뉴를 불러오는 중...</HeroTitle>
+              </HeroInner>
+            </Hero>
+          </ContentWrapper>
+        </PageViewport>
+      </Page>
+    );
+  }
+
+  if (activeTabId !== "orders" && error && menuData.length === 0) {
+    return (
+      <Page>
+        <PageViewport data-viewport="page" style={{ paddingRight: 24 }}>
+          <ContentWrapper data-content="page">
+            <Hero>
+              <HeroInner>
+                <HeroTitle>메뉴를 불러올 수 없습니다</HeroTitle>
+                <div
+                  style={{
+                    textAlign: "center",
+                    marginTop: "20px",
+                    color: "#666",
+                  }}
+                >
+                  서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.
+                </div>
+              </HeroInner>
+            </Hero>
+          </ContentWrapper>
+        </PageViewport>
+      </Page>
+    );
+  }
 
   return (
     <Page>
@@ -359,11 +441,13 @@ function TouchOrderContent() {
 
           <TabsContainer data-tabs="page">
             {(function renderTabs() {
-              const baseTabs = MENU_DATA.filter(function ({ label }) {
-                return label !== "커피";
-              }).map(function ({ id, label }) {
-                return { id, label };
-              });
+              const baseTabs = menuData
+                .filter(function ({ label }) {
+                  return label !== "커피";
+                })
+                .map(function ({ id, label }) {
+                  return { id, label };
+                });
               const tabs = [{ id: "orders", label: "주문 내역" }].concat(
                 baseTabs
               );

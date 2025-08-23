@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import PhoneInput from "../components/PhoneInput";
 import { saveOrderPoint } from "../utils/orderSpec";
-import { apiClient } from "../services/api";
+import { touchOrderService } from "../services/api";
 
 export default function PointPhone() {
   const navigate = useNavigate();
@@ -14,10 +14,11 @@ export default function PointPhone() {
     try {
       // 세션 ID가 있으면 전화번호 입력 API 호출
       if (sessionId) {
-        const response = await apiClient.post(`/api/phone/input/${sessionId}`, {
-          phone_number: phoneDigits,
-        });
-        console.log("✅ 전화번호 입력 API 응답:", response.data);
+        const response = await touchOrderService.submitPhoneNumber(
+          sessionId,
+          phoneDigits
+        );
+        console.log("✅ 전화번호 입력 API 응답:", response);
 
         // 주문 완료 페이지로 이동
         navigate("/order/complete", { replace: true });

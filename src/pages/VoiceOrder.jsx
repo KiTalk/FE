@@ -11,7 +11,7 @@ import {
   CardImage,
 } from "./VoiceOrder.styles";
 import BackButton from "../components/BackButton";
-import { orderService, apiClient } from "../services/api";
+import { orderService, touchOrderService } from "../services/api";
 import { goToVoiceError } from "../utils/voiceErrorUtils";
 import drink1 from "../assets/images/drink1.png";
 import drink3 from "../assets/images/drink3.png";
@@ -29,15 +29,15 @@ export default function VoiceOrder() {
   async function handleOneTwo() {
     try {
       console.log("🚀 한번에 주문 세션 생성 시작");
-      const response = await apiClient.post("/order-at-once/start");
-      const sessionId = response.data?.session_id || "";
+      const response = await touchOrderService.startOrderAtOnce();
+      const sessionId = response?.session_id || "";
 
       if (sessionId) {
         sessionStorage.setItem("currentSessionId", sessionId);
         console.log("✅ 한번에 주문 세션 생성 완료:", sessionId);
         navigate("/order/voice/one-two");
       } else {
-        console.error("❌ 세션 ID를 받지 못했습니다:", response.data);
+        console.error("❌ 세션 ID를 받지 못했습니다:", response);
         navigate("/voice-error");
       }
     } catch (error) {
