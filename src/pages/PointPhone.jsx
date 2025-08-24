@@ -89,7 +89,18 @@ export default function PointPhone() {
           "전화번호 입력 처리 중 오류가 발생했습니다.\n번호를 확인 후 다시 입력해 주세요!";
         setErrorMessage(msg);
       } else if (error.response?.status === 410) {
+        console.warn("⚠️ 세션이 만료되었습니다. 홈으로 리디렉션합니다.");
+
+        // 세션 정보 정리
+        sessionStorage.removeItem("currentSessionId");
+        sessionStorage.removeItem("touchCart_sessionId");
+
         setErrorMessage("세션이 만료되었습니다.\n처음부터 다시 시작해 주세요!");
+
+        // 3초 후 자동으로 홈으로 이동
+        setTimeout(() => {
+          navigate("/", { replace: true });
+        }, 3000);
       } else if (error.response?.status === 404) {
         setErrorMessage(
           "등록된 번호가 없습니다.\n번호를 확인 후 다시 입력해 주세요!"
