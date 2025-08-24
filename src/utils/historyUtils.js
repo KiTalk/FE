@@ -16,92 +16,84 @@ const MAX_HISTORY_SIZE = 50;
 // }
 
 // 히스토리 조회
-export const getHistory = () => {
+export function getHistory() {
   try {
-    const history = localStorage.getItem(HISTORY_KEY);
-    return history ? JSON.parse(history) : [];
-  } catch (error) {
-    console.error("히스토리 조회 오류:", error);
+    const stored = localStorage.getItem(HISTORY_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
     return [];
   }
-};
+}
 
 // 히스토리에 항목 추가
-export const addToHistory = (result, fileName = null, fileSize = null) => {
+export function addToHistory(result, fileName = null, fileSize = null) {
   try {
     const history = getHistory();
-
-    const historyItem = {
+    const newEntry = {
       id: generateId(),
       timestamp: Date.now(),
-      text: result.text,
-      confidence: result.confidence,
-      language: result.language,
-      processingTime: result.processingTime,
-      fileName: fileName,
-      fileSize: fileSize,
+      text: result.text || result.transcript || result.recognized_text || "",
+      confidence: result.confidence || null,
+      language: result.language || "ko",
+      processingTime: result.processingTime || null,
+      fileName: fileName || null,
+      fileSize: fileSize || null,
     };
 
-    // 새 항목을 맨 앞에 추가
-    history.unshift(historyItem);
+    // 최신 항목을 맨 앞에 추가
+    const updatedHistory = [newEntry, ...history];
 
-    // 최대 크기 제한
-    if (history.length > MAX_HISTORY_SIZE) {
-      history.splice(MAX_HISTORY_SIZE);
-    }
+    // 최대 100개 항목만 유지
+    const trimmedHistory = updatedHistory.slice(0, MAX_HISTORY_SIZE);
 
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-
-    return historyItem;
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmedHistory));
+    return newEntry;
   } catch (error) {
-    console.error("히스토리 추가 오류:", error);
+    console.error("히스토리 저장 실패:", error);
     return null;
   }
-};
+}
 
 // 히스토리 항목 삭제
-export const removeFromHistory = (itemId) => {
+export function removeFromHistory(itemId) {
   try {
     const history = getHistory();
     const updatedHistory = history.filter((item) => item.id !== itemId);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
     return true;
-  } catch (error) {
-    console.error("히스토리 삭제 오류:", error);
+  } catch {
     return false;
   }
-};
+}
 
 // 히스토리 전체 삭제
-export const clearHistory = () => {
+export function clearHistory() {
   try {
     localStorage.removeItem(HISTORY_KEY);
     return true;
-  } catch (error) {
-    console.error("히스토리 초기화 오류:", error);
+  } catch {
     return false;
   }
-};
+}
 
 // 히스토리 검색
-export const searchHistory = (query) => {
+export function searchHistory(query) {
   try {
     const history = getHistory();
-    const lowerQuery = query.toLowerCase();
+    if (!query || query.trim() === "") return history;
 
-    return history.filter(
-      (item) =>
-        item.text.toLowerCase().includes(lowerQuery) ||
-        (item.fileName && item.fileName.toLowerCase().includes(lowerQuery))
-    );
-  } catch (error) {
-    console.error("히스토리 검색 오류:", error);
+    const searchTerm = query.toLowerCase().trim();
+    return history.filter((item) => {
+      const text = (item.text || "").toLowerCase();
+      return text.includes(searchTerm);
+    });
+  } catch {
     return [];
   }
-};
+}
 
 // 날짜별 히스토리 그룹화
-export const groupHistoryByDate = (history = null) => {
+export function groupHistoryByDate(history = null) {
   try {
     const items = history || getHistory();
     const groups = {};
@@ -109,109 +101,120 @@ export const groupHistoryByDate = (history = null) => {
     items.forEach((item) => {
       const date = new Date(item.timestamp);
       const dateKey = date.toDateString();
+      const timeKey = date.toLocaleTimeString("ko-KR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
 
       if (!groups[dateKey]) {
-        groups[dateKey] = [];
+        groups[dateKey] = {
+          date: dateKey,
+          timestamp: item.timestamp,
+          items: [],
+        };
       }
 
-      groups[dateKey].push(item);
+      groups[dateKey].items.push({
+        ...item,
+        timeKey,
+      });
     });
 
-    return groups;
-  } catch (error) {
-    console.error("히스토리 그룹화 오류:", error);
-    return {};
+    // 날짜별로 정렬 (최신순)
+    return Object.values(groups).sort((a, b) => b.timestamp - a.timestamp);
+  } catch {
+    return [];
   }
-};
+}
 
 // 히스토리 통계
-export const getHistoryStats = () => {
+export function getHistoryStats() {
   try {
     const history = getHistory();
+    const totalItems = history.length;
 
-    if (history.length === 0) {
+    if (totalItems === 0) {
       return {
-        totalCount: 0,
-        totalProcessingTime: 0,
+        totalItems: 0,
+        totalText: 0,
         averageConfidence: 0,
         languageDistribution: {},
-        recentActivity: [],
+        averageProcessingTime: 0,
       };
     }
 
-    const stats = {
-      totalCount: history.length,
-      totalProcessingTime: history.reduce(
-        (sum, item) => sum + (item.processingTime || 0),
-        0
-      ),
-      averageConfidence:
-        history.reduce((sum, item) => sum + (item.confidence || 0), 0) /
-        history.length,
-      languageDistribution: {},
-      recentActivity: history.slice(0, 10), // 최근 10개
-    };
+    const totalText = history.reduce(
+      (sum, item) => sum + (item.text?.length || 0),
+      0
+    );
+    const confidenceValues = history
+      .map((item) => item.confidence)
+      .filter((c) => c !== null && !isNaN(c));
+    const averageConfidence =
+      confidenceValues.length > 0
+        ? confidenceValues.reduce((sum, c) => sum + c, 0) /
+          confidenceValues.length
+        : 0;
 
-    // 언어별 분포
-    history.forEach((item) => {
+    const languageDistribution = history.reduce((acc, item) => {
       const lang = item.language || "unknown";
-      stats.languageDistribution[lang] =
-        (stats.languageDistribution[lang] || 0) + 1;
-    });
+      acc[lang] = (acc[lang] || 0) + 1;
+      return acc;
+    }, {});
 
-    return stats;
-  } catch (error) {
-    console.error("히스토리 통계 오류:", error);
+    const processingTimes = history
+      .map((item) => item.processingTime)
+      .filter((t) => t !== null && !isNaN(t));
+    const averageProcessingTime =
+      processingTimes.length > 0
+        ? processingTimes.reduce((sum, t) => sum + t, 0) /
+          processingTimes.length
+        : 0;
+
     return {
-      totalCount: 0,
-      totalProcessingTime: 0,
+      totalItems,
+      totalText,
+      averageConfidence: Math.round(averageConfidence * 100) / 100,
+      languageDistribution,
+      averageProcessingTime: Math.round(averageProcessingTime * 100) / 100,
+    };
+  } catch {
+    return {
+      totalItems: 0,
+      totalText: 0,
       averageConfidence: 0,
       languageDistribution: {},
-      recentActivity: [],
+      averageProcessingTime: 0,
     };
   }
-};
+}
 
 // ID 생성
-const generateId = () => {
+function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
-};
+}
 
 // 날짜 포맷팅
-export const formatDate = (timestamp) => {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diff = now - date;
+export function formatDate(timestamp) {
+  try {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInMs = now - date;
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-  // 1분 미만
-  if (diff < 60000) {
-    return "방금 전";
+    if (diffInDays === 0) {
+      return "오늘";
+    } else if (diffInDays === 1) {
+      return "어제";
+    } else if (diffInDays < 7) {
+      return `${diffInDays}일 전`;
+    } else {
+      return date.toLocaleDateString("ko-KR", {
+        month: "short",
+        day: "numeric",
+      });
+    }
+  } catch {
+    return "알 수 없음";
   }
-
-  // 1시간 미만
-  if (diff < 3600000) {
-    const minutes = Math.floor(diff / 60000);
-    return `${minutes}분 전`;
-  }
-
-  // 1일 미만
-  if (diff < 86400000) {
-    const hours = Math.floor(diff / 3600000);
-    return `${hours}시간 전`;
-  }
-
-  // 1주일 미만
-  if (diff < 604800000) {
-    const days = Math.floor(diff / 86400000);
-    return `${days}일 전`;
-  }
-
-  // 그 외
-  return date.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
+}

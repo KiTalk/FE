@@ -325,7 +325,7 @@ export class AudioRecorder {
 }
 
 // 오디오 파일 재생 시간 계산
-export const getAudioDuration = (file) => {
+export function getAudioDuration(file) {
   return new Promise((resolve) => {
     const audio = new Audio();
     audio.onloadedmetadata = () => {
@@ -341,10 +341,10 @@ export const getAudioDuration = (file) => {
     };
     audio.src = URL.createObjectURL(file);
   });
-};
+}
 
 // 오디오 블롭 크기 검증
-export const validateAudio = (audioBlob) => {
+export function validateAudio(audioBlob) {
   const minSize = 10000; // 10KB
 
   if (audioBlob.size < minSize) {
@@ -352,4 +352,4 @@ export const validateAudio = (audioBlob) => {
   }
 
   return true;
-};
+}

@@ -44,12 +44,12 @@ export default function PhoneInput({
   const { formatted, canSave, cleanDigits, handleKeypadClick } =
     usePhoneInput(phoneInputOptions);
 
-  const handleSave = () => {
+  function handleSave() {
     if (!canSave) return;
     if (typeof onSave === "function") {
       onSave(cleanDigits);
     }
-  };
+  }
 
   return (
     <Page>

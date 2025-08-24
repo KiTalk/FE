@@ -54,19 +54,20 @@ export default function CartProductCard({
     }
   }, []);
 
-  const handleMinus = () => {
+  function handleMinus() {
     if (typeof onDecrease === "function" && product?.id != null)
       onDecrease(product.id);
-  };
-  const handlePlus = () => {
+  }
+
+  function handlePlus() {
     if (typeof onIncrease === "function" && product?.id != null)
       onIncrease(product.id);
-  };
+  }
 
-  const handleRemove = () => {
+  function handleRemove() {
     if (typeof onRemove === "function" && product?.id != null)
       onRemove(product.id);
-  };
+  }
 
   function getTemperatureLabel(temp) {
     if (temp === "ice") return "시원한";

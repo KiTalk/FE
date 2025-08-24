@@ -17,71 +17,70 @@ const DEFAULT_SETTINGS = {
 };
 
 // 설정 조회
-export const getSettings = () => {
+export function getSettings() {
   try {
-    const settings = localStorage.getItem(SETTINGS_KEY);
-    const parsed = settings ? JSON.parse(settings) : {};
-
-    // 기본 설정과 병합
-    return { ...DEFAULT_SETTINGS, ...parsed };
+    const stored = localStorage.getItem(SETTINGS_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return { ...DEFAULT_SETTINGS, ...parsed };
+    }
   } catch (error) {
-    console.error("설정 조회 오류:", error);
-    return DEFAULT_SETTINGS;
+    console.error("설정 로드 실패:", error);
   }
-};
+  return DEFAULT_SETTINGS;
+}
 
 // 설정 저장
-export const saveSettings = (newSettings) => {
+export function saveSettings(newSettings) {
   try {
     const currentSettings = getSettings();
-    const updatedSettings = { ...currentSettings, ...newSettings };
-
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(updatedSettings));
-
-    return updatedSettings;
+    const mergedSettings = { ...currentSettings, ...newSettings };
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(mergedSettings));
+    return true;
   } catch (error) {
-    console.error("설정 저장 오류:", error);
-    return null;
+    console.error("설정 저장 실패:", error);
+    return false;
   }
-};
+}
 
 // 개별 설정 업데이트
-export const updateSetting = (key, value) => {
+export function updateSetting(key, value) {
   try {
-    const settings = getSettings();
-    settings[key] = value;
-
-    return saveSettings(settings);
+    const currentSettings = getSettings();
+    const updatedSettings = { ...currentSettings, [key]: value };
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(updatedSettings));
+    return true;
   } catch (error) {
-    console.error("설정 업데이트 오류:", error);
-    return null;
+    console.error("설정 업데이트 실패:", error);
+    return false;
   }
-};
+}
 
 // 설정 초기화
-export const resetSettings = () => {
+export function resetSettings() {
   try {
     localStorage.removeItem(SETTINGS_KEY);
-    return DEFAULT_SETTINGS;
+    return true;
   } catch (error) {
-    console.error("설정 초기화 오류:", error);
-    return DEFAULT_SETTINGS;
+    console.error("설정 초기화 실패:", error);
+    return false;
   }
-};
+}
 
 // 설정 내보내기
-export const exportSettings = () => {
+export function exportSettings() {
   try {
     const settings = getSettings();
     const dataStr = JSON.stringify(settings, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
 
+    const url = URL.createObjectURL(dataBlob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `stt-settings-${new Date()
-      .toISOString()
-      .slice(0, 10)}.json`;
+    link.download = `kitalk-settings-${
+      new Date().toISOString().split("T")[0]
+    }.json`;
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -89,109 +88,103 @@ export const exportSettings = () => {
     URL.revokeObjectURL(url);
     return true;
   } catch (error) {
-    console.error("설정 내보내기 오류:", error);
+    console.error("설정 내보내기 실패:", error);
     return false;
   }
-};
+}
 
 // 설정 가져오기
-export const importSettings = (file) => {
+export function importSettings(file) {
   return new Promise((resolve, reject) => {
     try {
       const reader = new FileReader();
 
-      reader.onload = (e) => {
+      reader.onload = function (event) {
         try {
-          const importedSettings = JSON.parse(e.target.result);
+          const importedSettings = JSON.parse(event.target.result);
 
-          // 유효성 검증
-          if (
-            typeof importedSettings !== "object" ||
-            importedSettings === null
-          ) {
-            throw new Error("잘못된 설정 파일 형식입니다.");
+          // 기본 설정과 병합
+          const currentSettings = getSettings();
+          const mergedSettings = { ...currentSettings, ...importedSettings };
+
+          // 유효성 검사
+          if (validateSettings(mergedSettings)) {
+            saveSettings(mergedSettings);
+            resolve(true);
+          } else {
+            reject(new Error("잘못된 설정 파일입니다."));
           }
-
-          // 알려진 설정 키만 추출
-          const validSettings = {};
-          Object.keys(DEFAULT_SETTINGS).forEach((key) => {
-            // eslint-disable-next-line no-prototype-builtins
-            if (importedSettings.hasOwnProperty(key)) {
-              validSettings[key] = importedSettings[key];
-            }
-          });
-
-          const updatedSettings = saveSettings(validSettings);
-          resolve(updatedSettings);
         } catch (parseError) {
-          reject(
-            new Error("설정 파일을 파싱할 수 없습니다: " + parseError.message)
-          );
+          reject(new Error("설정 파일 파싱에 실패했습니다."));
         }
       };
 
-      reader.onerror = () => {
-        reject(new Error("파일을 읽을 수 없습니다."));
+      reader.onerror = function () {
+        reject(new Error("파일 읽기에 실패했습니다."));
       };
 
       reader.readAsText(file);
     } catch (error) {
-      reject(error);
+      reject(new Error("파일 처리 중 오류가 발생했습니다."));
     }
   });
-};
+}
 
 // 테마 적용
-export const applyTheme = (theme) => {
+export function applyTheme(theme) {
   try {
-    document.documentElement.setAttribute("data-theme", theme);
-    updateSetting("theme", theme);
+    const root = document.documentElement;
+
+    // 기존 테마 클래스 제거
+    root.classList.remove("theme-light", "theme-dark", "theme-auto");
+
+    // 새 테마 클래스 추가
+    root.classList.add(`theme-${theme}`);
+
+    // CSS 변수 설정
+    if (theme === "dark") {
+      root.style.setProperty("--bg-primary", "#1a1a1a");
+      root.style.setProperty("--text-primary", "#ffffff");
+    } else if (theme === "light") {
+      root.style.setProperty("--bg-primary", "#ffffff");
+      root.style.setProperty("--text-primary", "#000000");
+    }
+
     return true;
   } catch (error) {
-    console.error("테마 적용 오류:", error);
+    console.error("테마 적용 실패:", error);
     return false;
   }
-};
+}
 
-// 설정 검증
-export const validateSettings = (settings) => {
-  const errors = [];
-
-  // 기본 언어 검증
-  const validLanguages = ["ko", "en", "ja", "zh"];
-  if (!validLanguages.includes(settings.defaultLanguage)) {
-    errors.push("유효하지 않은 기본 언어입니다.");
-  }
-
-  // 테마 검증
-  const validThemes = ["light", "dark"];
-  if (!validThemes.includes(settings.theme)) {
-    errors.push("유효하지 않은 테마입니다.");
-  }
-
-  // 히스토리 크기 검증
-  if (settings.maxHistorySize < 1 || settings.maxHistorySize > 1000) {
-    errors.push("히스토리 크기는 1-1000 사이여야 합니다.");
-  }
-
-  // 불린 값 검증
-  const booleanKeys = [
-    "autoCopy",
-    "saveHistory",
-    "showConfidence",
-    "showProcessingTime",
-    "autoDownload",
-    "notificationSound",
-    "compactMode",
-  ];
-  booleanKeys.forEach((key) => {
-    if (typeof settings[key] !== "boolean") {
-      errors.push(`${key}는 불린 값이어야 합니다.`);
+// 설정 유효성 검사
+export function validateSettings(settings) {
+  try {
+    // 필수 필드 확인
+    const requiredFields = ["defaultLanguage", "theme", "autoSave"];
+    for (const field of requiredFields) {
+      if (!(field in settings)) {
+        return false;
+      }
     }
-  });
 
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};
+    // 언어 설정 유효성
+    if (!["ko", "en", "ja", "zh"].includes(settings.defaultLanguage)) {
+      return false;
+    }
+
+    // 테마 설정 유효성
+    if (!["light", "dark", "auto"].includes(settings.theme)) {
+      return false;
+    }
+
+    // 자동 저장 설정 유효성
+    if (typeof settings.autoSave !== "boolean") {
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}

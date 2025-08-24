@@ -42,7 +42,7 @@ export function usePhoneInput(options = {}) {
 
   // 숫자 추가
   const addDigit = useCallback(
-    (digit) => {
+    function (digit) {
       setDigits((prev) => {
         const cleaned = extractDigits(prev);
         if (!canAddDigit(cleaned, maxLength)) return prev;
@@ -53,25 +53,31 @@ export function usePhoneInput(options = {}) {
   );
 
   // 마지막 숫자 제거 (백스페이스)
-  const backspace = useCallback(() => {
-    setDigits((prev) => {
-      return removeLastDigit(prev, minLength);
-    });
-  }, [minLength]);
+  const backspace = useCallback(
+    function () {
+      setDigits((prev) => {
+        return removeLastDigit(prev, minLength);
+      });
+    },
+    [minLength]
+  );
 
   // 전체 초기화
-  const reset = useCallback(() => {
-    setDigits(initialValue);
-  }, [initialValue]);
+  const reset = useCallback(
+    function () {
+      setDigits(initialValue);
+    },
+    [initialValue]
+  );
 
   // 특정 값으로 설정
-  const setValue = useCallback((value) => {
+  const setValue = useCallback(function (value) {
     setDigits(value);
   }, []);
 
   // 키패드 클릭 핸들러 (통합)
   const handleKeypadClick = useCallback(
-    (event) => {
+    function (event) {
       const btn = event.currentTarget;
       const action = btn.getAttribute("data-action");
       const numAttr = btn.getAttribute("data-num");
