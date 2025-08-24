@@ -368,7 +368,7 @@ export default function VoiceThreePlusConfirmOrder() {
                 <ProfileIcon src={profile} alt="프로필" />
                 <MessageBubble>
                   <MainTitle>추가 되었습니다 이대로 주문할까요?</MainTitle>
-                  <ExampleText>예시) "응", "아니"</ExampleText>
+                  <ExampleText>예시) "그래", "아니"</ExampleText>
                 </MessageBubble>
               </GuideSection>
 
