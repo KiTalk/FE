@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Page,
@@ -92,12 +92,18 @@ function TouchOrderContent() {
   // 전화번호 관련 상태
   const [phoneOrdersData, setPhoneOrdersData] = useState([]); // 과거 주문 내역
   const [phoneFavoritesData, setPhoneFavoritesData] = useState([]); // 자주 시킨 메뉴
-  const [phoneDataLoading, setPhoneDataLoading] = useState(true);
-  const [phoneDataError, setPhoneDataError] = useState(null);
+  const [_phoneDataLoading, setPhoneDataLoading] = useState(true);
+  const [_phoneDataError, setPhoneDataError] = useState(null);
 
   // TouchOrder 방식의 장바구니 상태 추가
   const [cartCount, setCartCount] = useState(0);
   const [localCart, setLocalCart] = useState({}); // localStorage 기반 장바구니
+
+  // 과거 주문 선택 상태 (localStorage 기반)
+  const [pastOrderSelections, setPastOrderSelections] = useState({}); // {order_id: {menu_id: quantity}}
+
+  // 현재 페이지 인덱스 상태
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // 메뉴 데이터 로드
   useEffect(() => {
@@ -159,9 +165,52 @@ function TouchOrderContent() {
         ]);
 
         // 자주 시킨 메뉴 데이터 처리
-        if (favoritesResponse?.data) {
+        if (favoritesResponse?.data?.top_menus) {
           console.log("✅ 자주 시킨 메뉴 데이터:", favoritesResponse.data);
-          setPhoneFavoritesData(favoritesResponse.data);
+
+          // 메뉴 데이터와 매칭하여 가격 정보 가져오기
+          const transformedFavorites = await Promise.all(
+            favoritesResponse.data.top_menus.map(async (item, index) => {
+              // 기본 메뉴 정보
+              let menuInfo = {
+                id: `fav-${item.menu_id}`,
+                name: item.menu_item,
+                price: 4000, // 기본값
+                popular: true,
+                temp: "ice", // 기본값
+                originalId: item.menu_id,
+                count: item.count,
+                rank: index + 1,
+              };
+
+              // 메뉴 API에서 정확한 가격과 정보 찾기
+              try {
+                const menuResponse = await menuService.getMenuList();
+                if (menuResponse?.success && Array.isArray(menuResponse.data)) {
+                  const matchedMenu = menuResponse.data.find(
+                    (menu) =>
+                      menu.id === item.menu_id ||
+                      menu.name
+                        .toLowerCase()
+                        .includes(item.menu_item.toLowerCase())
+                  );
+
+                  if (matchedMenu) {
+                    menuInfo.price = matchedMenu.price;
+                    menuInfo.temp =
+                      matchedMenu.temperature?.toLowerCase() || "ice";
+                    menuInfo.profileImage = matchedMenu.profile;
+                  }
+                }
+              } catch (error) {
+                console.warn("메뉴 정보 매칭 실패:", error);
+              }
+
+              return menuInfo;
+            })
+          );
+
+          setPhoneFavoritesData(transformedFavorites);
         }
 
         // 과거 주문 내역 데이터 처리
@@ -184,7 +233,7 @@ function TouchOrderContent() {
     };
 
     loadPhoneOrderData();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // localStorage에서 장바구니 데이터 로드 (TouchOrder 방식)
   const loadLocalCart = () => {
@@ -227,9 +276,41 @@ function TouchOrderContent() {
     }
   };
 
-  // 컴포넌트 마운트 시 로컬 장바구니 데이터 로드
+  // localStorage에서 과거 주문 선택 상태 로드
+  const loadPastOrderSelections = () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) {
+      setPastOrderSelections({});
+      return;
+    }
+
+    try {
+      const selectionsKey = `pastOrderSelections_${sessionId}`;
+      const stored = localStorage.getItem(selectionsKey);
+      const selections = stored ? JSON.parse(stored) : {};
+      setPastOrderSelections(selections);
+    } catch {
+      setPastOrderSelections({});
+    }
+  };
+
+  // localStorage에 과거 주문 선택 상태 저장
+  const savePastOrderSelections = (selections) => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) return;
+
+    try {
+      const selectionsKey = `pastOrderSelections_${sessionId}`;
+      localStorage.setItem(selectionsKey, JSON.stringify(selections));
+    } catch {
+      // 저장 실패 시 무시
+    }
+  };
+
+  // 컴포넌트 마운트 시 로컬 데이터 로드
   useEffect(() => {
     loadLocalCart();
+    loadPastOrderSelections();
   }, []);
 
   /* 이 페이지에서만 '커피' 탭 숨김 */
@@ -355,52 +436,108 @@ function TouchOrderContent() {
     navigate("/order-method");
   }
 
-  // TouchOrder 방식으로 선택된 메뉴를 서버에 추가
-  async function handleAddSelectedToCart(getSelectedList, clearSelectedItems) {
+  // 과거 주문 메뉴 선택 상태 변경 (localStorage에 저장)
+  function handlePastOrderToggle(orderId, menuId, currentQty = 0) {
+    const newSelections = { ...pastOrderSelections };
+
+    if (!newSelections[orderId]) {
+      newSelections[orderId] = {};
+    }
+
+    // 현재 수량이 0이면 1로, 0이 아니면 0으로 토글
+    const newQty = currentQty > 0 ? 0 : 1;
+
+    if (newQty > 0) {
+      newSelections[orderId][menuId] = newQty;
+    } else {
+      delete newSelections[orderId][menuId];
+
+      // 해당 주문에 선택된 메뉴가 없으면 주문 자체를 삭제
+      if (Object.keys(newSelections[orderId]).length === 0) {
+        delete newSelections[orderId];
+      }
+    }
+
+    setPastOrderSelections(newSelections);
+    savePastOrderSelections(newSelections);
+  }
+
+  // 과거 주문 메뉴 수량 증가
+  function handlePastOrderIncrease(orderId, menuId) {
+    const newSelections = { ...pastOrderSelections };
+
+    if (!newSelections[orderId]) {
+      newSelections[orderId] = {};
+    }
+
+    const currentQty = newSelections[orderId][menuId] || 0;
+    newSelections[orderId][menuId] = currentQty + 1;
+
+    setPastOrderSelections(newSelections);
+    savePastOrderSelections(newSelections);
+  }
+
+  // 과거 주문 메뉴 수량 감소
+  function handlePastOrderDecrease(orderId, menuId) {
+    const newSelections = { ...pastOrderSelections };
+
+    if (!newSelections[orderId] || !newSelections[orderId][menuId]) {
+      return;
+    }
+
+    const currentQty = newSelections[orderId][menuId];
+    const newQty = Math.max(0, currentQty - 1);
+
+    if (newQty > 0) {
+      newSelections[orderId][menuId] = newQty;
+    } else {
+      delete newSelections[orderId][menuId];
+
+      // 해당 주문에 선택된 메뉴가 없으면 주문 자체를 삭제
+      if (Object.keys(newSelections[orderId]).length === 0) {
+        delete newSelections[orderId];
+      }
+    }
+
+    setPastOrderSelections(newSelections);
+    savePastOrderSelections(newSelections);
+  }
+
+  // 과거 주문에서 선택된 메뉴를 장바구니에 추가 (localStorage 기반)
+  async function handleAddSelectedPastOrdersToCart() {
     const sessionId = sessionStorage.getItem("currentSessionId");
     if (!sessionId) {
       navigate("/order-method");
       return;
     }
 
-    const selectedItems = getSelectedList();
-    if (selectedItems.length === 0) return;
+    // pastOrderSelections에서 선택된 항목들이 없으면 조기 반환
+    if (Object.keys(pastOrderSelections).length === 0) {
+      console.log("선택된 과거 주문 메뉴가 없습니다.");
+      return;
+    }
 
     try {
       // 선택된 항목들을 bulkUpdateTouchCart용 형태로 변환
       const cartUpdates = {};
 
-      for (const { product, quantity } of selectedItems) {
-        if (!product || quantity <= 0) continue;
+      for (const [_orderId, menuSelections] of Object.entries(
+        pastOrderSelections
+      )) {
+        for (const [menuId, quantity] of Object.entries(menuSelections)) {
+          if (quantity <= 0) continue;
 
-        // menu_id 추출 및 안전한 정수 변환
-        let menuId = product.originalId || product.id;
-        if (typeof menuId === "string" && menuId.startsWith("menu-")) {
-          menuId = parseInt(menuId.replace("menu-", ""), 10);
+          const numericMenuId = Number(menuId);
+          if (!Number.isInteger(numericMenuId) || numericMenuId <= 0) {
+            console.warn(`잘못된 메뉴 ID로 인해 건너뜀: ${menuId}`);
+            continue;
+          }
+
+          // 기존 수량에 추가
+          const currentQuantity = localCart[numericMenuId] || 0;
+          cartUpdates[numericMenuId] =
+            (cartUpdates[numericMenuId] || currentQuantity) + quantity;
         }
-
-        // 정수 변환 검증 - 실패 시 해당 항목 건너뛰기
-        const numericMenuId = Number(menuId);
-        if (!Number.isInteger(numericMenuId) || numericMenuId <= 0) {
-          console.warn(`잘못된 메뉴 ID로 인해 건너뜀: ${menuId}`, product);
-          continue;
-        }
-
-        // 기존 수량에 추가
-        const currentQuantity = localCart[numericMenuId] || 0;
-        cartUpdates[numericMenuId] = currentQuantity + quantity;
-
-        // 기존 CartContext에도 추가 (호환성 유지)
-        addItem(
-          {
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            popular: !!product.popular,
-            temp: product.temp,
-          },
-          quantity
-        );
       }
 
       // 유효한 항목이 없으면 조기 반환
@@ -430,11 +567,10 @@ function TouchOrderContent() {
       });
 
       // 장바구니에 추가한 후 선택 상태 초기화
-      if (clearSelectedItems) {
-        clearSelectedItems();
-      }
+      setPastOrderSelections({});
+      savePastOrderSelections({});
 
-      console.log("✅ 선택된 메뉴가 장바구니에 추가되었습니다");
+      console.log("✅ 선택된 과거 주문 메뉴가 장바구니에 추가되었습니다");
     } catch (error) {
       console.error("❌ 장바구니 추가 실패:", error);
       alert("장바구니에 추가하는 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -461,43 +597,57 @@ function TouchOrderContent() {
   const orderSpec = getOrderSpec();
   const phoneNumber = orderSpec?.point?.phone || "";
 
-  // API 응답 데이터를 OrderHistory 컴포넌트 형태로 변환
-  const transformOrdersData = (apiResults) => {
+  // created_at 배열에서 월과 일 정보만 사용하여 날짜 포맷팅
+  function formatMonthDay(createdAtArray) {
+    if (!Array.isArray(createdAtArray) || createdAtArray.length < 3) {
+      return "날짜 정보 없음";
+    }
+
+    const [, month, day] = createdAtArray;
+    return `${month.toString().padStart(2, "0")}.${day
+      .toString()
+      .padStart(2, "0")}`;
+  }
+
+  // API 응답 데이터를 OrderHistory 컴포넌트 형태로 변환 (개별 주문별로)
+  const transformOrdersData = useCallback((apiResults) => {
     if (!Array.isArray(apiResults)) return [];
 
-    // order_id별로 그룹화하여 날짜별 주문으로 변환
-    const ordersByDate = {};
+    // 각 주문을 개별 페이지로 변환
+    const individualOrders = [];
 
     apiResults.forEach((orderGroup) => {
       if (!orderGroup.orders || !Array.isArray(orderGroup.orders)) return;
 
-      // 현재는 날짜 정보가 없으므로 order_id를 기준으로 가상의 날짜 생성
-      // 실제 API에 날짜 정보가 있다면 그것을 사용
-      const fakeDate = `2025-08-${String(
-        15 - (orderGroup.order_id % 10)
-      ).padStart(2, "0")}`;
+      // created_at 배열에서 월.일 형식으로 날짜 키 생성
+      const dateKey = orderGroup.created_at
+        ? formatMonthDay(orderGroup.created_at)
+        : `08.${String(15 - (orderGroup.order_id % 10)).padStart(2, "0")}`;
 
-      if (!ordersByDate[fakeDate]) {
-        ordersByDate[fakeDate] = [];
-      }
+      // 각 주문 그룹을 개별 페이지로 처리
+      const items = orderGroup.orders.map((item) => ({
+        id: item.menu_id
+          ? `menu-${item.menu_id}-${item.temp || "ice"}`
+          : `${item.menu_item}-${item.temp || "ice"}`,
+        name: item.menu_item,
+        price: item.price || 0,
+        popular: false, // API에서 정보가 없으므로 기본값
+        temp: item.temp || "ice",
+        qty: 0, // 체크되지 않은 상태로 시작
+      }));
 
-      orderGroup.orders.forEach((item) => {
-        ordersByDate[fakeDate].push({
-          id: item.menu_id ? `menu-${item.menu_id}` : item.menu_item,
-          name: item.menu_item,
-          price: item.price || 0,
-          popular: false, // API에서 정보가 없으므로 기본값
-          temp: item.temp || "ice",
-          qty: 1, // 기본 수량
-        });
+      individualOrders.push({
+        date: dateKey,
+        items: items,
+        order_id: orderGroup.order_id, // 정렬을 위해 order_id 보존
       });
     });
 
-    // 날짜별로 정렬하여 반환
-    return Object.entries(ordersByDate)
-      .map(([date, items]) => ({ date, items }))
-      .sort((a, b) => b.date.localeCompare(a.date)); // 최신 날짜 우선
-  };
+    // order_id 기준으로 최신 주문 우선 정렬 (각 주문이 개별 페이지가 됨)
+    return individualOrders.sort(
+      (a, b) => (b.order_id || 0) - (a.order_id || 0)
+    );
+  }, []);
 
   // 커스텀 스크롤바를 위한 고정 요소들 반환
   const getFixedElements = () => {
@@ -604,58 +754,43 @@ function TouchOrderContent() {
           {/* 주문 내역 탭 */}
           {activeTabId === "orders" ? (
             <Section className="orderHistorySection">
-              <OrderHistory
-                customOrders={phoneOrdersData}
-                customFavorites={phoneFavoritesData}
-                loading={phoneDataLoading}
-                error={phoneDataError}
-              >
-                {function render({
-                  favorites,
-                  currentDay,
-                  windowDays,
-                  index,
-                  canPrev,
-                  canNext,
-                  handlePrev,
-                  handleNext,
-                  selected,
-                  toggleDate,
-                  toggleItem,
-                  qtyMinus,
-                  qtyPlus,
-                  getSelectedList,
-                  clearSelectedItems,
-                }) {
-                  /* 내부 동작 함수 선언식: 날짜의 전체 선택 여부 */
-                  function isAllChecked(date) {
-                    const bucket = selected?.[date] || {};
-                    const values = Object.values(bucket);
-                    return (
-                      values.length > 0 &&
-                      values.every(function (v) {
-                        return !!v.checked;
-                      })
-                    );
-                  }
-                  /* 내부 동작 함수 선언식: YYYY-MM-DD → M월 D일 */
-                  function formatDate(dateStr) {
-                    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr || "");
-                    if (!m) return dateStr;
-                    const mm = parseInt(m[2], 10);
-                    const dd = parseInt(m[3], 10);
-                    return `${mm}월 ${dd}일`;
-                  }
+              {/* 직접 주문 내역 UI 구현 (OrderHistory 컴포넌트 대신) */}
+              {(function renderPastOrdersDirectly() {
+                const windowDays = phoneOrdersData || [];
+                const currentDay = windowDays[currentIndex] || null;
 
-                  const favList = Array.isArray(favorites) ? favorites : [];
+                const canPrev = () => currentIndex > 0;
+                const canNext = () => currentIndex < windowDays.length - 1;
+                const handlePrev = () => {
+                  if (canPrev()) setCurrentIndex(currentIndex - 1);
+                };
+                const handleNext = () => {
+                  if (canNext()) setCurrentIndex(currentIndex + 1);
+                };
 
-                  return (
-                    <>
-                      <SubSectionTitle>자주 시킨 메뉴</SubSectionTitle>
-                      <FavWrap>
-                        <FavViewport aria-label="자주 시킨 메뉴 목록">
-                          <FavScrollArea>
-                            {favList.map(function (item, idx) {
+                // 날짜 포맷팅 함수
+                function formatDate(dateStr) {
+                  // 월.일 형식 (08.24) 처리
+                  const monthDayMatch = /^(\d{2})\.(\d{2})$/.exec(
+                    dateStr || ""
+                  );
+                  if (monthDayMatch) {
+                    const month = parseInt(monthDayMatch[1], 10);
+                    const day = parseInt(monthDayMatch[2], 10);
+                    return `${month}월 ${day}일`;
+                  }
+                  return dateStr;
+                }
+
+                return (
+                  <>
+                    <SubSectionTitle>자주 시킨 메뉴</SubSectionTitle>
+                    <FavWrap>
+                      <FavViewport aria-label="자주 시킨 메뉴 목록">
+                        <FavScrollArea>
+                          {Array.isArray(phoneFavoritesData) &&
+                          phoneFavoritesData.length > 0 ? (
+                            phoneFavoritesData.map(function (item, idx) {
                               const rankLabel =
                                 idx < 3 ? `${idx + 1}위` : undefined;
                               return (
@@ -668,147 +803,248 @@ function TouchOrderContent() {
                                   selectedMenuType={activeTabId}
                                 />
                               );
-                            })}
-                          </FavScrollArea>
-                        </FavViewport>
-                      </FavWrap>
+                            })
+                          ) : (
+                            <div
+                              style={{
+                                padding: "20px",
+                                textAlign: "center",
+                                color: "#666",
+                                fontSize: "14px",
+                              }}
+                            >
+                              {_phoneDataLoading
+                                ? "자주 시킨 메뉴를 불러오는 중..."
+                                : "자주 시킨 메뉴가 없습니다."}
+                            </div>
+                          )}
+                        </FavScrollArea>
+                      </FavViewport>
+                    </FavWrap>
 
-                      {/* 과거 주문 내역: 화살표로 날짜 전환 */}
-                      <SubSectionTitle>과거 주문 내역</SubSectionTitle>
-                      <SubSectionContext>
-                        주문했던 메뉴를 추가할 수 있어요.
-                      </SubSectionContext>
-                      <PastListWrap className="pastListWrap">
-                        {!!currentDay && (
-                          <>
-                            {/* 날짜 전체 선택 */}
-                            <DateHeader className="dateHeader">
-                              <DateCheck
-                                className="dateCheck"
-                                checked={isAllChecked(currentDay.date)}
-                                onChange={function onToggleDate() {
-                                  toggleDate(currentDay.date);
-                                }}
-                              />
-                              <DateLabel className="dateLabel">
-                                {formatDate(currentDay.date)}
-                              </DateLabel>
-                            </DateHeader>
+                    {/* 과거 주문 내역 */}
+                    <SubSectionTitle>과거 주문 내역</SubSectionTitle>
+                    <SubSectionContext>
+                      주문했던 메뉴를 추가할 수 있어요.
+                    </SubSectionContext>
+                    <PastListWrap className="pastListWrap">
+                      {currentDay ? (
+                        <>
+                          {/* 날짜 헤더 */}
+                          <DateHeader className="dateHeader">
+                            <DateCheck
+                              className="dateCheck"
+                              checked={
+                                Array.isArray(currentDay?.items) &&
+                                currentDay.items.every((item) => {
+                                  const menuId = item.id.split("-")[1];
+                                  const qty =
+                                    pastOrderSelections[currentDay.order_id]?.[
+                                      menuId
+                                    ] || 0;
+                                  return qty > 0;
+                                })
+                              }
+                              onChange={() => {
+                                // 날짜 전체 선택/해제
+                                const allChecked =
+                                  Array.isArray(currentDay?.items) &&
+                                  currentDay.items.every((item) => {
+                                    const menuId = item.id.split("-")[1];
+                                    const qty =
+                                      pastOrderSelections[
+                                        currentDay.order_id
+                                      ]?.[menuId] || 0;
+                                    return qty > 0;
+                                  });
 
-                            {/* 메뉴 목록 */}
-                            <MenuList className="menuList">
-                              {currentDay.items.map(function (it) {
-                                const st = selected?.[currentDay.date]?.[
-                                  it.id
-                                ] || { checked: false, qty: 0 };
+                                if (allChecked) {
+                                  // 모두 체크되어 있으면 모두 해제
+                                  const newSelections = {
+                                    ...pastOrderSelections,
+                                  };
+                                  if (newSelections[currentDay.order_id]) {
+                                    delete newSelections[currentDay.order_id];
+                                  }
+                                  setPastOrderSelections(newSelections);
+                                  savePastOrderSelections(newSelections);
+                                } else {
+                                  // 모두 체크되어 있지 않으면 모두 체크
+                                  const newSelections = {
+                                    ...pastOrderSelections,
+                                  };
+                                  if (!newSelections[currentDay.order_id]) {
+                                    newSelections[currentDay.order_id] = {};
+                                  }
+                                  currentDay.items.forEach((item) => {
+                                    const menuId = item.id.split("-")[1];
+                                    newSelections[currentDay.order_id][
+                                      menuId
+                                    ] = 1;
+                                  });
+                                  setPastOrderSelections(newSelections);
+                                  savePastOrderSelections(newSelections);
+                                }
+                              }}
+                            />
+                            <DateLabel className="dateLabel">
+                              {formatDate(currentDay.date)}
+                            </DateLabel>
+                          </DateHeader>
+
+                          {/* 메뉴 목록 */}
+                          <MenuList className="menuList">
+                            {Array.isArray(currentDay?.items) &&
+                            currentDay.items.length > 0 ? (
+                              currentDay.items.map(function (item) {
+                                const currentQty =
+                                  pastOrderSelections[currentDay.order_id]?.[
+                                    item.id.split("-")[1]
+                                  ] || 0;
+                                const isChecked = currentQty > 0;
+
                                 return (
                                   <MenuRow
                                     className="menuRow"
-                                    key={`${currentDay.date}${it.id}`}
+                                    key={`${currentDay.order_id}-${item.id}`}
                                   >
                                     <MenuCheck
                                       className="menuCheck"
-                                      checked={!!st.checked}
-                                      onChange={function onToggleItem() {
-                                        toggleItem(currentDay.date, it.id);
+                                      checked={isChecked}
+                                      onChange={() => {
+                                        const menuId = item.id.split("-")[1];
+                                        handlePastOrderToggle(
+                                          currentDay.order_id,
+                                          menuId,
+                                          currentQty
+                                        );
                                       }}
                                     />
                                     <MenuImage>
                                       {/* 이미지는 추후 추가 */}
                                     </MenuImage>
                                     <MenuName className="menuName">
-                                      {it.name}
+                                      {item.name}
                                     </MenuName>
 
                                     <Stepper className="menuStepper">
                                       <StepBtn
                                         className="menuMinus"
                                         $type="minus"
-                                        disabled={st.qty <= 0}
+                                        disabled={currentQty <= 0}
                                         aria-label="minus"
-                                        onClick={function onQtyMinus() {
-                                          qtyMinus(currentDay.date, it.id);
+                                        onClick={() => {
+                                          const menuId = item.id.split("-")[1];
+                                          handlePastOrderDecrease(
+                                            currentDay.order_id,
+                                            menuId
+                                          );
                                         }}
                                       />
                                       <StepValue className="menuQty">
-                                        {st.qty ?? 0}
+                                        {currentQty}
                                       </StepValue>
                                       <StepBtn
                                         className="menuPlus"
                                         $type="plus"
                                         aria-label="plus"
-                                        onClick={function onQtyPlus() {
-                                          qtyPlus(currentDay.date, it.id);
+                                        onClick={() => {
+                                          const menuId = item.id.split("-")[1];
+                                          handlePastOrderIncrease(
+                                            currentDay.order_id,
+                                            menuId
+                                          );
                                         }}
                                       />
                                     </Stepper>
 
                                     <Price className="menuPrice">
-                                      {it.price.toLocaleString()}원
+                                      {item.price.toLocaleString()}원
                                     </Price>
                                   </MenuRow>
                                 );
-                              })}
-                            </MenuList>
-                          </>
-                        )}
-                      </PastListWrap>
-
-                      {/* 날짜 네비게이션 */}
-                      <HistoryNav>
-                        {/* 페이지네이션 점들 */}
-                        <PaginationDots>
-                          {windowDays.map((_, dotIndex) => (
-                            <PaginationDot
-                              key={dotIndex}
-                              $active={dotIndex === index}
-                            />
-                          ))}
-                        </PaginationDots>
-
-                        {/* 네비게이션 버튼들 */}
-                        <NavButtons>
-                          <HistoryNavIcon
-                            src={backIcon}
-                            alt="이전"
-                            $disabled={!canPrev()}
-                            onClick={!canPrev() ? undefined : handlePrev}
-                            aria-label="이전 날짜"
-                          />
-                          <HistoryNavIcon
-                            src={nextIcon}
-                            alt="다음"
-                            $disabled={!canNext()}
-                            onClick={!canNext() ? undefined : handleNext}
-                            aria-label="다음 날짜"
-                          />
-                        </NavButtons>
-                      </HistoryNav>
-
-                      {/* 하단 버튼 - 섹션 맨 아래(가운데 정렬은 스타일에서 처리) */}
-                      <FooterBar className="historyFooter">
-                        <GhostButton
-                          type="button"
-                          onClick={handleGoToOrderMethod}
+                              })
+                            ) : (
+                              <div
+                                style={{
+                                  padding: "20px",
+                                  textAlign: "center",
+                                  color: "#666",
+                                  fontSize: "14px",
+                                }}
+                              >
+                                이 주문에 메뉴가 없습니다.
+                              </div>
+                            )}
+                          </MenuList>
+                        </>
+                      ) : (
+                        <div
+                          style={{
+                            padding: "40px",
+                            textAlign: "center",
+                            color: "#666",
+                            fontSize: "14px",
+                          }}
                         >
-                          처음으로
-                        </GhostButton>
-                        <PrimaryButton
-                          type="button"
-                          onClick={() =>
-                            handleAddSelectedToCart(
-                              getSelectedList,
-                              clearSelectedItems
-                            )
-                          }
-                        >
-                          선택한 메뉴 담기
-                        </PrimaryButton>
-                      </FooterBar>
-                    </>
-                  );
-                }}
-              </OrderHistory>
+                          {_phoneDataLoading
+                            ? "과거 주문 내역을 불러오는 중..."
+                            : "과거 주문 내역이 없습니다."}
+                        </div>
+                      )}
+                    </PastListWrap>
+
+                    {/* 날짜 네비게이션 */}
+                    <HistoryNav>
+                      {/* 페이지네이션 점들 */}
+                      <PaginationDots>
+                        {Array.isArray(windowDays)
+                          ? windowDays.map((_, dotIndex) => (
+                              <PaginationDot
+                                key={dotIndex}
+                                $active={dotIndex === currentIndex}
+                              />
+                            ))
+                          : []}
+                      </PaginationDots>
+
+                      {/* 네비게이션 버튼들 */}
+                      <NavButtons>
+                        <HistoryNavIcon
+                          src={backIcon}
+                          alt="이전"
+                          $disabled={!canPrev()}
+                          onClick={!canPrev() ? undefined : handlePrev}
+                          aria-label="이전 주문"
+                        />
+                        <HistoryNavIcon
+                          src={nextIcon}
+                          alt="다음"
+                          $disabled={!canNext()}
+                          onClick={!canNext() ? undefined : handleNext}
+                          aria-label="다음 주문"
+                        />
+                      </NavButtons>
+                    </HistoryNav>
+
+                    {/* 하단 버튼 */}
+                    <FooterBar className="historyFooter">
+                      <GhostButton
+                        type="button"
+                        onClick={handleGoToOrderMethod}
+                      >
+                        처음으로
+                      </GhostButton>
+                      <PrimaryButton
+                        type="button"
+                        onClick={handleAddSelectedPastOrdersToCart}
+                      >
+                        선택한 메뉴 담기
+                      </PrimaryButton>
+                    </FooterBar>
+                  </>
+                );
+              })()}
             </Section>
           ) : (
             (Array.isArray(activeMenu?.sections)
@@ -819,17 +1055,19 @@ function TouchOrderContent() {
                 <Section key={section.id}>
                   <SectionTitle>{section.title}</SectionTitle>
                   <ProductRow>
-                    {section.products.map(function (item) {
-                      return (
-                        <ProductCard
-                          key={item.id}
-                          product={item}
-                          onAdd={makeOnAddHandler(item)}
-                          currentMode="phone"
-                          selectedMenuType={activeTabId}
-                        />
-                      );
-                    })}
+                    {Array.isArray(section?.products)
+                      ? section.products.map(function (item) {
+                          return (
+                            <ProductCard
+                              key={item.id}
+                              product={item}
+                              onAdd={makeOnAddHandler(item)}
+                              currentMode="phone"
+                              selectedMenuType={activeTabId}
+                            />
+                          );
+                        })
+                      : []}
                   </ProductRow>
                 </Section>
               );
