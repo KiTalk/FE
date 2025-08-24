@@ -643,6 +643,7 @@ function TouchOrderContent() {
         popular: false, // API에서 정보가 없으므로 기본값
         temp: item.temp || "ice",
         qty: 0, // 체크되지 않은 상태로 시작
+        profileImage: item.profile, // API 응답의 profile 이미지 추가
       }));
 
       individualOrders.push({
@@ -930,7 +931,18 @@ function TouchOrderContent() {
                                       }}
                                     />
                                     <MenuImage>
-                                      {/* 이미지는 추후 추가 */}
+                                      {item.profileImage && (
+                                        <img
+                                          src={item.profileImage}
+                                          alt={item.name}
+                                          style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "cover",
+                                            borderRadius: "1.25rem",
+                                          }}
+                                        />
+                                      )}
                                     </MenuImage>
                                     <MenuName className="menuName">
                                       {item.name}
