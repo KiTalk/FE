@@ -53,6 +53,7 @@ export const Subtitle = styled.p`
   line-height: 160%;
   letter-spacing: -0.015em;
   color: #5d5d5d;
+  white-space: nowrap;
 `;
 
 export const CheckImage = styled.img`

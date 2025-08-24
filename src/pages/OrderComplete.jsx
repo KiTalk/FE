@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import checkImg from "../assets/images/check.png";
 import {
@@ -11,6 +11,7 @@ import {
 
 export default function OrderCompletePage() {
   const navigate = useNavigate();
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     // localStorage 스냅샷 수집
@@ -38,36 +39,26 @@ export default function OrderCompletePage() {
       }
     }
 
-    // 지연 후 홈으로 이동 예약하고 타이머 id 반환
-    function scheduleNavigateHome(delayMs) {
-      const timerId = setTimeout(() => {
-        navigate("/", { replace: true });
-      }, delayMs);
-      return timerId;
-    }
-
     // 현재 localStorage의 모든 키-값을 객체로 정리
     const storageSnapshot = collectLocalStorageSnapshot();
     console.log(storageSnapshot); /* 추후 삭제 */
 
-    // 임시: 백엔드 전송 코드 예시 (주석처리)
-    // import apiClient from "../services/api";
-    // import { API_ENDPOINTS } from "../config/api";
-    // (async () => {
-    //   try {
-    //     await apiClient.post(API_ENDPOINTS.ORDER_COMPLETE, storageSnapshot);
-    //   } catch (error) {
-    //     console.error("주문 완료 데이터 전송 실패", error);
-    //   }
-    // })();
-
     // 전송 여부와 관계 없이 localStorage 초기화
     clearLocalStorageSafe();
 
-    // 4초 후 홈으로 이동
-    const timerId = scheduleNavigateHome(4000);
+    // 카운트다운 타이머 시작
+    const countdownInterval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
+          navigate("/", { replace: true });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-    return () => clearTimeout(timerId);
+    return () => clearInterval(countdownInterval);
   }, [navigate]);
 
   return (
@@ -75,7 +66,7 @@ export default function OrderCompletePage() {
       <CheckImage src={checkImg} alt="" aria-hidden="true" />
       <Frame>
         <Title>주문이 완료되었습니다</Title>
-        <Subtitle>결제는 직원에게 직접 해주세요</Subtitle>
+        <Subtitle>{countdown}초 뒤에 처음 화면으로 돌아갑니다</Subtitle>
       </Frame>
     </Page>
   );
