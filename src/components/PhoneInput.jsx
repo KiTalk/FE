@@ -24,6 +24,7 @@ import {
  * @param {string} props.subtitle - 페이지 부제목
  * @param {string} props.inputHeading - 입력 영역 제목
  * @param {string} props.instruction - 입력 안내 텍스트
+ * @param {string} props.errorMessage - 에러 메시지 (있을 경우 instruction 대신 표시)
  * @param {string} props.saveButtonText - 저장 버튼 텍스트
  * @param {function} props.onSave - 저장 버튼 클릭 핸들러
  * @param {object} props.phoneInputOptions - usePhoneInput 훅 옵션
@@ -34,6 +35,7 @@ export default function PhoneInput({
   subtitle = "전화번호 입력시 '자주 주문한 메뉴'를 확인할 수 있습니다",
   inputHeading = "전화번호 입력",
   instruction = "오른쪽 숫자 패드에서 전화번호 입력 후 저장을 눌러주세요",
+  errorMessage = null,
   saveButtonText = "저장",
   onSave,
   phoneInputOptions = {},
@@ -67,7 +69,18 @@ export default function PhoneInput({
             <BottomAccent />
           </PhoneRow>
 
-          <Instruction>{instruction}</Instruction>
+          {errorMessage ? (
+            <Instruction $isError>
+              {errorMessage.split(/\n|<br\s*\/?>/i).map((part, idx, arr) => (
+                <React.Fragment key={idx}>
+                  {part}
+                  {idx < arr.length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </Instruction>
+          ) : (
+            <Instruction>{instruction}</Instruction>
+          )}
         </InputArea>
 
         <Keypad>

@@ -15,8 +15,13 @@ export default function PointPhone() {
     if (sessionId && orderSpec) {
       try {
         const spec = JSON.parse(orderSpec);
-        // 터치주문 모드인 경우
-        return spec.mode === "touch" || spec.mode === "color";
+        // 터치주문 모드인 경우 (PhoneOrder도 포함)
+        return (
+          spec.mode === "touch" ||
+          spec.mode === "color" ||
+          spec.mode === "phone" ||
+          spec.point?.enabled
+        );
       } catch {
         return false;
       }

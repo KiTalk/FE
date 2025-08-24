@@ -646,4 +646,77 @@ export const touchOrderService = {
       throw error;
     }
   },
+
+  // 터치주문 전화번호 저장 (새로운 API)
+  saveTouchPhoneNumber: async (sessionId, phoneNumber) => {
+    try {
+      // 전화번호를 하이픈 포함 형태로 변환 (formatPhoneWithHyphens 함수 활용)
+      const formattedPhone = phoneNumber.includes("-")
+        ? phoneNumber
+        : phoneNumber.length === 11
+        ? `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(
+            3,
+            7
+          )}-${phoneNumber.slice(7)}`
+        : phoneNumber;
+
+      const response = await touchOrderApiClient.post(
+        API_ENDPOINTS.TOUCH_PHONE_NUMBER(sessionId),
+        { phone: formattedPhone }
+      );
+      console.log("터치주문 전화번호 저장 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("터치주문 전화번호 저장 실패:", error);
+      throw error;
+    }
+  },
+
+  // 전화번호 상단 메뉴 조회
+  getPhoneTopMenus: async (phoneNumber) => {
+    try {
+      const response = await touchOrderApiClient.get(
+        API_ENDPOINTS.PHONE_TOP_MENUS,
+        {
+          params: { phone: phoneNumber },
+        }
+      );
+      console.log("전화번호 상단 메뉴 조회 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("전화번호 상단 메뉴 조회 실패:", error);
+      throw error;
+    }
+  },
+
+  // 전화번호 주문 내역 조회
+  getPhoneOrders: async (phoneNumber) => {
+    try {
+      const response = await touchOrderApiClient.get(
+        API_ENDPOINTS.PHONE_ORDERS,
+        {
+          params: { phone: phoneNumber },
+        }
+      );
+      console.log("전화번호 주문 내역 조회 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("전화번호 주문 내역 조회 실패:", error);
+      throw error;
+    }
+  },
+
+  // 전화번호 주문 완료
+  completePhoneOrder: async (sessionId) => {
+    try {
+      const response = await touchOrderApiClient.post(
+        API_ENDPOINTS.PHONE_COMPLETE(sessionId)
+      );
+      console.log("✅ 전화번호 주문 완료 성공:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ 전화번호 주문 완료 실패:", error);
+      throw error;
+    }
+  },
 };

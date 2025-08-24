@@ -28,6 +28,7 @@ export const API_ENDPOINTS = {
     `/order-retry/update-temp/${sessionId}`,
 
   // TOUCH_ORDER_API_BASE_URL 사용
+  // 터치주문
   MENU_LIST: "/api/menu/list",
   TOUCH_CART_ADD: (sessionId) => `/api/touch/cart/${sessionId}/add`,
   TOUCH_CART_GET: (sessionId) => `/api/touch/cart/${sessionId}`,
@@ -37,6 +38,14 @@ export const API_ENDPOINTS = {
   TOUCH_CART_PACKAGING: (sessionId) => `/api/touch/cart/${sessionId}/packaging`,
   TOUCH_PHONE_CHOICE: (sessionId) => `/api/touch/phone/${sessionId}/choice`,
   TOUCH_PHONE_INPUT: (sessionId) => `/api/touch/phone/${sessionId}/input`,
+
+  // TOUCH_ORDER_API_BASE_URL 사용
+  // 전화번호 간편주문
+  TOUCH_PHONE_NUMBER: (sessionId) =>
+    `/api/touch/phone/${sessionId}/phone_number`,
+  PHONE_TOP_MENUS: "/api/phone/top-menus",
+  PHONE_ORDERS: "/api/phone/orders",
+  PHONE_COMPLETE: (sessionId) => `/api/touch/phone/${sessionId}/complete`,
 };
 
 // 지원 언어 목록

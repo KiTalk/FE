@@ -84,7 +84,7 @@ export const Instruction = styled.div`
   font-size: 2.25rem;
   line-height: 3.125rem;
   letter-spacing: -0.015em;
-  color: #5d5d5d;
+  color: ${(props) => (props.$isError ? "#e74c3c" : "#5d5d5d")};
   white-space: normal;
 `;
 
