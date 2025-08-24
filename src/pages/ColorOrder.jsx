@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { setMode } from "../utils/orderSpec";
 import {
   Page,
+  PageViewport,
+  ContentWrapper,
   Hero,
   HeroInner,
   HeroTitle,
@@ -27,6 +29,7 @@ import { menuService, touchOrderService } from "../services/api.js";
 import CategoryTabs from "../components/CategoryTabs";
 
 import ProductCard from "../components/ProductCard";
+import CustomScrollbar from "../components/CustomScrollbar";
 import { clearAllAddedTotals } from "../utils/storage";
 
 export default function ColorOrderPage() {
@@ -56,10 +59,130 @@ function ColorOrderContent() {
         const apiMenuData = await menuService.getTransformedMenuData();
 
         if (apiMenuData && apiMenuData.length > 0) {
-          setMenuData(apiMenuData);
+          // 커피 메뉴를 세분화하는 함수
+          const subdivideCoffeeSection = (sections) => {
+            // 커피 섹션을 찾기
+            const coffeeSection = sections.find(
+              (section) => section.title === "커피"
+            );
+            if (!coffeeSection) return sections;
+
+            // 커피 제품들을 분류
+            const americanoProducts = coffeeSection.products.filter((product) =>
+              product.name.includes("아메리카노")
+            );
+            const latteProducts = coffeeSection.products.filter(
+              (product) =>
+                product.name.includes("라떼") &&
+                !product.name.includes("아메리카노")
+            );
+            const otherProducts = coffeeSection.products.filter(
+              (product) =>
+                !product.name.includes("아메리카노") &&
+                !product.name.includes("라떼")
+            );
+
+            // 커피 섹션을 제거하고 세분화된 섹션들로 교체
+            const otherSections = sections.filter(
+              (section) => section.title !== "커피"
+            );
+            const newCoffeeSections = [];
+
+            if (americanoProducts.length > 0) {
+              newCoffeeSections.push({
+                id: "americano",
+                title: "아메리카노",
+                products: americanoProducts,
+              });
+            }
+
+            if (latteProducts.length > 0) {
+              newCoffeeSections.push({
+                id: "latte",
+                title: "라떼",
+                products: latteProducts,
+              });
+            }
+
+            if (otherProducts.length > 0) {
+              newCoffeeSections.push({
+                id: "other-coffee",
+                title: "달달한 음료",
+                products: otherProducts,
+              });
+            }
+
+            return [...newCoffeeSections, ...otherSections];
+          };
+
+          // 모든 카테고리에서 커피 메뉴를 세분화
+          const transformedMenuData = apiMenuData.map((category) => {
+            if (category.id === "coffee") {
+              // 커피 카테고리의 모든 제품을 수집
+              const allCoffeeProducts = category.sections.flatMap(
+                (section) => section.products
+              );
+
+              // 제품을 분류
+              const americanoProducts = allCoffeeProducts.filter((product) =>
+                product.name.includes("아메리카노")
+              );
+              const latteProducts = allCoffeeProducts.filter(
+                (product) =>
+                  product.name.includes("라떼") &&
+                  !product.name.includes("아메리카노")
+              );
+              const otherProducts = allCoffeeProducts.filter(
+                (product) =>
+                  !product.name.includes("아메리카노") &&
+                  !product.name.includes("라떼")
+              );
+
+              // 새로운 섹션 구조로 재구성
+              const newSections = [];
+
+              if (americanoProducts.length > 0) {
+                newSections.push({
+                  id: "americano",
+                  title: "아메리카노",
+                  products: americanoProducts,
+                });
+              }
+
+              if (latteProducts.length > 0) {
+                newSections.push({
+                  id: "latte",
+                  title: "라떼",
+                  products: latteProducts,
+                });
+              }
+
+              if (otherProducts.length > 0) {
+                newSections.push({
+                  id: "other-coffee",
+                  title: "달달한 음료",
+                  products: otherProducts,
+                });
+              }
+
+              return {
+                ...category,
+                sections: newSections,
+              };
+            } else if (category.id === "all") {
+              // 모든 메뉴 카테고리에서도 커피 섹션을 세분화
+              return {
+                ...category,
+                sections: subdivideCoffeeSection(category.sections),
+              };
+            }
+            return category;
+          });
+
+          setMenuData(transformedMenuData);
           console.log(
             "ColorOrder - API에서 메뉴 데이터 로드 성공:",
-            apiMenuData
+            transformedMenuData
           );
         } else {
           console.warn(
@@ -246,50 +369,75 @@ function ColorOrderContent() {
     );
   }
 
+  // 커스텀 스크롤바를 위한 고정 요소들 반환
+  const getFixedElements = () => {
+    return {
+      hero: document.querySelector("[data-hero='color']"),
+      tabs: document.querySelector("[data-tabs='color']"),
+    };
+  };
+
   return (
     <Page>
-      <Hero>
-        <HeroInner>
-          <HeroTitle>무엇을 드시겠어요?</HeroTitle>
+      <PageViewport data-viewport="color" style={{ paddingRight: 24 }}>
+        <ContentWrapper data-content="color">
+          <Hero data-hero="color">
+            <HeroInner>
+              <HeroTitle>무엇을 드시겠어요?</HeroTitle>
 
-          <CartWidget onClick={handleCartClick}>
-            <CartTextWrap>
-              <CartText>장바구니</CartText>
-            </CartTextWrap>
-            <CartIcon src={marketImage} alt="장바구니" />
-            <CartBadgeWrap>
-              <CartBadge src={badgeImage} alt="배지" />
-              <CartBadgeCount>{cartCount}</CartBadgeCount>
-            </CartBadgeWrap>
-            <CartArrow src={arrowImage} alt="열기" />
-          </CartWidget>
-        </HeroInner>
-      </Hero>
+              <CartWidget onClick={handleCartClick}>
+                <CartTextWrap>
+                  <CartText>장바구니</CartText>
+                </CartTextWrap>
+                <CartIcon src={marketImage} alt="장바구니" />
+                <CartBadgeWrap>
+                  <CartBadge src={badgeImage} alt="배지" />
+                  <CartBadgeCount>{cartCount}</CartBadgeCount>
+                </CartBadgeWrap>
+                <CartArrow src={arrowImage} alt="열기" />
+              </CartWidget>
+            </HeroInner>
+          </Hero>
 
-      <CategoryTabs
-        tabs={menuData.map(({ id, label }) => ({ id, label }))}
-        activeId={activeTabId}
-        onChange={setActiveTabId}
+          <div data-tabs="color">
+            <CategoryTabs
+              tabs={menuData.map(({ id, label }) => ({ id, label }))}
+              activeId={activeTabId}
+              onChange={setActiveTabId}
+            />
+          </div>
+
+          {activeMenu?.sections.map((section) => (
+            <Section key={section.id}>
+              <SectionTitle>{section.title}</SectionTitle>
+
+              <ProductRow>
+                {section.products.map((item) => (
+                  <ProductCard
+                    currentMode={currentMode}
+                    selectedMenuType={selectedMenuType}
+                    key={item.id}
+                    product={item}
+                    cartQty={getCartQuantity(item)}
+                    onAdd={makeOnAddHandler(item)}
+                  />
+                ))}
+              </ProductRow>
+            </Section>
+          ))}
+        </ContentWrapper>
+      </PageViewport>
+      <CustomScrollbar
+        viewportSelector="[data-viewport='color']"
+        contentSelector="[data-content='color']"
+        getFixedElements={getFixedElements}
+        positioning={{
+          topExtraOffset: 40,
+          bottomOffset: 70,
+          rightOffset: 65,
+        }}
+        minThumbHeight={40}
       />
-
-      {activeMenu?.sections.map((section) => (
-        <Section key={section.id}>
-          <SectionTitle>{section.title}</SectionTitle>
-
-          <ProductRow>
-            {section.products.map((item) => (
-              <ProductCard
-                currentMode={currentMode}
-                selectedMenuType={selectedMenuType}
-                key={item.id}
-                product={item}
-                cartQty={getCartQuantity(item)}
-                onAdd={makeOnAddHandler(item)}
-              />
-            ))}
-          </ProductRow>
-        </Section>
-      ))}
     </Page>
   );
 }
