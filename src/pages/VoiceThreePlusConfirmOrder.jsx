@@ -372,7 +372,7 @@ export default function VoiceThreePlusConfirmOrder() {
                 </MessageBubble>
               </GuideSection>
 
-              {(isRecording || loading) && !voiceRecognizedText && (
+              {isRecording && !voiceRecognizedText && (
                 <VoiceRecognitionArea
                   style={{
                     transform: showTopSection
@@ -399,6 +399,34 @@ export default function VoiceThreePlusConfirmOrder() {
                       gap={6}
                     />
                   </AudioSpectrumContainer>
+                </VoiceRecognitionArea>
+              )}
+
+              {loading && !isRecording && !voiceRecognizedText && (
+                <VoiceRecognitionArea
+                  style={{
+                    transform: showTopSection
+                      ? "translateY(0)"
+                      : "translateY(80px)",
+                    opacity: showTopSection ? 1 : 0,
+                    transition:
+                      "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s, opacity 0.6s ease 0.1s",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "100%",
+                      height: "100%",
+                      fontSize: "2.5rem",
+                      color: "#223770",
+                      fontWeight: "500",
+                    }}
+                  >
+                    처리 중...
+                  </div>
                 </VoiceRecognitionArea>
               )}
 
