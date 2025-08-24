@@ -159,8 +159,8 @@ export default function VoiceThreePlusRecording() {
                 </MessageBubble>
               </GuideSection>
 
-              {/* 녹음 중이거나 변환 중일 때: 음성 인식 영역 */}
-              {(isRecording || loading) && !recognizedText && (
+              {/* 녹음 중일 때: 음성 인식 영역 */}
+              {isRecording && !recognizedText && (
                 <VoiceRecognitionArea>
                   <AudioSpectrumContainer>
                     <AudioSpectrum
@@ -178,6 +178,26 @@ export default function VoiceThreePlusRecording() {
                       gap={6}
                     />
                   </AudioSpectrumContainer>
+                </VoiceRecognitionArea>
+              )}
+
+              {/* 변환 중일 때: 처리 중 메시지 */}
+              {loading && !isRecording && !recognizedText && (
+                <VoiceRecognitionArea>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "100%",
+                      height: "100%",
+                      fontSize: "2.5rem",
+                      color: "#223770",
+                      fontWeight: "500",
+                    }}
+                  >
+                    처리 중...
+                  </div>
                 </VoiceRecognitionArea>
               )}
 
