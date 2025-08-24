@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 export const CategoryBar = styled.div`
   position: relative;
   width: 90rem;
-  height: 6.4375rem;
+  height: 5.625rem;
   margin: 0 auto;
   background: #f2f6fb;
   display: flex;
@@ -29,7 +29,7 @@ const activeTab = css`
   background: #ffffff;
   color: #272727;
   font-weight: 700;
-  box-shadow: 0.125rem 0.125rem 0.4375rem rgba(0, 0, 0, 0.25);
+  box-shadow: 0.125rem 0 0.4375rem -0.2rem rgba(0, 0, 0, 0.25);
 `;
 
 export const CategoryTab = styled.button`
@@ -50,20 +50,20 @@ export const CategoryTab = styled.button`
     background: ${(p) => (p.$active ? "#ffffff" : "#53669d")};
     color: ${(p) => (p.$active ? "#272727" : "#ffffff")};
     box-shadow: ${(p) =>
-      p.$active ? "0.125rem 0.125rem 0.4375rem rgba(0,0,0,0.25)" : "none"};
+      p.$active ? "0.125rem 0 0.4375rem -0.2rem rgba(0,0,0,0.25)" : "none"};
   }
 
   &:active {
     background: ${(p) => (p.$active ? "#ffffff" : "#53669d")};
     color: ${(p) => (p.$active ? "#272727" : "#ffffff")};
     box-shadow: ${(p) =>
-      p.$active ? "0.125rem 0.125rem 0.4375rem rgba(0,0,0,0.25)" : "none"};
+      p.$active ? "0.125rem 0 0.4375rem -0.2rem rgba(0,0,0,0.25)" : "none"};
   }
 
   &:focus,
   &:focus-visible {
     outline: none;
     box-shadow: ${(p) =>
-      p.$active ? "0.125rem 0.125rem 0.4375rem rgba(0,0,0,0.25)" : "none"};
+      p.$active ? "0.125rem 0 0.4375rem -0.2rem rgba(0,0,0,0.25)" : "none"};
   }
 `;
