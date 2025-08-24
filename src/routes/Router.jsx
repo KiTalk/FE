@@ -5,29 +5,29 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
-import PageTransition from "../components/PageTransition";
-import Home from "../pages/Home";
-import OrderMethod from "../pages/OrderMethod";
-import TouchOrder from "../pages/TouchOrder";
-import Cart from "../pages/Cart";
-import VoiceOrder from "../pages/VoiceOrder";
-import VoiceOneTwo from "../pages/VoiceOneTwo";
-import VoiceThreePlus from "../pages/VoiceThreePlus";
-import VoiceThreePlusRecording from "../pages/VoiceThreePlusRecording";
-import VoiceThreePlusDetails from "../pages/VoiceThreePlusDetails";
-import VoiceThreePlusDetailsPlus from "../pages/VoiceThreePlusDetailsPlus";
-import VoiceThreePlusConfirmOrder from "../pages/VoiceThreePlusConfirmOrder";
-import VoiceRecognize from "../pages/VoiceRecognize";
-import ColorIntro from "../pages/ColorIntro";
-import ColorOrder from "../pages/ColorOrder";
-import PhoneNumber from "../pages/PhoneNumber";
-import PhoneOrder from "../pages/PhoneOrder";
-import VoiceCart from "../pages/VoiceCart";
-import PackagePage from "../pages/Package";
-import PointCheckPage from "../pages/PointCheck";
-import OrderCompletePage from "../pages/OrderComplete";
-import PointPhone from "../pages/PointPhone";
-import VoiceError from "../pages/VoiceError";
+import PageTransition from "../components/motion/PageTransition";
+import Home from "../pages/common/Home";
+import OrderMethod from "../pages/common/OrderMethod";
+import TouchOrder from "../pages/touch/TouchOrder";
+import Cart from "../pages/common/Cart";
+import VoiceOrder from "../pages/single_voice/VoiceOrder";
+import VoiceOneTwo from "../pages/single_voice/VoiceOneTwo";
+import VoiceThreePlus from "../pages/complex_voice/VoiceThreePlus";
+import VoiceThreePlusRecording from "../pages/complex_voice/VoiceThreePlusRecording";
+import VoiceThreePlusDetails from "../pages/complex_voice/VoiceThreePlusDetails";
+import VoiceThreePlusDetailsPlus from "../pages/complex_voice/VoiceThreePlusDetailsPlus";
+import VoiceThreePlusConfirmOrder from "../pages/complex_voice/VoiceThreePlusConfirmOrder";
+import VoiceRecognize from "../pages/single_voice/VoiceRecognize";
+import ColorIntro from "../pages/color/ColorIntro";
+import ColorOrder from "../pages/color/ColorOrder";
+import PhoneNumber from "../pages/phone/PhoneNumber";
+import PhoneOrder from "../pages/phone/PhoneOrder";
+import VoiceCart from "../pages/single_voice/VoiceCart";
+import PackagePage from "../pages/common/Package";
+import PointCheckPage from "../pages/common/PointCheck";
+import OrderCompletePage from "../pages/common/OrderComplete";
+import PointPhone from "../pages/common/PointPhone";
+import VoiceError from "../pages/common/VoiceError";
 
 function AnimatedRoutes() {
   const location = useLocation();
