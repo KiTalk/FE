@@ -432,7 +432,7 @@ export const OrderDetails = styled.div`
 
 export const OrderQuantityRow = styled.div`
   position: absolute;
-  width: 20.3125rem;
+  width: 19.1125rem;
   height: 3.0625rem;
   left: 0;
   top: 0;

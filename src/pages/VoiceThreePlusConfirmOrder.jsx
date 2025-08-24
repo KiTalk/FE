@@ -63,7 +63,6 @@ export default function VoiceThreePlusConfirmOrder() {
     totalQuantity: 0,
     totalPrice: 0,
   });
-  const [showOrderSection, setShowOrderSection] = useState(false);
   const [animateProducts, setAnimateProducts] = useState(false);
   const [showTopSection, setShowTopSection] = useState(false);
 
@@ -361,12 +360,10 @@ export default function VoiceThreePlusConfirmOrder() {
   }, [voiceRecognizedText, isTransitioning, navigate, sessionId, syncNow]);
   useEffect(() => {
     const t1 = setTimeout(() => setShowTopSection(true), 100);
-    const t2 = setTimeout(() => setShowOrderSection(true), 400);
-    const t3 = setTimeout(() => setAnimateProducts(true), 900);
+    const t2 = setTimeout(() => setAnimateProducts(true), 900);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
     };
   }, []);
 
@@ -518,12 +515,7 @@ export default function VoiceThreePlusConfirmOrder() {
         }}
       </VoiceRecorder>
 
-      <OrderSection
-        style={{
-          transform: showOrderSection ? "translateY(0)" : "translateY(100%)",
-          transition: "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-        }}
-      >
+      <OrderSection>
         <OrderHeader>
           <OrderTitle>주문 내역</OrderTitle>
           <CancelButton onClick={handleCancelAll}>전체 취소</CancelButton>
@@ -579,13 +571,7 @@ export default function VoiceThreePlusConfirmOrder() {
           <ScrollSpacer width={calculateScrollSpace()} />
         </ProductsArea>
 
-        <OrderSummary
-          style={{
-            opacity: animateProducts ? 1 : 0,
-            transform: animateProducts ? "translateX(0)" : "translateX(50px)",
-            transition: "opacity 0.5s ease 0.6s, transform 0.5s ease 0.6s",
-          }}
-        >
+        <OrderSummary>
           <OrderDetails>
             <OrderQuantityRow>
               <OrderQuantityLabel>주문 수량</OrderQuantityLabel>
