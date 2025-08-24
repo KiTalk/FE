@@ -41,7 +41,7 @@ export default function VoiceProductCard({
     <ItemCard>
       <OrderTypeTag>{orderType}</OrderTypeTag>
       <ImageArea $variant={temperatureVariant}>
-        {/* profile 이미지가 있을 때만 표시 (CartProductCard.jsx와 동일) */}
+        {/* profile 이미지가 있을 때만 표시 */}
         {product?.profileImage && (
           <ProductImage
             src={product.profileImage}
