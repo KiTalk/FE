@@ -58,7 +58,8 @@ import arrowImage from "../assets/images/arrow.png";
 import badgeImage from "../assets/images/badge.png";
 import backIcon from "../assets/images/button-back.png";
 import nextIcon from "../assets/images/button-next.png";
-import { menuService } from "../services/api.js";
+import { menuService, touchOrderService } from "../services/api.js";
+import { formatPhoneWithHyphens } from "../utils/phoneUtils";
 import CategoryTabs from "../components/CategoryTabs";
 import ProductCard from "../components/ProductCard";
 
@@ -86,8 +87,17 @@ function TouchOrderContent() {
   const [menuData, setMenuData] = useState([]); // 메뉴 데이터 상태
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { addItem, totalQty: _totalQty } = useCart();
-  const totalQty = Number.isFinite(_totalQty) ? _totalQty : 0;
+  const { addItem } = useCart();
+
+  // 전화번호 관련 상태
+  const [phoneOrdersData, setPhoneOrdersData] = useState([]); // 과거 주문 내역
+  const [phoneFavoritesData, setPhoneFavoritesData] = useState([]); // 자주 시킨 메뉴
+  const [phoneDataLoading, setPhoneDataLoading] = useState(true);
+  const [phoneDataError, setPhoneDataError] = useState(null);
+
+  // TouchOrder 방식의 장바구니 상태 추가
+  const [cartCount, setCartCount] = useState(0);
+  const [localCart, setLocalCart] = useState({}); // localStorage 기반 장바구니
 
   // 메뉴 데이터 로드
   useEffect(() => {
@@ -121,6 +131,108 @@ function TouchOrderContent() {
     loadMenuData();
   }, []);
 
+  // 전화번호 주문 데이터 로드
+  useEffect(() => {
+    const loadPhoneOrderData = async () => {
+      try {
+        setPhoneDataLoading(true);
+        setPhoneDataError(null);
+
+        // localStorage에서 전화번호 가져오기
+        const orderSpec = getOrderSpec();
+        const phoneNumber = orderSpec?.point?.phone;
+
+        if (!phoneNumber) {
+          console.warn("전화번호가 없습니다. 주문 내역을 불러올 수 없습니다.");
+          setPhoneOrdersData([]);
+          setPhoneFavoritesData([]);
+          setPhoneDataLoading(false);
+          return;
+        }
+
+        const formattedPhone = formatPhoneWithHyphens(phoneNumber);
+        console.log("📞 전화번호로 데이터 조회:", formattedPhone);
+
+        // 병렬로 API 호출
+        const [favoritesResponse, ordersResponse] = await Promise.all([
+          touchOrderService.getPhoneTopMenus(formattedPhone),
+          touchOrderService.getPhoneOrders(formattedPhone),
+        ]);
+
+        // 자주 시킨 메뉴 데이터 처리
+        if (favoritesResponse?.data) {
+          console.log("✅ 자주 시킨 메뉴 데이터:", favoritesResponse.data);
+          setPhoneFavoritesData(favoritesResponse.data);
+        }
+
+        // 과거 주문 내역 데이터 처리
+        if (ordersResponse?.data?.results) {
+          console.log("✅ 과거 주문 내역 데이터:", ordersResponse.data.results);
+          // API 응답을 OrderHistory 컴포넌트가 기대하는 형태로 변환
+          const transformedOrders = transformOrdersData(
+            ordersResponse.data.results
+          );
+          setPhoneOrdersData(transformedOrders);
+        }
+      } catch (err) {
+        console.error("❌ 전화번호 주문 데이터 로드 실패:", err);
+        setPhoneDataError(err.message);
+        setPhoneOrdersData([]);
+        setPhoneFavoritesData([]);
+      } finally {
+        setPhoneDataLoading(false);
+      }
+    };
+
+    loadPhoneOrderData();
+  }, []);
+
+  // localStorage에서 장바구니 데이터 로드 (TouchOrder 방식)
+  const loadLocalCart = () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) {
+      setLocalCart({});
+      setCartCount(0);
+      return;
+    }
+
+    try {
+      const cartKey = `touchCart_${sessionId}`;
+      const stored = localStorage.getItem(cartKey);
+      const cart = stored ? JSON.parse(stored) : {};
+
+      // 총 개수 계산
+      const totalQuantity = Object.values(cart).reduce(
+        (sum, quantity) => sum + quantity,
+        0
+      );
+
+      setLocalCart(cart);
+      setCartCount(totalQuantity);
+    } catch {
+      setLocalCart({});
+      setCartCount(0);
+    }
+  };
+
+  // localStorage에 장바구니 데이터 저장 (TouchOrder 방식)
+  const saveLocalCart = (cart) => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) return;
+
+    try {
+      const cartKey = `touchCart_${sessionId}`;
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+    } catch {
+      // 장바구니 저장 실패 시 무시
+    }
+  };
+
+  // 컴포넌트 마운트 시 로컬 장바구니 데이터 로드
+  useEffect(() => {
+    loadLocalCart();
+  }, []);
+
   /* 이 페이지에서만 '커피' 탭 숨김 */
   const HIDDEN_TAB_IDS = React.useMemo(
     function () {
@@ -148,37 +260,172 @@ function TouchOrderContent() {
   );
 
   /* 내부 동작 함수 선언식 */
-  function handleCartClick() {
-    navigate("/order/cart");
+  // 장바구니 버튼 클릭 시 서버에 동기화 후 이동 (TouchOrder 방식)
+  async function handleCartClick() {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) {
+      navigate("/order-method");
+      return;
+    }
+
+    try {
+      // PhoneOrder 모드를 order_spec에 설정
+      const orderSpec = getOrderSpec();
+      orderSpec.mode = "phone";
+      localStorage.setItem("order_spec", JSON.stringify(orderSpec));
+
+      // localStorage의 장바구니 데이터를 서버에 동기화
+      await syncCartToServer();
+      navigate("/order/cart");
+    } catch {
+      navigate("/order-method");
+    }
   }
 
-  function handleAddToCart(product, quantity) {
+  // localStorage 장바구니를 서버에 동기화 (원자성 보장)
+  const syncCartToServer = async () => {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) return;
+
+    // 일괄 업데이트로 원자성 보장
+    await touchOrderService.bulkUpdateTouchCart(sessionId, localCart);
+  };
+
+  // TouchOrder 방식으로 개별 메뉴를 서버에 추가
+  async function handleAddToCart(product, quantity) {
     const qty = Number(quantity ?? 1);
     if (!product?.id || qty <= 0) return;
-    addItem(
-      {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        popular: !!product.popular,
-        temp: product.temp,
-      },
-      qty
-    );
+
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) {
+      navigate("/order-method");
+      return;
+    }
+
+    try {
+      // menu_id 추출 - originalId 우선, 없으면 id 사용
+      let menuId = product.originalId || product.id;
+      if (typeof menuId === "string" && menuId.startsWith("menu-")) {
+        menuId = parseInt(menuId.replace("menu-", ""), 10);
+      }
+
+      // 기존 수량에 추가
+      const currentQuantity = localCart[menuId] || 0;
+      const newQuantity = currentQuantity + qty;
+
+      // 일괄 업데이트로 서버에 동기화
+      await touchOrderService.bulkUpdateTouchCart(sessionId, {
+        [menuId]: newQuantity,
+      });
+
+      // localStorage 업데이트
+      setLocalCart((prevCart) => {
+        const updatedCart = { ...prevCart, [menuId]: newQuantity };
+        saveLocalCart(updatedCart);
+        return updatedCart;
+      });
+
+      // 장바구니 카운트 업데이트
+      setCartCount(() => {
+        const totalQuantity = Object.values({
+          ...localCart,
+          [menuId]: newQuantity,
+        }).reduce((sum, quantity) => sum + quantity, 0);
+        return totalQuantity;
+      });
+
+      // 기존 CartContext에도 추가 (호환성 유지)
+      addItem(
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          popular: !!product.popular,
+          temp: product.temp,
+        },
+        qty
+      );
+
+      console.log("✅ 메뉴가 장바구니에 추가되었습니다:", product.name);
+    } catch (error) {
+      console.error("❌ 장바구니 추가 실패:", error);
+      alert("장바구니에 추가하는 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   }
 
   function handleGoToOrderMethod() {
     navigate("/order-method");
   }
 
-  function handleAddSelectedToCart(getSelectedList, clearSelectedItems) {
-    getSelectedList().forEach(function ({ product, quantity }) {
-      const onAdd = makeOnAddHandler(product);
-      onAdd({ product, quantity });
-    });
-    // 장바구니에 추가한 후 선택 상태 초기화
-    if (clearSelectedItems) {
-      clearSelectedItems();
+  // TouchOrder 방식으로 선택된 메뉴를 서버에 추가
+  async function handleAddSelectedToCart(getSelectedList, clearSelectedItems) {
+    const sessionId = sessionStorage.getItem("currentSessionId");
+    if (!sessionId) {
+      navigate("/order-method");
+      return;
+    }
+
+    const selectedItems = getSelectedList();
+    if (selectedItems.length === 0) return;
+
+    try {
+      // 선택된 항목들을 bulkUpdateTouchCart용 형태로 변환
+      const cartUpdates = {};
+
+      for (const { product, quantity } of selectedItems) {
+        if (!product || quantity <= 0) continue;
+
+        // menu_id 추출 (API 응답에서 온 경우 id가 "menu-6" 형태일 수 있음)
+        let menuId = product.id;
+        if (typeof menuId === "string" && menuId.startsWith("menu-")) {
+          menuId = parseInt(menuId.replace("menu-", ""), 10);
+        }
+
+        // 기존 수량에 추가
+        const currentQuantity = localCart[menuId] || 0;
+        cartUpdates[menuId] = currentQuantity + quantity;
+
+        // 기존 CartContext에도 추가 (호환성 유지)
+        addItem(
+          {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            popular: !!product.popular,
+            temp: product.temp,
+          },
+          quantity
+        );
+      }
+
+      // 일괄 업데이트로 서버에 동기화
+      await touchOrderService.bulkUpdateTouchCart(sessionId, cartUpdates);
+
+      // localStorage 업데이트
+      setLocalCart((prevCart) => {
+        const updatedCart = { ...prevCart, ...cartUpdates };
+        saveLocalCart(updatedCart);
+        return updatedCart;
+      });
+
+      // 장바구니 카운트 업데이트
+      setCartCount(() => {
+        const totalQuantity = Object.values({
+          ...localCart,
+          ...cartUpdates,
+        }).reduce((sum, quantity) => sum + quantity, 0);
+        return totalQuantity;
+      });
+
+      // 장바구니에 추가한 후 선택 상태 초기화
+      if (clearSelectedItems) {
+        clearSelectedItems();
+      }
+
+      console.log("✅ 선택된 메뉴가 장바구니에 추가되었습니다");
+    } catch (error) {
+      console.error("❌ 장바구니 추가 실패:", error);
+      alert("장바구니에 추가하는 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
   }
 
@@ -201,6 +448,44 @@ function TouchOrderContent() {
 
   const orderSpec = getOrderSpec();
   const phoneNumber = orderSpec?.point?.phone || "";
+
+  // API 응답 데이터를 OrderHistory 컴포넌트 형태로 변환
+  const transformOrdersData = (apiResults) => {
+    if (!Array.isArray(apiResults)) return [];
+
+    // order_id별로 그룹화하여 날짜별 주문으로 변환
+    const ordersByDate = {};
+
+    apiResults.forEach((orderGroup) => {
+      if (!orderGroup.orders || !Array.isArray(orderGroup.orders)) return;
+
+      // 현재는 날짜 정보가 없으므로 order_id를 기준으로 가상의 날짜 생성
+      // 실제 API에 날짜 정보가 있다면 그것을 사용
+      const fakeDate = `2025-08-${String(
+        15 - (orderGroup.order_id % 10)
+      ).padStart(2, "0")}`;
+
+      if (!ordersByDate[fakeDate]) {
+        ordersByDate[fakeDate] = [];
+      }
+
+      orderGroup.orders.forEach((item) => {
+        ordersByDate[fakeDate].push({
+          id: item.menu_id ? `menu-${item.menu_id}` : item.menu_item,
+          name: item.menu_item,
+          price: item.price || 0,
+          popular: false, // API에서 정보가 없으므로 기본값
+          temp: item.temp || "ice",
+          qty: 1, // 기본 수량
+        });
+      });
+    });
+
+    // 날짜별로 정렬하여 반환
+    return Object.entries(ordersByDate)
+      .map(([date, items]) => ({ date, items }))
+      .sort((a, b) => b.date.localeCompare(a.date)); // 최신 날짜 우선
+  };
 
   // 커스텀 스크롤바를 위한 고정 요소들 반환
   const getFixedElements = () => {
@@ -275,7 +560,7 @@ function TouchOrderContent() {
                 <CartIcon src={marketImage} alt="장바구니" />
                 <CartBadgeWrap>
                   <CartBadge src={badgeImage} alt="배지" />
-                  <CartBadgeCount>{totalQty}</CartBadgeCount>
+                  <CartBadgeCount>{cartCount}</CartBadgeCount>
                 </CartBadgeWrap>
                 <CartArrow src={arrowImage} alt="열기" />
               </CartWidget>
@@ -307,7 +592,12 @@ function TouchOrderContent() {
           {/* 주문 내역 탭 */}
           {activeTabId === "orders" ? (
             <Section className="orderHistorySection">
-              <OrderHistory>
+              <OrderHistory
+                customOrders={phoneOrdersData}
+                customFavorites={phoneFavoritesData}
+                loading={phoneDataLoading}
+                error={phoneDataError}
+              >
                 {function render({
                   favorites,
                   currentDay,

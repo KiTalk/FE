@@ -168,6 +168,7 @@ export const Section = styled.section`
   position: relative;
   width: 76.25rem;
   margin: 2.5rem auto;
+  padding: 0 2rem;
 `;
 
 export const SectionTitle = styled.h3`
@@ -194,8 +195,10 @@ export const SectionTitle = styled.h3`
 
 export const ProductRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 23.8125rem);
-  gap: 4.375rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 76.25rem;
+  margin: 0 auto;
 `;
 
 export const SubSectionTitle = styled.h4`

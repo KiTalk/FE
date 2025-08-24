@@ -27,8 +27,13 @@ export default function PackagePage() {
     if (sessionId && orderSpec) {
       try {
         const spec = JSON.parse(orderSpec);
-        // 터치주문 모드인 경우
-        return spec.mode === "touch" || spec.mode === "color";
+        // 터치주문 모드인 경우 (PhoneOrder도 포함)
+        return (
+          spec.mode === "touch" ||
+          spec.mode === "color" ||
+          spec.mode === "phone" ||
+          spec.point?.enabled
+        );
       } catch {
         return false;
       }
@@ -52,6 +57,35 @@ export default function PackagePage() {
     try {
       // 터치주문에서 온 경우 터치주문 포장 API 사용
       if (isFromTouchCart()) {
+        const orderSpec = localStorage.getItem("order_spec");
+        let spec = {};
+        try {
+          spec = JSON.parse(orderSpec || "{}");
+        } catch {
+          // JSON 파싱 실패 시 빈 객체 사용
+        }
+
+        // phone 모드인 경우 바로 주문 완료 처리
+        if (spec.mode === "phone") {
+          const packagingType = type === "takeout" ? "포장" : "매장";
+
+          // 포장 방식 설정
+          await touchOrderService.setTouchCartPackaging(
+            sessionId,
+            packagingType
+          );
+          console.log("✅ 전화번호 주문 포장 방식 설정 완료");
+
+          // 바로 주문 완료 처리
+          const response = await touchOrderService.completePhoneOrder(
+            sessionId
+          );
+          console.log("✅ 전화번호 주문 완료:", response);
+          navigate("/order/complete");
+          return;
+        }
+
+        // 일반 터치주문인 경우
         const packagingType = type === "takeout" ? "포장" : "매장";
         const response = await touchOrderService.setTouchCartPackaging(
           sessionId,

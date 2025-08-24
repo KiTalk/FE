@@ -2,10 +2,15 @@
 // 서버 연동 시: fetch(`${import.meta.env.VITE_API_URL}/orders?...`) 로 교체하면 됨
 
 import React, { useEffect, useMemo, useState } from "react";
-import { DUMMY_ORDERS } from "../data/OrderHistory.data.js";
 
 /* 컴포넌트 함수 선언식: Headless OrderHistory */
-export default function OrderHistory({ children }) {
+export default function OrderHistory({
+  children,
+  customOrders = null,
+  customFavorites = null,
+  loading: customLoading = null,
+  error: customError = null,
+}) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,8 +37,10 @@ export default function OrderHistory({ children }) {
   const [selected, setSelected] = useState({});
 
   function initOrders() {
-    // 실제 연동 시: fetch(`${import.meta.env.VITE_API_URL}/orders?...`)
-    const list = [...DUMMY_ORDERS].sort((a, b) => (a.date > b.date ? -1 : 1));
+    // customOrders가 제공되면 그것을 사용, 아니면 빈 배열 사용
+    const list = customOrders
+      ? [...customOrders].sort((a, b) => (a.date > b.date ? -1 : 1))
+      : [];
     setOrders(list);
 
     // 과거 수량으로 초기화(수량>0 → 자동 체크)
@@ -49,7 +56,12 @@ export default function OrderHistory({ children }) {
     });
     setSelected(initSel);
 
-    setLoading(false);
+    // 로딩 상태는 customLoading이 제공되면 그것을 사용
+    if (customLoading !== null) {
+      setLoading(customLoading);
+    } else {
+      setLoading(false);
+    }
   }
 
   function toggleDate(date) {
@@ -120,9 +132,15 @@ export default function OrderHistory({ children }) {
     });
   }
 
-  // 즐겨찾기(자주 시킨 메뉴): 수량>0 이었던 날짜 수로 랭킹
+  // 즐겨찾기(자주 시킨 메뉴): customFavorites가 제공되면 사용, 아니면 계산
   const favorites = useMemo(
     function () {
+      if (customFavorites && Array.isArray(customFavorites)) {
+        // API에서 제공된 자주 시킨 메뉴 사용
+        return customFavorites;
+      }
+
+      // 기존 로직: 수량>0 이었던 날짜 수로 랭킹
       const counter = new Map();
       orders.forEach(function (d) {
         d.items.forEach(function (it) {
@@ -137,10 +155,10 @@ export default function OrderHistory({ children }) {
         .sort((a, b) => b.count - a.count)
         .map((x) => ({ ...x.item, _count: x.count }));
     },
-    [orders]
+    [orders, customFavorites]
   );
 
-  useEffect(initOrders, []);
+  useEffect(initOrders, [customOrders, customLoading]);
 
   const windowDays = orders.slice(0, MAX_DAYS);
   const currentDay = windowDays[index] || null;
