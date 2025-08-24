@@ -21,7 +21,7 @@ export const BottomAccentBar = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  height: 10.5rem;
+  height: 13.5rem;
   background: #223770;
   border-top-left-radius: 2.4375rem;
   border-top-right-radius: 2.4375rem;
