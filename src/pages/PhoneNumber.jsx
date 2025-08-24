@@ -44,9 +44,11 @@ export default function PhoneNumber() {
           topMenuError.response?.status === 404 ||
           topMenuError.response?.status === 500
         ) {
-          setErrorMessage(
-            "등록된 번호가 없습니다 <br/> 번호를 확인 후 다시 입력해 주세요!"
-          );
+          const msg =
+            topMenuError.response?.status === 404
+              ? "등록된 번호가 없습니다\n번호를 확인 후 다시 입력해 주세요!"
+              : "서버 오류가 발생했습니다.\n잠시 후 다시 시도해 주세요.";
+          setErrorMessage(msg);
         } else {
           // 다른 에러의 경우 일반적인 에러 처리
           throw topMenuError;

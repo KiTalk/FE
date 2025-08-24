@@ -69,12 +69,18 @@ export default function PhoneInput({
             <BottomAccent />
           </PhoneRow>
 
-          <Instruction
-            $isError={!!errorMessage}
-            dangerouslySetInnerHTML={{
-              __html: errorMessage || instruction,
-            }}
-          />
+          {errorMessage ? (
+            <Instruction $isError>
+              {errorMessage.split(/\n|<br\s*\/?>/i).map((part, idx, arr) => (
+                <React.Fragment key={idx}>
+                  {part}
+                  {idx < arr.length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </Instruction>
+          ) : (
+            <Instruction>{instruction}</Instruction>
+          )}
         </InputArea>
 
         <Keypad>

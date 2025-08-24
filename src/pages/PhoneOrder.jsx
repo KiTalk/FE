@@ -151,7 +151,6 @@ function TouchOrderContent() {
         }
 
         const formattedPhone = formatPhoneWithHyphens(phoneNumber);
-        console.log("📞 전화번호로 데이터 조회:", formattedPhone);
 
         // 병렬로 API 호출
         const [favoritesResponse, ordersResponse] = await Promise.all([
@@ -313,11 +312,6 @@ function TouchOrderContent() {
       const currentQuantity = localCart[menuId] || 0;
       const newQuantity = currentQuantity + qty;
 
-      // 일괄 업데이트로 서버에 동기화
-      await touchOrderService.bulkUpdateTouchCart(sessionId, {
-        [menuId]: newQuantity,
-      });
-
       // localStorage 업데이트
       setLocalCart((prevCart) => {
         const updatedCart = { ...prevCart, [menuId]: newQuantity };
@@ -325,12 +319,16 @@ function TouchOrderContent() {
         return updatedCart;
       });
 
+      // 전체 장바구니 스냅샷으로 서버에 동기화
+      const updatedCart = { ...localCart, [menuId]: newQuantity };
+      await touchOrderService.bulkUpdateTouchCart(sessionId, updatedCart);
+
       // 장바구니 카운트 업데이트
       setCartCount(() => {
-        const totalQuantity = Object.values({
-          ...localCart,
-          [menuId]: newQuantity,
-        }).reduce((sum, quantity) => sum + quantity, 0);
+        const totalQuantity = Object.values(updatedCart).reduce(
+          (sum, quantity) => sum + quantity,
+          0
+        );
         return totalQuantity;
       });
 
@@ -375,15 +373,22 @@ function TouchOrderContent() {
       for (const { product, quantity } of selectedItems) {
         if (!product || quantity <= 0) continue;
 
-        // menu_id 추출 (API 응답에서 온 경우 id가 "menu-6" 형태일 수 있음)
-        let menuId = product.id;
+        // menu_id 추출 및 안전한 정수 변환
+        let menuId = product.originalId || product.id;
         if (typeof menuId === "string" && menuId.startsWith("menu-")) {
           menuId = parseInt(menuId.replace("menu-", ""), 10);
         }
 
+        // 정수 변환 검증 - 실패 시 해당 항목 건너뛰기
+        const numericMenuId = Number(menuId);
+        if (!Number.isInteger(numericMenuId) || numericMenuId <= 0) {
+          console.warn(`잘못된 메뉴 ID로 인해 건너뜀: ${menuId}`, product);
+          continue;
+        }
+
         // 기존 수량에 추가
-        const currentQuantity = localCart[menuId] || 0;
-        cartUpdates[menuId] = currentQuantity + quantity;
+        const currentQuantity = localCart[numericMenuId] || 0;
+        cartUpdates[numericMenuId] = currentQuantity + quantity;
 
         // 기존 CartContext에도 추가 (호환성 유지)
         addItem(
@@ -398,8 +403,11 @@ function TouchOrderContent() {
         );
       }
 
-      // 일괄 업데이트로 서버에 동기화
-      await touchOrderService.bulkUpdateTouchCart(sessionId, cartUpdates);
+      // 유효한 항목이 없으면 조기 반환
+      if (Object.keys(cartUpdates).length === 0) {
+        console.warn("유효한 메뉴 ID가 없어 장바구니 업데이트를 건너뜀");
+        return;
+      }
 
       // localStorage 업데이트
       setLocalCart((prevCart) => {
@@ -408,12 +416,16 @@ function TouchOrderContent() {
         return updatedCart;
       });
 
+      // 전체 장바구니 스냅샷으로 서버에 동기화
+      const updatedCart = { ...localCart, ...cartUpdates };
+      await touchOrderService.bulkUpdateTouchCart(sessionId, updatedCart);
+
       // 장바구니 카운트 업데이트
       setCartCount(() => {
-        const totalQuantity = Object.values({
-          ...localCart,
-          ...cartUpdates,
-        }).reduce((sum, quantity) => sum + quantity, 0);
+        const totalQuantity = Object.values(updatedCart).reduce(
+          (sum, quantity) => sum + quantity,
+          0
+        );
         return totalQuantity;
       });
 
