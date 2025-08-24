@@ -52,7 +52,7 @@ function ColorOrderContent() {
 
   // 메뉴 데이터 로드
   useEffect(() => {
-    const loadMenuData = async () => {
+    async function loadMenuData() {
       try {
         setLoading(true);
         setError(null);
@@ -60,7 +60,7 @@ function ColorOrderContent() {
 
         if (apiMenuData && apiMenuData.length > 0) {
           // 커피 메뉴를 세분화하는 함수
-          const subdivideCoffeeSection = (sections) => {
+          function subdivideCoffeeSection(sections) {
             // 커피 섹션을 찾기
             const coffeeSection = sections.find(
               (section) => section.title === "커피"
@@ -113,7 +113,7 @@ function ColorOrderContent() {
             }
 
             return [...newCoffeeSections, ...otherSections];
-          };
+          }
 
           // 모든 카테고리에서 커피 메뉴를 세분화
           const transformedMenuData = apiMenuData.map((category) => {
@@ -198,13 +198,13 @@ function ColorOrderContent() {
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     loadMenuData();
   }, []);
 
   // localStorage에서 장바구니 데이터 로드
-  const loadLocalCart = () => {
+  function loadLocalCart() {
     const sessionId = sessionStorage.getItem("currentSessionId");
     if (!sessionId) {
       setLocalCart({});
@@ -229,10 +229,10 @@ function ColorOrderContent() {
       setLocalCart({});
       setCartCount(0);
     }
-  };
+  }
 
   // localStorage에 장바구니 데이터 저장
-  const saveLocalCart = (cart) => {
+  function saveLocalCart(cart) {
     const sessionId = sessionStorage.getItem("currentSessionId");
     if (!sessionId) return;
 
@@ -242,7 +242,7 @@ function ColorOrderContent() {
     } catch {
       // 장바구니 저장 실패 시 무시
     }
-  };
+  }
 
   // 컴포넌트 마운트 시 로컬 장바구니 데이터 로드
   useEffect(() => {
@@ -274,13 +274,13 @@ function ColorOrderContent() {
   }
 
   // localStorage 장바구니를 서버에 동기화 (원자성 보장)
-  const syncCartToServer = async () => {
+  async function syncCartToServer() {
     const sessionId = sessionStorage.getItem("currentSessionId");
     if (!sessionId) return;
 
     // 일괄 업데이트로 원자성 보장
     await touchOrderService.bulkUpdateTouchCart(sessionId, localCart);
-  };
+  }
 
   // 특정 제품의 장바구니 수량 조회 (localStorage 기반)
   function getCartQuantity(product) {

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { AudioRecorder, getAudioDuration } from "../../utils/audioUtils";
 import { addToHistory } from "../../utils/historyUtils";
 import { sttService } from "../../services/api";
@@ -55,32 +55,38 @@ export default function VoiceRecorder({
     return "";
   }
 
-  const sendInterimSnapshot = useCallback(async () => {
-    if (!recorderRef.current || snapshotInFlightRef.current) return;
-    snapshotInFlightRef.current = true;
-    try {
-      const snapshotFile = await recorderRef.current.getSnapshotFile(
-        "recording-interim"
-      );
-      if (!snapshotFile || snapshotFile.size < 2000) return;
-      const data = await sttService.convertSpeechToText(snapshotFile, language);
-      const text = extractTextFromSttResponse(data);
-      if (text) {
-        setRecognized(text);
-        if (typeof onRecognized === "function") {
-          try {
-            onRecognized(text);
-          } catch {
-            /* no-op */
+  const sendInterimSnapshot = useCallback(
+    async function () {
+      if (!recorderRef.current || snapshotInFlightRef.current) return;
+      snapshotInFlightRef.current = true;
+      try {
+        const snapshotFile = await recorderRef.current.getSnapshotFile(
+          "recording-interim"
+        );
+        if (!snapshotFile || snapshotFile.size < 2000) return;
+        const data = await sttService.convertSpeechToText(
+          snapshotFile,
+          language
+        );
+        const text = extractTextFromSttResponse(data);
+        if (text) {
+          setRecognized(text);
+          if (typeof onRecognized === "function") {
+            try {
+              onRecognized(text);
+            } catch {
+              /* no-op */
+            }
           }
         }
+      } catch {
+        // ignore interim errors
+      } finally {
+        snapshotInFlightRef.current = false;
       }
-    } catch {
-      // ignore interim errors
-    } finally {
-      snapshotInFlightRef.current = false;
-    }
-  }, [language, onRecognized]);
+    },
+    [language, onRecognized]
+  );
 
   async function toggleRecording() {
     setError("");

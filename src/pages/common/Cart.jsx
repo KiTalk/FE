@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Page,
   CartPageContainer,
@@ -49,7 +49,7 @@ function CartContent(props) {
   const loadedRef = useRef(false); // 중복 호출 방지
 
   // localStorage에 장바구니 데이터 저장
-  const saveLocalCart = (cart) => {
+  function saveLocalCart(cart) {
     const sessionId = sessionStorage.getItem("currentSessionId");
     if (!sessionId) return;
 
@@ -59,10 +59,10 @@ function CartContent(props) {
     } catch (error) {
       console.error("장바구니 저장 실패:", error);
     }
-  };
+  }
 
   // 서버에서 장바구니 데이터 로드 (최초 마운트 시에만)
-  const loadServerCartData = useCallback(async () => {
+  const loadServerCartData = useCallback(async function () {
     // 이미 로드된 경우 중복 호출 방지
     if (loadedRef.current) {
       setLoading(false);
@@ -214,7 +214,7 @@ function CartContent(props) {
   }
 
   // localStorage 장바구니를 서버에 동기화 (원자성 보장)
-  const syncCartToServer = async () => {
+  async function syncCartToServer() {
     const sessionId = sessionStorage.getItem("currentSessionId");
     if (!sessionId) return;
 
@@ -225,7 +225,7 @@ function CartContent(props) {
       console.error("서버 동기화 실패:", error);
       throw error;
     }
-  };
+  }
 
   // 수량 증가 (localStorage만 업데이트)
   function handleIncrease(menuId) {

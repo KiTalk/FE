@@ -19,19 +19,19 @@ import { setMode } from "../../utils/orderSpec";
 export default function ColorIntro() {
   const navigate = useNavigate();
 
-  const handleAmericanoClick = () => {
+  function handleAmericanoClick() {
     setMode("color");
     // 아메리카노 선택 정보를 localStorage에 저장
     localStorage.setItem("selectedMenuType", "americano");
     navigate("/order/color");
-  };
+  }
 
-  const handleLatteClick = () => {
+  function handleLatteClick() {
     setMode("color");
     // 라떼 선택 정보를 localStorage에 저장
     localStorage.setItem("selectedMenuType", "latte");
     navigate("/order/color");
-  };
+  }
 
   function handleBack() {
     navigate(-1);
