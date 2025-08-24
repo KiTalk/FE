@@ -183,6 +183,10 @@ function TouchOrderContent() {
                 rank: index + 1,
               };
 
+              // API 응답에서 직접 profile 이미지와 temp 사용
+              menuInfo.profileImage = item.profile;
+              menuInfo.temp = item.temp || "ice"; // API 응답의 temp 우선 사용
+
               // 메뉴 API에서 정확한 가격과 정보 찾기
               try {
                 const menuResponse = await menuService.getMenuList();
@@ -197,9 +201,14 @@ function TouchOrderContent() {
 
                   if (matchedMenu) {
                     menuInfo.price = matchedMenu.price;
-                    menuInfo.temp =
-                      matchedMenu.temperature?.toLowerCase() || "ice";
-                    menuInfo.profileImage = matchedMenu.profile;
+                    // API 응답의 temp가 없을 경우에만 메뉴 API의 temperature 사용
+                    if (!item.temp && matchedMenu.temperature) {
+                      menuInfo.temp = matchedMenu.temperature.toLowerCase();
+                    }
+                    // API 응답의 profile이 있으면 우선 사용, 없으면 메뉴 API의 profile 사용
+                    if (!menuInfo.profileImage && matchedMenu.profile) {
+                      menuInfo.profileImage = matchedMenu.profile;
+                    }
                   }
                 }
               } catch (error) {

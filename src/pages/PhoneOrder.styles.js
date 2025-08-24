@@ -168,7 +168,6 @@ export const Section = styled.section`
   position: relative;
   width: 76.25rem;
   margin: 2.5rem auto;
-  padding: 0 2rem;
 `;
 
 export const SectionTitle = styled.h3`
@@ -196,7 +195,7 @@ export const SectionTitle = styled.h3`
 export const ProductRow = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  gap: 2.375rem;
   max-width: 76.25rem;
   margin: 0 auto;
 `;
@@ -296,9 +295,8 @@ export const FavViewport = styled.div`
 
 export const FavScrollArea = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 23.8125rem);
-  column-gap: 2.38rem;
-  row-gap: 3.3rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.375rem;
   justify-content: center;
   align-items: start;
   min-height: max-content;
