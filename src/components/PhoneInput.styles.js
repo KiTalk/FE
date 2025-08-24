@@ -120,7 +120,7 @@ export const Segment = styled.span`
   font-size: 4rem;
   font-style: normal;
   letter-spacing: -0.06rem;
-  color: #272727;
+  color: ${(props) => (props.$isError ? "#FF2626" : "#272727")};
   white-space: nowrap;
 `;
 

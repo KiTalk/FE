@@ -61,11 +61,17 @@ export default function PhoneInput({
           <InputHeading>{inputHeading}</InputHeading>
 
           <PhoneRow>
-            <Segment slot="head">{formatted.head}</Segment>
+            <Segment slot="head" $isError={!!errorMessage}>
+              {formatted.head}
+            </Segment>
             <Hyphen $index={1} />
-            <Segment slot="mid">{formatted.mid || ""}</Segment>
+            <Segment slot="mid" $isError={!!errorMessage}>
+              {formatted.mid || ""}
+            </Segment>
             <Hyphen $index={2} />
-            <Segment slot="tail">{formatted.tail || ""}</Segment>
+            <Segment slot="tail" $isError={!!errorMessage}>
+              {formatted.tail || ""}
+            </Segment>
             <BottomAccent />
           </PhoneRow>
 
