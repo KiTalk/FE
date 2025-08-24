@@ -432,7 +432,7 @@ export const OrderDetails = styled.div`
 
 export const OrderQuantityRow = styled.div`
   position: absolute;
-  width: 18.3125rem;
+  width: 20.3125rem;
   height: 3.0625rem;
   left: 0;
   top: 0;
@@ -449,6 +449,7 @@ export const OrderQuantityLabel = styled.span`
   line-height: 3rem;
   letter-spacing: -0.015em;
   color: #223770;
+  white-space: nowrap;
 `;
 
 export const OrderQuantityValue = styled.span`
@@ -460,6 +461,7 @@ export const OrderQuantityValue = styled.span`
   text-align: right;
   letter-spacing: -0.015em;
   color: #223770;
+  white-space: nowrap;
 `;
 
 export const OrderDivider = styled.div`
@@ -486,6 +488,7 @@ export const OrderTotal = styled.div`
   align-items: center;
   letter-spacing: -0.015em;
   color: #223770;
+  white-space: nowrap;
 `;
 
 export const OrderButton = styled.button`
