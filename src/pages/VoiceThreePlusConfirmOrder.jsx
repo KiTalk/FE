@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Page,
@@ -50,6 +56,7 @@ export default function VoiceThreePlusConfirmOrder() {
   const { state } = useLocation();
   const sessionId =
     state?.sessionId || sessionStorage.getItem("currentSessionId") || "";
+  const quantityUpdated = state?.quantityUpdated || false;
   const [orderItems, setOrderItems] = useState([]);
   const [additionalProducts] = useState([]);
   const [orderSummary, setOrderSummary] = useState({
@@ -194,63 +201,89 @@ export default function VoiceThreePlusConfirmOrder() {
     return 0;
   }
 
-  useEffect(() => {
-    let aborted = false;
-    async function fetchUpdatedOrders() {
-      if (!sessionId) return;
-      try {
-        let retryCount = 0;
-        const maxRetries = 10; // 최대 10번 재시도 (10초)
+  // 페이지 진입 시마다 최신 주문 내역을 불러오는 함수
+  const fetchLatestOrders = useCallback(async () => {
+    if (!sessionId) return;
 
-        while (retryCount < maxRetries && !aborted) {
-          try {
-            const sessionData = await orderService.getSession(sessionId);
+    try {
+      console.log(
+        "🔄 VoiceThreePlusConfirmOrder - 최신 주문 내역 조회 시작:",
+        sessionId
+      );
 
-            if (sessionData?.orders && sessionData.orders.length > 0) {
-              const mapped = Array.isArray(sessionData.orders)
-                ? sessionData.orders.map((o) => ({
-                    id: o.menu_id,
-                    name: o.menu_item,
-                    original: o.original,
-                    price: Number(o.price || 0),
-                    quantity: Number(o.quantity || 0),
-                    popular: Boolean(o.popular),
-                    temp: o.temp,
-                    profileImage: o.profile,
-                    menu_id: o.menu_id,
-                  }))
-                : [];
-              setOrderItems(mapped);
+      // 즉시 한 번 시도
+      const sessionData = await orderService.getSession(sessionId);
+      console.log("📋 최신 세션 데이터:", sessionData);
 
-              orderStorage.saveOrders(sessionId, mapped);
+      if (sessionData?.orders && sessionData.orders.length > 0) {
+        const mapped = Array.isArray(sessionData.orders)
+          ? sessionData.orders.map((o) => ({
+              id: o.menu_id,
+              name: o.menu_item,
+              original: o.original,
+              price: Number(o.price || 0),
+              quantity: Number(o.quantity || 0),
+              popular: Boolean(o.popular),
+              temp: o.temp,
+              profileImage: o.profile,
+              menu_id: o.menu_id,
+            }))
+          : [];
 
-              const totalQuantity = Number(sessionData.total_items ?? 0);
-              const totalPrice = Number(sessionData.total_price ?? 0);
-              setOrderSummary({ totalQuantity, totalPrice });
-              break;
-            }
-          } catch (error) {
-            console.log("재시도 중...", retryCount + 1, error.message);
-          }
+        console.log("✅ 매핑된 주문 내역:", mapped);
+        setOrderItems(mapped);
+        orderStorage.saveOrders(sessionId, mapped);
 
-          retryCount++;
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-
-        if (retryCount >= maxRetries) {
-          console.warn("⚠️ 최대 재시도 횟수 초과");
-        }
-      } catch (e) {
-        if (!aborted) {
-          console.error("주문 내역 불러오기 실패:", e?.message || e);
-        }
+        const totalQuantity = Number(sessionData.total_items ?? 0);
+        const totalPrice = Number(sessionData.total_price ?? 0);
+        setOrderSummary({ totalQuantity, totalPrice });
+        console.log("💰 주문 요약 업데이트:", { totalQuantity, totalPrice });
+      } else {
+        console.warn("⚠️ 주문 내역이 비어있음");
       }
+    } catch (error) {
+      console.error("❌ 최신 주문 내역 불러오기 실패:", error);
     }
-    fetchUpdatedOrders();
-    return () => {
-      aborted = true;
-    };
   }, [sessionId]);
+
+  // 컴포넌트 마운트 시와 sessionId 변경 시 최신 주문 내역 불러오기
+  useEffect(() => {
+    fetchLatestOrders();
+  }, [sessionId, fetchLatestOrders]); // sessionId와 fetchLatestOrders가 변경될 때마다 다시 불러오기
+
+  // 수량이 업데이트된 경우 즉시 주문 내역 새로고침
+  useEffect(() => {
+    if (quantityUpdated) {
+      console.log("🔄 수량 업데이트 감지 - 주문 내역 즉시 새로고침");
+      // 약간의 지연을 주어 이전 페이지의 변경사항이 서버에 반영될 시간 확보
+      setTimeout(() => {
+        fetchLatestOrders();
+      }, 300);
+    }
+  }, [quantityUpdated, fetchLatestOrders]);
+
+  // 페이지가 focus 될 때마다 최신 주문 내역 불러오기 (브라우저 뒤로가기 등)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log("🔄 페이지가 다시 활성화됨 - 주문 내역 새로고침");
+        fetchLatestOrders();
+      }
+    };
+
+    const handleFocus = () => {
+      console.log("🔄 페이지가 포커스됨 - 주문 내역 새로고침");
+      fetchLatestOrders();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [sessionId, fetchLatestOrders]);
 
   // 3초 타이머 관리
   useEffect(() => {

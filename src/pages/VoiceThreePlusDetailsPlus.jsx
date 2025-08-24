@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Page,
@@ -108,63 +114,69 @@ export default function VoiceThreePlusDetailsPlus() {
     return { totalQuantity, totalPrice };
   }
 
-  async function handleRemoveItem(itemId) {
-    const itemToRemove = orderItems.find((item) => item.id === itemId);
+  const handleRemoveItem = useCallback(
+    async (itemId) => {
+      const itemToRemove = orderItems.find((item) => item.id === itemId);
 
-    if (itemToRemove && sessionId && itemToRemove.menu_id) {
-      try {
-        await orderService.removeOrder(sessionId, itemToRemove.menu_id);
-      } catch (error) {
-        console.error("❌ 주문 삭제 실패:", error);
+      if (itemToRemove && sessionId && itemToRemove.menu_id) {
+        try {
+          await orderService.removeOrder(sessionId, itemToRemove.menu_id);
+        } catch (error) {
+          console.error("❌ 주문 삭제 실패:", error);
+          return;
+        }
+      }
+
+      setOrderItems((prev) => {
+        const newItems = prev.filter((item) => item.id !== itemId);
+        const totals = calculateTotals(newItems);
+        setOrderSummary(totals);
+
+        if (sessionId) {
+          orderStorage.saveOrders(sessionId, newItems);
+        }
+
+        return newItems;
+      });
+    },
+    [sessionId, orderItems]
+  );
+
+  const handleQuantityChange = useCallback(
+    (itemId, newQuantity) => {
+      if (newQuantity < 1) {
+        handleRemoveItem(itemId);
         return;
       }
-    }
 
-    setOrderItems((prev) => {
-      const newItems = prev.filter((item) => item.id !== itemId);
-      const totals = calculateTotals(newItems);
-      setOrderSummary(totals);
+      setOrderItems((prev) => {
+        const exists = prev.some((item) => item.id === itemId);
+        let newItems;
+        if (exists) {
+          newItems = prev.map((item) =>
+            item.id === itemId ? { ...item, quantity: newQuantity } : item
+          );
+        } else {
+          const base = additionalProducts.find((p) => p.id === itemId);
+          newItems = [
+            ...prev,
+            base
+              ? { ...base, quantity: newQuantity }
+              : { id: itemId, name: "상품", price: 0, quantity: newQuantity },
+          ];
+        }
+        const totals = calculateTotals(newItems);
+        setOrderSummary(totals);
 
-      if (sessionId) {
-        orderStorage.saveOrders(sessionId, newItems);
-      }
+        if (sessionId) {
+          orderStorage.saveOrders(sessionId, newItems);
+        }
 
-      return newItems;
-    });
-  }
-
-  function handleQuantityChange(itemId, newQuantity) {
-    if (newQuantity < 1) {
-      handleRemoveItem(itemId);
-      return;
-    }
-
-    setOrderItems((prev) => {
-      const exists = prev.some((item) => item.id === itemId);
-      let newItems;
-      if (exists) {
-        newItems = prev.map((item) =>
-          item.id === itemId ? { ...item, quantity: newQuantity } : item
-        );
-      } else {
-        const base = additionalProducts.find((p) => p.id === itemId);
-        newItems = [
-          ...prev,
-          base
-            ? { ...base, quantity: newQuantity }
-            : { id: itemId, name: "상품", price: 0, quantity: newQuantity },
-        ];
-      }
-      const totals = calculateTotals(newItems);
-      setOrderSummary(totals);
-
-      if (sessionId) {
-        orderStorage.saveOrders(sessionId, newItems);
-      }
-
-      return newItems;
-    });
-  }
+        return newItems;
+      });
+    },
+    [sessionId, additionalProducts, handleRemoveItem]
+  );
 
   function handleCheckout() {
     navigate("/order/package");
@@ -289,19 +301,105 @@ export default function VoiceThreePlusDetailsPlus() {
         try {
           await syncNow();
 
-          orderService
-            .addOrder(sessionId, voiceRecognizedText)
-            .then(() => console.log("📤 추가 주문 요청 전송됨"))
-            .catch((e) =>
-              console.warn("⚠️ 추가 주문 요청 전송 실패(무시):", e)
-            );
+          // 동일한 상품명이 이미 주문 내역에 있는지 확인
+          const recognizedTextLower = voiceRecognizedText.toLowerCase().trim();
+          const duplicateItem = orderItems.find((item) => {
+            const itemNameLower = item.name.toLowerCase().trim();
 
-          navigate("/order/voice/details/plus/confirm", {
-            state: {
-              sessionId: sessionId,
-              recognizedText: voiceRecognizedText,
-            },
+            // 핵심 키워드 추출 함수
+            const extractKeywords = (text) => {
+              return text
+                .replace(/아이스|ice|차가운|시원한/gi, "") // 온도 관련 제거
+                .replace(/핫|hot|뜨거운|따뜻한/gi, "") // 온도 관련 제거
+                .replace(/[0-9]+잔|[0-9]+개|[0-9]+컵/gi, "") // 수량 제거
+                .replace(/\s+/g, " ") // 연속 공백 제거
+                .trim();
+            };
+
+            const recognizedKeywords = extractKeywords(recognizedTextLower);
+            const itemKeywords = extractKeywords(itemNameLower);
+
+            // 1. 정확한 매칭
+            if (itemNameLower === recognizedTextLower) return true;
+
+            // 2. 핵심 키워드가 동일한 경우 (아메리카노 = 아이스 아메리카노)
+            if (
+              recognizedKeywords &&
+              itemKeywords &&
+              (recognizedKeywords === itemKeywords ||
+                recognizedKeywords.includes(itemKeywords) ||
+                itemKeywords.includes(recognizedKeywords))
+            ) {
+              return true;
+            }
+
+            // 3. 부분 매칭 (더 관대한 매칭)
+            return (
+              itemNameLower.includes(recognizedTextLower) ||
+              recognizedTextLower.includes(itemNameLower)
+            );
           });
+
+          if (duplicateItem) {
+            // 중복 상품이 있으면 수량 증가
+            console.log("🔄 중복 상품 감지, 수량 증가:", duplicateItem.name);
+            const newQuantity = duplicateItem.quantity + 1;
+
+            // 1. 로컬 상태 업데이트
+            handleQuantityChange(duplicateItem.id, newQuantity);
+
+            // 2. 서버에도 수량 변경 API 호출
+            try {
+              console.log("📤 서버 수량 업데이트 API 호출:", {
+                sessionId,
+                menuId: duplicateItem.menu_id,
+                newQuantity,
+              });
+
+              // 수량 변경을 위한 API 호출 (patchUpdate 사용)
+              // 서버가 기대하는 형식: { orders: [{ menu_item, quantity, temp }] }
+              await orderService.patchUpdate(sessionId, {
+                orders: [
+                  {
+                    menu_item: duplicateItem.name,
+                    quantity: newQuantity,
+                    temp: duplicateItem.temp || "ice",
+                  },
+                ],
+              });
+
+              console.log("✅ 서버 수량 업데이트 성공");
+            } catch (error) {
+              console.error("❌ 서버 수량 업데이트 실패:", error);
+              // 실패해도 진행 (로컬 상태는 이미 업데이트됨)
+            }
+
+            // 3. 확인 페이지로 이동
+            navigate("/order/voice/details/plus/confirm", {
+              state: {
+                sessionId: sessionId,
+                recognizedText: voiceRecognizedText,
+                quantityUpdated: true, // 수량이 업데이트되었음을 알림
+                updatedAt: Date.now(), // 업데이트 시점 기록
+              },
+            });
+          } else {
+            // 새로운 상품이면 기존 로직대로 추가
+            console.log("➕ 새로운 상품 추가:", voiceRecognizedText);
+            orderService
+              .addOrder(sessionId, voiceRecognizedText)
+              .then(() => console.log("📤 추가 주문 요청 전송됨"))
+              .catch((e) =>
+                console.warn("⚠️ 추가 주문 요청 전송 실패(무시):", e)
+              );
+
+            navigate("/order/voice/details/plus/confirm", {
+              state: {
+                sessionId: sessionId,
+                recognizedText: voiceRecognizedText,
+              },
+            });
+          }
         } catch (error) {
           console.error("❌ 추가 주문 요청 실패:", error);
           goToVoiceError(navigate, { cause: error });
@@ -309,7 +407,15 @@ export default function VoiceThreePlusDetailsPlus() {
         }
       }, 1000);
     }
-  }, [voiceRecognizedText, isTransitioning, sessionId, navigate, syncNow]);
+  }, [
+    voiceRecognizedText,
+    isTransitioning,
+    sessionId,
+    navigate,
+    syncNow,
+    orderItems,
+    handleQuantityChange,
+  ]);
 
   useEffect(() => {
     const t1 = setTimeout(() => setShowTopSection(true), 100);
