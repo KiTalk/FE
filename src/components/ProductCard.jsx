@@ -85,7 +85,7 @@ export default function ProductCard({
       {tagLabel ? (
         <PopularTag>{tagLabel}</PopularTag>
       ) : (
-        product?.popular && <PopularTag>인기</PopularTag>
+        Boolean(product?.popular) && <PopularTag>인기</PopularTag>
       )}
       <ImageArea $variant={temperatureVariant}>
         {/* profile 이미지가 있을 때만 표시 */}

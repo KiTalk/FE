@@ -272,7 +272,7 @@ export const menuService = {
           .toLowerCase()}-${item.temperature.toLowerCase()}`,
         name: item.name,
         price: item.price,
-        popular: item.isActive, // isActive를 popular로 사용
+        popular: item.popular,
         temp:
           item.temperature.toLowerCase() === "hot"
             ? "hot"
