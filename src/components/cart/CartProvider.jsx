@@ -3,24 +3,6 @@ import React, { useMemo, useReducer, useEffect } from "react";
 import { CartContext } from "./CartContext.jsx";
 import { loadOrderSpec, saveCartItems } from "../../utils/orderSpec";
 
-/** 제품 조회를 위한 동적 룩업 생성 */
-function buildProductLookupByNameAndPrice(menuData = []) {
-  const lookup = {};
-  try {
-    menuData.forEach(function (category) {
-      (category.sections || []).forEach(function (section) {
-        (section.products || []).forEach(function (product) {
-          const key = `${product.name}|${product.price}`;
-          lookup[key] = product;
-        });
-      });
-    });
-  } catch (err) {
-    console.warn("Failed to build product lookup", err);
-  }
-  return lookup;
-}
-
 function loadFromStorage() {
   try {
     const spec = loadOrderSpec();

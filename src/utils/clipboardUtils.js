@@ -27,7 +27,7 @@ export async function copyToClipboard(text) {
       const successful = document.execCommand("copy");
       document.body.removeChild(textArea);
       return successful;
-    } catch (err) {
+    } catch {
       document.body.removeChild(textArea);
       throw new Error("클립보드 복사에 실패했습니다.");
     }
