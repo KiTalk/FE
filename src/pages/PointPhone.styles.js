@@ -1,4 +1,54 @@
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
+
+// 토스트 애니메이션
+export const slideIn = keyframes`
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
+
+export const slideOut = keyframes`
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+`;
+
+// 토스트 컨테이너
+export const ToastContainer = styled.div`
+  position: absolute;
+  width: 30.875rem;
+  height: 6.75rem;
+  left: calc(50% - 494px / 2 + 6px);
+  bottom: 6.69rem;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: ${(props) => (props.$isVisible ? slideIn : slideOut)} 0.3s
+    ease-in-out;
+`;
+
+// 토스트 텍스트
+export const ToastText = styled.span`
+  color: #ffffff;
+  font-size: 2.875rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: -0.04313rem;
+`;
 
 export const Page = styled.div`
   position: relative;

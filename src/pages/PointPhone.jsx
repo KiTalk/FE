@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import PhoneInput from "../components/PhoneInput";
 import { voiceOrderService, touchOrderService } from "../services/api";
+import { ToastContainer, ToastText } from "./PointPhone.styles";
 
 export default function PointPhone() {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [showToast, setShowToast] = useState(false);
 
   // 터치주문에서 온 경우인지 확인하는 함수
   const isFromTouchOrder = () => {
@@ -53,7 +55,15 @@ export default function PointPhone() {
           phoneDigits
         );
         console.log("✅ 터치주문 전화번호 입력 완료:", response);
-        navigate("/order/complete", { replace: true });
+
+        // 토스트 표시
+        setShowToast(true);
+        setTimeout(() => {
+          setShowToast(false);
+          setTimeout(() => {
+            navigate("/order/complete", { replace: true });
+          }, 300); // 애니메이션 완료 후 이동
+        }, 2000);
         return;
       }
 
@@ -63,7 +73,15 @@ export default function PointPhone() {
         phoneDigits
       );
       console.log("✅ 음성주문 전화번호 입력 완료:", response);
-      navigate("/order/complete", { replace: true });
+
+      // 토스트 표시
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+        setTimeout(() => {
+          navigate("/order/complete", { replace: true });
+        }, 300); // 애니메이션 완료 후 이동
+      }, 2000);
     } catch (error) {
       console.error("전화번호 입력 API 실패:", error);
 
@@ -120,17 +138,24 @@ export default function PointPhone() {
   }
 
   return (
-    <PhoneInput
-      title="전화번호로 간편 주문"
-      subtitle="전화번호 입력시 '자주 주문한 메뉴'를 확인할 수 있습니다"
-      inputHeading="전화번호 입력"
-      instruction="오른쪽 숫자 패드에서 전화번호 입력 후 저장을 눌러주세요"
-      errorMessage={errorMessage}
-      saveButtonText={isSaving ? "저장 중..." : "저장"}
-      onSave={handleSave}
-      onBack={handleGoBack}
-    >
-      <BackButton onClick={handleGoBack} />
-    </PhoneInput>
+    <>
+      {showToast && (
+        <ToastContainer $isVisible={showToast}>
+          <ToastText>저장이 완료되었어요</ToastText>
+        </ToastContainer>
+      )}
+      <PhoneInput
+        title="전화번호로 간편 주문"
+        subtitle="전화번호 입력시 '자주 주문한 메뉴'를 확인할 수 있습니다"
+        inputHeading="전화번호 입력"
+        instruction="오른쪽 숫자 패드에서 전화번호 입력 후 저장을 눌러주세요"
+        errorMessage={errorMessage}
+        saveButtonText={isSaving ? "저장 중..." : "저장"}
+        onSave={handleSave}
+        onBack={handleGoBack}
+      >
+        <BackButton onClick={handleGoBack} />
+      </PhoneInput>
+    </>
   );
 }
