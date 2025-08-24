@@ -97,7 +97,7 @@ export default function PackagePage() {
       }
 
       // 음성주문에서 온 경우 기존 음성주문 API 사용
-      const packagingType = type === "takeout" ? "takeout" : "dinein";
+      const packagingType = type === "takeout" ? "포장" : "매장식사";
       const response = await orderService.selectPackaging(
         sessionId,
         packagingType
