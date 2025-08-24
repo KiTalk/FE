@@ -33,7 +33,7 @@ export default function TouchOrderPage() {
 
 function TouchOrderContent() {
   const navigate = useNavigate();
-  const [activeTabId, setActiveTabId] = useState("all");
+  const [activeTabId, setActiveTabId] = useState("coffee");
   const [menuData, setMenuData] = useState([]); // 빈 배열로 초기화
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
