@@ -265,3 +265,56 @@ export const TemperatureBadge = styled.span`
       border-color: #da2525;
     `}
 `;
+
+export const RemoveButton = styled.button`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2.35rem; /* 37.67px */
+  height: 2.35rem; /* 37.67px */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0;
+  transition: all 0.2s ease;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    width: 1.87rem; /* 29.89px */
+    height: 0.17rem; /* 2.69px */
+    background: #5d5d5d;
+    border-radius: 1.76rem; /* 28.2504px */
+    top: 50%;
+    left: 50%;
+    transform-origin: center;
+  }
+
+  &::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+
+  &::after {
+    transform: translate(-50%, -50%) rotate(135deg);
+  }
+
+  &:hover {
+    transform: scale(1.1);
+
+    &::before,
+    &::after {
+      background: #ff0000;
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:focus {
+    outline: 2px solid #ff0000;
+    outline-offset: 2px;
+  }
+`;

@@ -38,6 +38,9 @@ import {
   RecognizedText,
   VoiceRecognitionArea,
   AudioSpectrumContainer,
+  EmptyStateContainer,
+  EmptyStateTitle,
+  EmptyStateMessage,
 } from "./VoiceThreePlusConfirmOrder.styles";
 import CartProductCard from "../components/CartProductCard";
 import VoiceRecorder from "../components/VoiceRecorder";
@@ -522,53 +525,70 @@ export default function VoiceThreePlusConfirmOrder() {
         </OrderHeader>
 
         <ProductsArea>
-          {orderItems.map((item, index) => (
-            <ProductCardContainer
-              key={item.id}
-              $animate={animateProducts}
-              $delay={index * 0.2}
-            >
-              <CartProductCard
-                product={item}
-                qty={item.quantity}
-                onIncrease={(productId) =>
-                  handleQuantityChange(productId, item.quantity + 1)
-                }
-                onDecrease={(productId) =>
-                  handleQuantityChange(productId, item.quantity - 1)
-                }
-              />
-            </ProductCardContainer>
-          ))}
+          {orderItems.length === 0 ? (
+            <EmptyStateContainer>
+              <EmptyStateTitle>주문내역이 비어있습니다</EmptyStateTitle>
+              <EmptyStateMessage>
+                음성으로 메뉴를 추가해보세요
+              </EmptyStateMessage>
+            </EmptyStateContainer>
+          ) : (
+            <>
+              {orderItems.map((item, index) => (
+                <ProductCardContainer
+                  key={item.id}
+                  $animate={animateProducts}
+                  $delay={index * 0.2}
+                >
+                  <CartProductCard
+                    product={item}
+                    qty={item.quantity}
+                    onIncrease={(productId) =>
+                      handleQuantityChange(productId, item.quantity + 1)
+                    }
+                    onDecrease={(productId) =>
+                      handleQuantityChange(productId, item.quantity - 1)
+                    }
+                    onRemove={handleRemoveItem}
+                  />
+                </ProductCardContainer>
+              ))}
 
-          {additionalProducts.map((product, index) => {
-            const existingItem = orderItems.find(
-              (item) => item.id === product.id
-            );
-            const displayQuantity = existingItem ? existingItem.quantity : 0;
+              {additionalProducts.map((product, index) => {
+                const existingItem = orderItems.find(
+                  (item) => item.id === product.id
+                );
+                const displayQuantity = existingItem
+                  ? existingItem.quantity
+                  : 0;
 
-            return (
-              <ProductCardContainer
-                key={product.id}
-                $animate={animateProducts}
-                $delay={(orderItems.length + index) * 0.2}
-              >
-                <CartProductCard
-                  product={product}
-                  qty={displayQuantity}
-                  onIncrease={(productId) =>
-                    handleQuantityChange(productId, displayQuantity + 1)
-                  }
-                  onDecrease={(productId) =>
-                    displayQuantity > 0 &&
-                    handleQuantityChange(productId, displayQuantity - 1)
-                  }
-                />
-              </ProductCardContainer>
-            );
-          })}
+                return (
+                  <ProductCardContainer
+                    key={product.id}
+                    $animate={animateProducts}
+                    $delay={(orderItems.length + index) * 0.2}
+                  >
+                    <CartProductCard
+                      product={product}
+                      qty={displayQuantity}
+                      onIncrease={(productId) =>
+                        handleQuantityChange(productId, displayQuantity + 1)
+                      }
+                      onDecrease={(productId) =>
+                        displayQuantity > 0 &&
+                        handleQuantityChange(productId, displayQuantity - 1)
+                      }
+                      onRemove={
+                        displayQuantity > 0 ? handleRemoveItem : undefined
+                      }
+                    />
+                  </ProductCardContainer>
+                );
+              })}
 
-          <ScrollSpacer width={calculateScrollSpace()} />
+              <ScrollSpacer width={calculateScrollSpace()} />
+            </>
+          )}
         </ProductsArea>
 
         <OrderSummary>
@@ -585,7 +605,16 @@ export default function VoiceThreePlusConfirmOrder() {
             </OrderTotal>
           </OrderDetails>
 
-          <OrderButton onClick={handleCheckout}>주문하기</OrderButton>
+          <OrderButton
+            onClick={orderItems.length > 0 ? handleCheckout : undefined}
+            disabled={orderItems.length === 0}
+            style={{
+              opacity: orderItems.length === 0 ? 0.5 : 1,
+              cursor: orderItems.length === 0 ? "not-allowed" : "pointer",
+            }}
+          >
+            주문하기
+          </OrderButton>
         </OrderSummary>
       </OrderSection>
     </Page>
