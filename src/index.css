@@ -33,13 +33,33 @@ a:hover {
   color: #2980b9;
 }
 
-body {
+html {
   margin: 0;
   padding: 0;
   width: 100vw;
   height: 100vh;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 1440px;
+  height: 1024px;
   font-size: 16px;
+  position: relative;
+  transform-origin: center center;
+}
+
+#root {
+  width: 1440px;
+  height: 1024px;
+  overflow: hidden;
+  position: relative;
 }
 
 h1 {
@@ -93,20 +113,21 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-@media (min-width: 1440px) and (min-height: 1024px) {
+/* 화면 해상도가 1440x1024보다 작을 때 스케일 다운 */
+@media (max-width: 1439px), (max-height: 1023px) {
+  body {
+    transform: scale(calc(min(100vw / 1440, 100vh / 1024)));
+    transform-origin: center center;
+  }
+}
+
+/* 브라우저 줌 방지 */
+@media screen {
   html {
-    font-size: 16px;
+    zoom: 1 !important;
   }
 
-  h1 {
-    font-size: 3rem;
-  }
-
-  h2 {
-    font-size: 2.25rem;
-  }
-
-  h3 {
-    font-size: 1.75rem;
+  body {
+    zoom: 1 !important;
   }
 }
