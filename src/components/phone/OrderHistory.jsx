@@ -9,7 +9,6 @@ export default function OrderHistory({
   customOrders = null,
   customFavorites = null,
   loading: customLoading = null,
-  error: customError = null,
 }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);

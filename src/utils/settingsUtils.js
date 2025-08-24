@@ -114,7 +114,7 @@ export function importSettings(file) {
           } else {
             reject(new Error("잘못된 설정 파일입니다."));
           }
-        } catch (parseError) {
+        } catch {
           reject(new Error("설정 파일 파싱에 실패했습니다."));
         }
       };
@@ -124,7 +124,7 @@ export function importSettings(file) {
       };
 
       reader.readAsText(file);
-    } catch (error) {
+    } catch {
       reject(new Error("파일 처리 중 오류가 발생했습니다."));
     }
   });
