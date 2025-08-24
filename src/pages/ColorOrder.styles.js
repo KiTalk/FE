@@ -11,6 +11,33 @@ export const Page = styled.div`
     Roboto, sans-serif;
 `;
 
+export const PageViewport = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+
+  &::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: transparent !important;
+  }
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+`;
+
+export const ContentWrapper = styled.div``;
+
 export const Hero = styled.div`
   position: relative;
   width: 90rem;
