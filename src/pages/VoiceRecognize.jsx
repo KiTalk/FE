@@ -39,7 +39,7 @@ export default function VoiceRecognize() {
         clearTimeout(timerRef.current);
       }
 
-      // 3초 후 자동 처리
+      // 2초 후 자동 처리
       timerRef.current = setTimeout(async () => {
         if (recognizedText && !isProcessing) {
           setIsProcessing(true);
@@ -98,7 +98,7 @@ export default function VoiceRecognize() {
             state: { recognized: recognizedText },
           });
         }
-      }, 3000);
+      }, 2000);
     }
 
     return () => {
