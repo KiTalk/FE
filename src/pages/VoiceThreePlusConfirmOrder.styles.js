@@ -570,3 +570,23 @@ export const AudioSpectrumContainer = styled.div`
   top: 50%;
   transform: translate(-50%, -50%);
 `;
+
+export const EmptyStateContainer = styled.div`
+  position: absolute;
+  left: 17rem;
+  top: 5.5rem;
+  padding: 3rem 2rem;
+  color: #666;
+  min-height: 200px;
+`;
+
+export const EmptyStateTitle = styled.div`
+  margin-bottom: 1rem;
+  font-size: 3rem;
+`;
+
+export const EmptyStateMessage = styled.div`
+  text-align: center;
+  line-height: 1.5;
+  font-size: 2rem;
+`;

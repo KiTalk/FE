@@ -13,6 +13,7 @@ import {
   QtyValue,
   NameRow,
   TemperatureBadge,
+  RemoveButton,
 } from "./CartProductCard.styles";
 
 /**
@@ -27,6 +28,7 @@ export default function CartProductCard({
   qty = 0,
   onIncrease,
   onDecrease,
+  onRemove,
   tagLabel,
 }) {
   // ✅ 현재 모드 읽기 (order_spec.mode)
@@ -61,6 +63,11 @@ export default function CartProductCard({
       onIncrease(product.id);
   };
 
+  const handleRemove = () => {
+    if (typeof onRemove === "function" && product?.id != null)
+      onRemove(product.id);
+  };
+
   function getTemperatureLabel(temp) {
     if (temp === "ice") return "시원한";
     if (temp === "hot") return "뜨거운";
@@ -84,6 +91,13 @@ export default function CartProductCard({
       $productName={product?.name}
       $selectedMenuType={selectedMenuType}
     >
+      {onRemove && currentMode === "voice" && (
+        <RemoveButton
+          onClick={handleRemove}
+          aria-label="상품 삭제"
+          type="button"
+        />
+      )}
       {tagLabel ? (
         <PopularTag>{tagLabel}</PopularTag>
       ) : (
