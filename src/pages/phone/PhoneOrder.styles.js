@@ -424,7 +424,7 @@ export const MenuCheck = styled.input.attrs({ type: "checkbox" })`
     top: 0;
     width: 100%;
     height: 100%;
-    background-image: url("../../assets/images/check2.png");
+    background-image: url(${checkIcon});
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
