@@ -106,7 +106,7 @@ function TouchOrderContent() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // 메뉴 데이터 로드
-  useEffect(() => {
+  useEffect(function () {
     async function loadMenuData() {
       try {
         setLoading(true);
@@ -117,30 +117,38 @@ function TouchOrderContent() {
           // 커피 메뉴를 세분화하는 함수
           function subdivideCoffeeSection(sections) {
             // 커피 섹션을 찾기
-            const coffeeSection = sections.find(
-              (section) => section.title === "커피"
-            );
+            const coffeeSection = sections.find(function (section) {
+              return section.title === "커피";
+            });
             if (!coffeeSection) return sections;
 
             // 커피 제품들을 분류
-            const americanoProducts = coffeeSection.products.filter((product) =>
-              product.name.includes("아메리카노")
-            );
-            const latteProducts = coffeeSection.products.filter(
-              (product) =>
+            const americanoProducts = coffeeSection.products.filter(function (
+              product
+            ) {
+              return product.name.includes("아메리카노");
+            });
+            const latteProducts = coffeeSection.products.filter(function (
+              product
+            ) {
+              return (
                 product.name.includes("라떼") &&
                 !product.name.includes("아메리카노")
-            );
-            const otherProducts = coffeeSection.products.filter(
-              (product) =>
+              );
+            });
+            const otherProducts = coffeeSection.products.filter(function (
+              product
+            ) {
+              return (
                 !product.name.includes("아메리카노") &&
                 !product.name.includes("라떼")
-            );
+              );
+            });
 
             // 커피 섹션을 제거하고 세분화된 섹션들로 교체
-            const otherSections = sections.filter(
-              (section) => section.title !== "커피"
-            );
+            const otherSections = sections.filter(function (section) {
+              return section.title !== "커피";
+            });
             const newCoffeeSections = [];
 
             if (americanoProducts.length > 0) {
@@ -171,27 +179,37 @@ function TouchOrderContent() {
           }
 
           // 모든 카테고리에서 커피 메뉴를 세분화
-          const transformedMenuData = apiMenuData.map((category) => {
+          const transformedMenuData = apiMenuData.map(function (category) {
             if (category.id === "coffee") {
               // 커피 카테고리의 모든 제품을 수집
-              const allCoffeeProducts = category.sections.flatMap(
-                (section) => section.products
-              );
+              const allCoffeeProducts = category.sections.flatMap(function (
+                section
+              ) {
+                return section.products;
+              });
 
               // 제품을 분류
-              const americanoProducts = allCoffeeProducts.filter((product) =>
-                product.name.includes("아메리카노")
-              );
-              const latteProducts = allCoffeeProducts.filter(
-                (product) =>
+              const americanoProducts = allCoffeeProducts.filter(function (
+                product
+              ) {
+                return product.name.includes("아메리카노");
+              });
+              const latteProducts = allCoffeeProducts.filter(function (
+                product
+              ) {
+                return (
                   product.name.includes("라떼") &&
                   !product.name.includes("아메리카노")
-              );
-              const otherProducts = allCoffeeProducts.filter(
-                (product) =>
+                );
+              });
+              const otherProducts = allCoffeeProducts.filter(function (
+                product
+              ) {
+                return (
                   !product.name.includes("아메리카노") &&
                   !product.name.includes("라떼")
-              );
+                );
+              });
 
               // 새로운 섹션 구조로 재구성
               const newSections = [];
@@ -258,8 +276,8 @@ function TouchOrderContent() {
   }, []);
 
   // 전화번호 주문 데이터 로드
-  useEffect(() => {
-    const loadPhoneOrderData = async () => {
+  useEffect(function () {
+    const loadPhoneOrderData = async function () {
       try {
         setPhoneDataLoading(true);
         setPhoneDataError(null);
@@ -290,7 +308,7 @@ function TouchOrderContent() {
 
           // 메뉴 데이터와 매칭하여 가격 정보 가져오기
           const transformedFavorites = await Promise.all(
-            favoritesResponse.data.top_menus.map(async (item, index) => {
+            favoritesResponse.data.top_menus.map(async function (item, index) {
               // 기본 메뉴 정보
               let menuInfo = {
                 id: `fav-${item.menu_id}`,
@@ -311,13 +329,14 @@ function TouchOrderContent() {
               try {
                 const menuResponse = await menuService.getMenuList();
                 if (menuResponse?.success && Array.isArray(menuResponse.data)) {
-                  const matchedMenu = menuResponse.data.find(
-                    (menu) =>
+                  const matchedMenu = menuResponse.data.find(function (menu) {
+                    return (
                       menu.id === item.menu_id ||
                       menu.name
                         .toLowerCase()
                         .includes(item.menu_item.toLowerCase())
-                  );
+                    );
+                  });
 
                   if (matchedMenu) {
                     menuInfo.price = matchedMenu.price;
@@ -379,10 +398,13 @@ function TouchOrderContent() {
       const cart = stored ? JSON.parse(stored) : {};
 
       // 총 개수 계산
-      const totalQuantity = Object.values(cart).reduce(
-        (sum, quantity) => sum + quantity,
-        0
-      );
+      const totalQuantity = Object.values(cart).reduce(function (
+        sum,
+        quantity
+      ) {
+        return sum + quantity;
+      },
+      0);
 
       setLocalCart(cart);
       setCartCount(totalQuantity);
@@ -437,7 +459,7 @@ function TouchOrderContent() {
   }
 
   // 컴포넌트 마운트 시 로컬 데이터 로드
-  useEffect(() => {
+  useEffect(function () {
     loadLocalCart();
     loadPastOrderSelections();
   }, []);
@@ -492,13 +514,13 @@ function TouchOrderContent() {
   }
 
   // localStorage 장바구니를 서버에 동기화 (원자성 보장)
-  const syncCartToServer = async () => {
+  async function syncCartToServer() {
     const sessionId = sessionStorage.getItem("currentSessionId");
     if (!sessionId) return;
 
     // 일괄 업데이트로 원자성 보장
     await touchOrderService.bulkUpdateTouchCart(sessionId, localCart);
-  };
+  }
 
   // TouchOrder 방식으로 개별 메뉴를 서버에 추가
   async function handleAddToCart(product, quantity) {
@@ -523,7 +545,7 @@ function TouchOrderContent() {
       const newQuantity = currentQuantity + qty;
 
       // localStorage 업데이트
-      setLocalCart((prevCart) => {
+      setLocalCart(function (prevCart) {
         const updatedCart = { ...prevCart, [menuId]: newQuantity };
         saveLocalCart(updatedCart);
         return updatedCart;
@@ -534,11 +556,14 @@ function TouchOrderContent() {
       await touchOrderService.bulkUpdateTouchCart(sessionId, updatedCart);
 
       // 장바구니 카운트 업데이트
-      setCartCount(() => {
-        const totalQuantity = Object.values(updatedCart).reduce(
-          (sum, quantity) => sum + quantity,
-          0
-        );
+      setCartCount(function () {
+        const totalQuantity = Object.values(updatedCart).reduce(function (
+          sum,
+          quantity
+        ) {
+          return sum + quantity;
+        },
+        0);
         return totalQuantity;
       });
 
@@ -676,7 +701,7 @@ function TouchOrderContent() {
       }
 
       // localStorage 업데이트
-      setLocalCart((prevCart) => {
+      setLocalCart(function (prevCart) {
         const updatedCart = { ...prevCart, ...cartUpdates };
         saveLocalCart(updatedCart);
         return updatedCart;
@@ -687,11 +712,14 @@ function TouchOrderContent() {
       await touchOrderService.bulkUpdateTouchCart(sessionId, updatedCart);
 
       // 장바구니 카운트 업데이트
-      setCartCount(() => {
-        const totalQuantity = Object.values(updatedCart).reduce(
-          (sum, quantity) => sum + quantity,
-          0
-        );
+      setCartCount(function () {
+        const totalQuantity = Object.values(updatedCart).reduce(function (
+          sum,
+          quantity
+        ) {
+          return sum + quantity;
+        },
+        0);
         return totalQuantity;
       });
 
@@ -713,7 +741,7 @@ function TouchOrderContent() {
   }
 
   // localStorage에서 주문 상태 가져오기
-  const getOrderSpec = () => {
+  function getOrderSpec() {
     try {
       const stored = localStorage.getItem("order_spec");
       return stored ? JSON.parse(stored) : {};
@@ -721,7 +749,7 @@ function TouchOrderContent() {
       console.error(err);
       return {};
     }
-  };
+  }
 
   const orderSpec = getOrderSpec();
   const phoneNumber = orderSpec?.point?.phone || "";
@@ -739,13 +767,13 @@ function TouchOrderContent() {
   }
 
   // API 응답 데이터를 OrderHistory 컴포넌트 형태로 변환 (개별 주문별로)
-  const transformOrdersData = useCallback((apiResults) => {
+  const transformOrdersData = useCallback(function (apiResults) {
     if (!Array.isArray(apiResults)) return [];
 
     // 각 주문을 개별 페이지로 변환
     const individualOrders = [];
 
-    apiResults.forEach((orderGroup) => {
+    apiResults.forEach(function (orderGroup) {
       if (!orderGroup.orders || !Array.isArray(orderGroup.orders)) return;
 
       // created_at 배열에서 월.일 형식으로 날짜 키 생성
@@ -754,17 +782,19 @@ function TouchOrderContent() {
         : `08.${String(15 - (orderGroup.order_id % 10)).padStart(2, "0")}`;
 
       // 각 주문 그룹을 개별 페이지로 처리
-      const items = orderGroup.orders.map((item) => ({
-        id: item.menu_id
-          ? `menu-${item.menu_id}-${item.temp || "ice"}`
-          : `${item.menu_item}-${item.temp || "ice"}`,
-        name: item.menu_item,
-        price: item.price || 0,
-        popular: false, // API에서 정보가 없으므로 기본값
-        temp: item.temp || "ice",
-        qty: 0, // 체크되지 않은 상태로 시작
-        profileImage: item.profile, // API 응답의 profile 이미지 추가
-      }));
+      const items = orderGroup.orders.map(function (item) {
+        return {
+          id: item.menu_id
+            ? `menu-${item.menu_id}-${item.temp || "ice"}`
+            : `${item.menu_item}-${item.temp || "ice"}`,
+          name: item.menu_item,
+          price: item.price || 0,
+          popular: false, // API에서 정보가 없으므로 기본값
+          temp: item.temp || "ice",
+          qty: 0, // 체크되지 않은 상태로 시작
+          profileImage: item.profile, // API 응답의 profile 이미지 추가
+        };
+      });
 
       individualOrders.push({
         date: dateKey,
@@ -774,18 +804,18 @@ function TouchOrderContent() {
     });
 
     // order_id 기준으로 최신 주문 우선 정렬 (각 주문이 개별 페이지가 됨)
-    return individualOrders.sort(
-      (a, b) => (b.order_id || 0) - (a.order_id || 0)
-    );
+    return individualOrders.sort(function (a, b) {
+      return (b.order_id || 0) - (a.order_id || 0);
+    });
   }, []);
 
   // 커스텀 스크롤바를 위한 고정 요소들 반환
-  const getFixedElements = () => {
+  function getFixedElements() {
     return {
       hero: document.querySelector("[data-hero='page']"),
       tabs: document.querySelector("[data-tabs='page']"),
     };
-  };
+  }
 
   const activeMenu = menuData.find(function (menu) {
     return menu.id === activeTabId;
@@ -889,12 +919,16 @@ function TouchOrderContent() {
                 const windowDays = phoneOrdersData || [];
                 const currentDay = windowDays[currentIndex] || null;
 
-                const canPrev = () => currentIndex > 0;
-                const canNext = () => currentIndex < windowDays.length - 1;
-                const handlePrev = () => {
+                const canPrev = function () {
+                  return currentIndex > 0;
+                };
+                const canNext = function () {
+                  return currentIndex < windowDays.length - 1;
+                };
+                const handlePrev = function () {
                   if (canPrev()) setCurrentIndex(currentIndex - 1);
                 };
-                const handleNext = () => {
+                const handleNext = function () {
                   if (canNext()) setCurrentIndex(currentIndex + 1);
                 };
 
@@ -966,7 +1000,7 @@ function TouchOrderContent() {
                               className="dateCheck"
                               checked={
                                 Array.isArray(currentDay?.items) &&
-                                currentDay.items.every((item) => {
+                                currentDay.items.every(function (item) {
                                   const menuId = item.id.split("-")[1];
                                   const qty =
                                     pastOrderSelections[currentDay.order_id]?.[
@@ -975,11 +1009,11 @@ function TouchOrderContent() {
                                   return qty > 0;
                                 })
                               }
-                              onChange={() => {
+                              onChange={function () {
                                 // 날짜 전체 선택/해제
                                 const allChecked =
                                   Array.isArray(currentDay?.items) &&
-                                  currentDay.items.every((item) => {
+                                  currentDay.items.every(function (item) {
                                     const menuId = item.id.split("-")[1];
                                     const qty =
                                       pastOrderSelections[
@@ -1006,7 +1040,7 @@ function TouchOrderContent() {
                                   if (!newSelections[currentDay.order_id]) {
                                     newSelections[currentDay.order_id] = {};
                                   }
-                                  currentDay.items.forEach((item) => {
+                                  currentDay.items.forEach(function (item) {
                                     const menuId = item.id.split("-")[1];
                                     newSelections[currentDay.order_id][
                                       menuId
@@ -1041,7 +1075,7 @@ function TouchOrderContent() {
                                     <MenuCheck
                                       className="menuCheck"
                                       checked={isChecked}
-                                      onChange={() => {
+                                      onChange={function () {
                                         const menuId = item.id.split("-")[1];
                                         handlePastOrderToggle(
                                           currentDay.order_id,
@@ -1074,7 +1108,7 @@ function TouchOrderContent() {
                                         $type="minus"
                                         disabled={currentQty <= 0}
                                         aria-label="minus"
-                                        onClick={() => {
+                                        onClick={function () {
                                           const menuId = item.id.split("-")[1];
                                           handlePastOrderDecrease(
                                             currentDay.order_id,
@@ -1089,7 +1123,7 @@ function TouchOrderContent() {
                                         className="menuPlus"
                                         $type="plus"
                                         aria-label="plus"
-                                        onClick={() => {
+                                        onClick={function () {
                                           const menuId = item.id.split("-")[1];
                                           handlePastOrderIncrease(
                                             currentDay.order_id,
@@ -1140,12 +1174,14 @@ function TouchOrderContent() {
                       {/* 페이지네이션 점들 */}
                       <PaginationDots>
                         {Array.isArray(windowDays)
-                          ? windowDays.map((_, dotIndex) => (
-                              <PaginationDot
-                                key={dotIndex}
-                                $active={dotIndex === currentIndex}
-                              />
-                            ))
+                          ? windowDays.map(function (_, dotIndex) {
+                              return (
+                                <PaginationDot
+                                  key={dotIndex}
+                                  $active={dotIndex === currentIndex}
+                                />
+                              );
+                            })
                           : []}
                       </PaginationDots>
 

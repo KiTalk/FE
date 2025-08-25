@@ -259,7 +259,7 @@ export const menuService = {
     const categoryGroups = {};
 
     // 카테고리별로 메뉴 아이템들을 그룹화
-    menuItems.forEach((item) => {
+    menuItems.forEach(function (item) {
       const apiCategory = item.category || "기타";
       if (!categoryGroups[apiCategory]) {
         categoryGroups[apiCategory] = [];
@@ -333,7 +333,7 @@ export const menuService = {
     };
 
     // API 카테고리를 프론트엔드 구조로 변환
-    Object.entries(categoryGroups).forEach(([apiCategory, items]) => {
+    Object.entries(categoryGroups).forEach(function ([apiCategory, items]) {
       const mapping = categoryToFrontendMapping[apiCategory];
       if (mapping && items.length > 0) {
         const frontendCategory = frontendCategories[mapping.frontendId];
@@ -352,7 +352,7 @@ export const menuService = {
 
     // "모든 메뉴" 탭 생성
     const allMenuSections = [];
-    Object.values(frontendCategories).forEach((category) => {
+    Object.values(frontendCategories).forEach(function (category) {
       if (category.sections.length > 0) {
         allMenuSections.push(...category.sections);
       }
@@ -367,7 +367,7 @@ export const menuService = {
     }
 
     // 개별 카테고리 탭들 생성
-    Object.values(frontendCategories).forEach((category) => {
+    Object.values(frontendCategories).forEach(function (category) {
       if (category.sections.length > 0) {
         transformedData.push(category);
       }
@@ -575,12 +575,17 @@ export const touchOrderService = {
     try {
       // cartItems: { menuId: quantity, ... } 형태의 객체
       const orders = Object.entries(cartItems)
-        .map(([menuId, quantity]) => [Number(menuId), Number(quantity)])
-        .filter(
-          ([id, qty]) =>
+        .map(function ([menuId, quantity]) {
+          return [Number(menuId), Number(quantity)];
+        })
+        .filter(function ([id, qty]) {
+          return (
             Number.isInteger(id) && id > 0 && Number.isInteger(qty) && qty > 0
-        )
-        .map(([id, qty]) => ({ menu_id: id, quantity: qty }));
+          );
+        })
+        .map(function ([id, qty]) {
+          return { menu_id: id, quantity: qty };
+        });
 
       // 빈 배열이면 서버 장바구니 비우기 호출
       if (orders.length === 0) {

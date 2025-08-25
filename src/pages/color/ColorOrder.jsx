@@ -51,7 +51,7 @@ function ColorOrderContent() {
   const selectedMenuType = localStorage.getItem("selectedMenuType");
 
   // 메뉴 데이터 로드
-  useEffect(() => {
+  useEffect(function () {
     async function loadMenuData() {
       try {
         setLoading(true);
@@ -62,30 +62,38 @@ function ColorOrderContent() {
           // 커피 메뉴를 세분화하는 함수
           function subdivideCoffeeSection(sections) {
             // 커피 섹션을 찾기
-            const coffeeSection = sections.find(
-              (section) => section.title === "커피"
-            );
+            const coffeeSection = sections.find(function (section) {
+              return section.title === "커피";
+            });
             if (!coffeeSection) return sections;
 
             // 커피 제품들을 분류
-            const americanoProducts = coffeeSection.products.filter((product) =>
-              product.name.includes("아메리카노")
-            );
-            const latteProducts = coffeeSection.products.filter(
-              (product) =>
+            const americanoProducts = coffeeSection.products.filter(function (
+              product
+            ) {
+              return product.name.includes("아메리카노");
+            });
+            const latteProducts = coffeeSection.products.filter(function (
+              product
+            ) {
+              return (
                 product.name.includes("라떼") &&
                 !product.name.includes("아메리카노")
-            );
-            const otherProducts = coffeeSection.products.filter(
-              (product) =>
+              );
+            });
+            const otherProducts = coffeeSection.products.filter(function (
+              product
+            ) {
+              return (
                 !product.name.includes("아메리카노") &&
                 !product.name.includes("라떼")
-            );
+              );
+            });
 
             // 커피 섹션을 제거하고 세분화된 섹션들로 교체
-            const otherSections = sections.filter(
-              (section) => section.title !== "커피"
-            );
+            const otherSections = sections.filter(function (section) {
+              return section.title !== "커피";
+            });
             const newCoffeeSections = [];
 
             if (americanoProducts.length > 0) {
@@ -116,27 +124,37 @@ function ColorOrderContent() {
           }
 
           // 모든 카테고리에서 커피 메뉴를 세분화
-          const transformedMenuData = apiMenuData.map((category) => {
+          const transformedMenuData = apiMenuData.map(function (category) {
             if (category.id === "coffee") {
               // 커피 카테고리의 모든 제품을 수집
-              const allCoffeeProducts = category.sections.flatMap(
-                (section) => section.products
-              );
+              const allCoffeeProducts = category.sections.flatMap(function (
+                section
+              ) {
+                return section.products;
+              });
 
               // 제품을 분류
-              const americanoProducts = allCoffeeProducts.filter((product) =>
-                product.name.includes("아메리카노")
-              );
-              const latteProducts = allCoffeeProducts.filter(
-                (product) =>
+              const americanoProducts = allCoffeeProducts.filter(function (
+                product
+              ) {
+                return product.name.includes("아메리카노");
+              });
+              const latteProducts = allCoffeeProducts.filter(function (
+                product
+              ) {
+                return (
                   product.name.includes("라떼") &&
                   !product.name.includes("아메리카노")
-              );
-              const otherProducts = allCoffeeProducts.filter(
-                (product) =>
+                );
+              });
+              const otherProducts = allCoffeeProducts.filter(function (
+                product
+              ) {
+                return (
                   !product.name.includes("아메리카노") &&
                   !product.name.includes("라떼")
-              );
+                );
+              });
 
               // 새로운 섹션 구조로 재구성
               const newSections = [];
@@ -245,16 +263,19 @@ function ColorOrderContent() {
   }
 
   // 컴포넌트 마운트 시 로컬 장바구니 데이터 로드
-  useEffect(() => {
+  useEffect(function () {
     loadLocalCart();
   }, []);
 
-  useEffect(() => {
-    setMode("color");
-    if (Number(cartCount ?? 0) === 0) {
-      clearAllAddedTotals();
-    }
-  }, [cartCount]);
+  useEffect(
+    function () {
+      setMode("color");
+      if (Number(cartCount ?? 0) === 0) {
+        clearAllAddedTotals();
+      }
+    },
+    [cartCount]
+  );
 
   // 장바구니 버튼 클릭 시 서버에 동기화 후 이동
   async function handleCartClick() {
@@ -323,10 +344,9 @@ function ColorOrderContent() {
     saveLocalCart(updatedCart);
 
     // 총 개수 업데이트
-    const totalQuantity = Object.values(updatedCart).reduce(
-      (sum, q) => sum + q,
-      0
-    );
+    const totalQuantity = Object.values(updatedCart).reduce(function (sum, q) {
+      return sum + q;
+    }, 0);
     setCartCount(totalQuantity);
   }
 
@@ -336,7 +356,9 @@ function ColorOrderContent() {
     };
   }
 
-  const activeMenu = menuData.find((menu) => menu.id === activeTabId);
+  const activeMenu = menuData.find(function (menu) {
+    return menu.id === activeTabId;
+  });
 
   // 로딩 상태 처리
   if (loading) {
@@ -370,12 +392,12 @@ function ColorOrderContent() {
   }
 
   // 커스텀 스크롤바를 위한 고정 요소들 반환
-  const getFixedElements = () => {
+  function getFixedElements() {
     return {
       hero: document.querySelector("[data-hero='color']"),
       tabs: document.querySelector("[data-tabs='color']"),
     };
-  };
+  }
 
   return (
     <Page>
@@ -401,30 +423,36 @@ function ColorOrderContent() {
 
           <div data-tabs="color">
             <CategoryTabs
-              tabs={menuData.map(({ id, label }) => ({ id, label }))}
+              tabs={menuData.map(function ({ id, label }) {
+                return { id, label };
+              })}
               activeId={activeTabId}
               onChange={setActiveTabId}
             />
           </div>
 
-          {activeMenu?.sections.map((section) => (
-            <Section key={section.id}>
-              <SectionTitle>{section.title}</SectionTitle>
+          {activeMenu?.sections.map(function (section) {
+            return (
+              <Section key={section.id}>
+                <SectionTitle>{section.title}</SectionTitle>
 
-              <ProductRow>
-                {section.products.map((item) => (
-                  <ProductCard
-                    currentMode={currentMode}
-                    selectedMenuType={selectedMenuType}
-                    key={item.id}
-                    product={item}
-                    cartQty={getCartQuantity(item)}
-                    onAdd={makeOnAddHandler(item)}
-                  />
-                ))}
-              </ProductRow>
-            </Section>
-          ))}
+                <ProductRow>
+                  {section.products.map(function (item) {
+                    return (
+                      <ProductCard
+                        currentMode={currentMode}
+                        selectedMenuType={selectedMenuType}
+                        key={item.id}
+                        product={item}
+                        cartQty={getCartQuantity(item)}
+                        onAdd={makeOnAddHandler(item)}
+                      />
+                    );
+                  })}
+                </ProductRow>
+              </Section>
+            );
+          })}
         </ContentWrapper>
       </PageViewport>
       <CustomScrollbar

@@ -38,59 +38,64 @@ export default function VoiceThreePlusRecording() {
   const transitionTimerRef = useRef(null);
   const loadingRef = useRef(false);
 
-  const language = useMemo(() => getSettings().defaultLanguage || "ko", []);
+  const language = useMemo(function () {
+    return getSettings().defaultLanguage || "ko";
+  }, []);
 
   function handleBack() {
     navigate(-1);
   }
 
   // 5초 타이머 관리
-  useEffect(() => {
-    if (timeLeft > 0) {
-      timerRef.current = setTimeout(() => {
-        setTimeLeft((prev) => {
-          const newTime = prev - 1;
-          if (
-            newTime === 0 &&
-            toggleRecordingRef.current &&
-            !autoStopTriggered
-          ) {
-            // 실제 '녹음 중'일 때만 자동 중지 수행
-            if (!isRecordingRef.current) {
-              console.warn(
-                "⏱️ 카운트다운 종료 시 녹음 상태가 아님 - 자동 중지 스킵"
-              );
-              return 0;
-            }
-            setAutoStopTriggered(true);
-            setTimeout(() => {
-              if (toggleRecordingRef.current && isRecordingRef.current) {
-                console.log("⏰ 5초 타이머 완료 - 자동 녹음 중지");
-                toggleRecordingRef.current();
+  useEffect(
+    function () {
+      if (timeLeft > 0) {
+        timerRef.current = setTimeout(function () {
+          setTimeLeft(function (prev) {
+            const newTime = prev - 1;
+            if (
+              newTime === 0 &&
+              toggleRecordingRef.current &&
+              !autoStopTriggered
+            ) {
+              // 실제 '녹음 중'일 때만 자동 중지 수행
+              if (!isRecordingRef.current) {
+                console.warn(
+                  "⏱️ 카운트다운 종료 시 녹음 상태가 아님 - 자동 중지 스킵"
+                );
+                return 0;
               }
-            }, 100); // 약간의 지연을 두어 상태 동기화 시간 확보
-          }
-          return newTime;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
+              setAutoStopTriggered(true);
+              setTimeout(function () {
+                if (toggleRecordingRef.current && isRecordingRef.current) {
+                  console.log("⏰ 5초 타이머 완료 - 자동 녹음 중지");
+                  toggleRecordingRef.current();
+                }
+              }, 100); // 약간의 지연을 두어 상태 동기화 시간 확보
+            }
+            return newTime;
+          });
+        }, 1000);
       }
-    };
-  }, [timeLeft, autoStopTriggered]);
+
+      return function () {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+        }
+      };
+    },
+    [timeLeft, autoStopTriggered]
+  );
 
   // 컴포넌트 마운트 시 타이머 시작
-  useEffect(() => {
+  useEffect(function () {
     setTimeLeft(5);
     setAutoStopTriggered(false);
   }, []);
 
   // 컴포넌트 언마운트 시 타이머 정리
-  useEffect(() => {
-    return () => {
+  useEffect(function () {
+    return function () {
       if (transitionTimerRef.current) {
         clearTimeout(transitionTimerRef.current);
       }
@@ -98,28 +103,40 @@ export default function VoiceThreePlusRecording() {
   }, []);
 
   // 음성 인식이 완료되면 1초 후 자동으로 다음 페이지로 이동
-  useEffect(() => {
-    if (recognizedText && !isTransitioning) {
-      setIsTransitioning(true);
-      transitionTimerRef.current = setTimeout(() => {
-        navigate("/order/voice/details", {
-          state: { recognized: recognizedText },
-        });
-      }, 1000); // 1초 후 자동 전환
-    }
-  }, [recognizedText, isTransitioning, navigate]);
+  useEffect(
+    function () {
+      if (recognizedText && !isTransitioning) {
+        setIsTransitioning(true);
+        transitionTimerRef.current = setTimeout(function () {
+          navigate("/order/voice/details", {
+            state: { recognized: recognizedText },
+          });
+        }, 1000); // 1초 후 자동 전환
+      }
+    },
+    [recognizedText, isTransitioning, navigate]
+  );
 
   // 자동 종료 이후에도 인식된 텍스트가 없으면 에러 페이지로 이동
-  useEffect(() => {
-    if (autoStopTriggered) {
-      const t = setTimeout(() => {
-        if (!isRecordingRef.current && !loadingRef.current && !recognizedText) {
-          goToVoiceError(navigate);
-        }
-      }, 1200);
-      return () => clearTimeout(t);
-    }
-  }, [autoStopTriggered, recognizedText, navigate]);
+  useEffect(
+    function () {
+      if (autoStopTriggered) {
+        const t = setTimeout(function () {
+          if (
+            !isRecordingRef.current &&
+            !loadingRef.current &&
+            !recognizedText
+          ) {
+            goToVoiceError(navigate);
+          }
+        }, 1200);
+        return function () {
+          clearTimeout(t);
+        };
+      }
+    },
+    [autoStopTriggered, recognizedText, navigate]
+  );
 
   return (
     <Page>
@@ -218,7 +235,7 @@ export default function VoiceThreePlusRecording() {
               {/* 녹음 중이 아니고 인식된 텍스트가 없을 때: 눌러서 말하기 버튼 */}
               {!isRecording && !recognizedText && !loading && (
                 <SpeakButton
-                  onClick={() => {
+                  onClick={function () {
                     // 수동 시작 시 타이머 리셋 및 자동중지 플래그 초기화
                     setTimeLeft(5);
                     setAutoStopTriggered(false);

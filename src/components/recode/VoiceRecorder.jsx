@@ -45,7 +45,9 @@ export default function VoiceRecorder({
       return nested.transcript;
     if (Array.isArray(raw?.segments)) {
       const joined = raw.segments
-        .map((s) => s.text || s.transcript || "")
+        .map(function (s) {
+          return s.text || s.transcript || "";
+        })
         .filter(Boolean)
         .join(" ")
         .trim();
@@ -190,54 +192,60 @@ export default function VoiceRecorder({
     }
   }
 
-  useEffect(() => {
-    let isCancelled = false;
-    async function startOnMount() {
-      try {
-        if (!recorderRef.current) {
-          const recorder = new AudioRecorder();
-          const init = await recorder.initializeRecording();
-          if (!init.success) {
-            if (!isCancelled) setError(init.error || "마이크 초기화 실패");
-            return;
+  useEffect(
+    function () {
+      let isCancelled = false;
+      async function startOnMount() {
+        try {
+          if (!recorderRef.current) {
+            const recorder = new AudioRecorder();
+            const init = await recorder.initializeRecording();
+            if (!init.success) {
+              if (!isCancelled) setError(init.error || "마이크 초기화 실패");
+              return;
+            }
+            recorderRef.current = recorder;
           }
-          recorderRef.current = recorder;
+          if (!isCancelled && autoStart) {
+            recorderRef.current.startRecording();
+            setIsRecording(true);
+          }
+        } catch (e) {
+          if (!isCancelled)
+            setError(e?.message || "녹음 시작 중 오류가 발생했습니다.");
         }
-        if (!isCancelled && autoStart) {
-          recorderRef.current.startRecording();
-          setIsRecording(true);
-        }
-      } catch (e) {
-        if (!isCancelled)
-          setError(e?.message || "녹음 시작 중 오류가 발생했습니다.");
       }
-    }
-    startOnMount();
-    return () => {
-      isCancelled = true;
-    };
-  }, [autoStart]);
+      startOnMount();
+      return function () {
+        isCancelled = true;
+      };
+    },
+    [autoStart]
+  );
 
-  useEffect(() => {
-    if (isRecording && !disableInterim) {
-      if (interimTimerRef.current) clearInterval(interimTimerRef.current);
-      interimTimerRef.current = setInterval(() => {
-        sendInterimSnapshot();
-      }, 3000);
-    } else if (interimTimerRef.current) {
-      clearInterval(interimTimerRef.current);
-      interimTimerRef.current = null;
-    }
-    return () => {
-      if (interimTimerRef.current) {
+  useEffect(
+    function () {
+      if (isRecording && !disableInterim) {
+        if (interimTimerRef.current) clearInterval(interimTimerRef.current);
+        interimTimerRef.current = setInterval(function () {
+          sendInterimSnapshot();
+        }, 3000);
+      } else if (interimTimerRef.current) {
         clearInterval(interimTimerRef.current);
         interimTimerRef.current = null;
       }
-    };
-  }, [isRecording, sendInterimSnapshot, disableInterim]);
+      return function () {
+        if (interimTimerRef.current) {
+          clearInterval(interimTimerRef.current);
+          interimTimerRef.current = null;
+        }
+      };
+    },
+    [isRecording, sendInterimSnapshot, disableInterim]
+  );
 
-  useEffect(() => {
-    return () => {
+  useEffect(function () {
+    return function () {
       if (recorderRef.current) {
         try {
           recorderRef.current.cancelRecording();

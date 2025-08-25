@@ -22,7 +22,7 @@ export default function PointCheckPage() {
   }
 
   // 터치주문에서 온 경우인지 확인하는 함수
-  const isFromTouchOrder = () => {
+  function isFromTouchOrder() {
     const sessionId = sessionStorage.getItem("currentSessionId");
     const orderSpec = localStorage.getItem("order_spec");
 
@@ -36,7 +36,7 @@ export default function PointCheckPage() {
       }
     }
     return false;
-  };
+  }
 
   async function handleSelect(save) {
     const sessionId = sessionStorage.getItem("currentSessionId");
@@ -89,13 +89,23 @@ export default function PointCheckPage() {
       <BackButton onClick={handleBack} />
       <Title>주문 내역을 기억해드릴까요?</Title>
       <CardGrid>
-        <Card type="button" onClick={() => handleSelect(false)}>
+        <Card
+          type="button"
+          onClick={function () {
+            handleSelect(false);
+          }}
+        >
           <IconCenter>
             <CrossIcon />
           </IconCenter>
           <CardLabel>아니요</CardLabel>
         </Card>
-        <Card type="button" onClick={() => handleSelect(true)}>
+        <Card
+          type="button"
+          onClick={function () {
+            handleSelect(true);
+          }}
+        >
           <IconCenter>
             <CircleIcon />
           </IconCenter>

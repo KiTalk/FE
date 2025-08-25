@@ -31,7 +31,9 @@ export function clearAllAddedTotals(
   ls = typeof window !== "undefined" ? window.localStorage : null
 ) {
   if (!ls) return;
-  listAddedTotalKeys(ls).forEach((k) => ls.removeItem(k));
+  listAddedTotalKeys(ls).forEach(function (k) {
+    ls.removeItem(k);
+  });
 }
 
 /** 허용된 id(정규화된 id) 목록만 남기고 나머지 added_total_* 삭제 */
@@ -41,7 +43,7 @@ export function purgeAddedTotalsByIds(
 ) {
   if (!ls) return;
   const allowSet = new Set(allowedNormIds.map(normalizeId));
-  listAddedTotalKeys(ls).forEach((k) => {
+  listAddedTotalKeys(ls).forEach(function (k) {
     // k 형태: "added_total_{normId}"
     const normId = k.replace("added_total_", "");
     if (!allowSet.has(normId)) {
@@ -53,7 +55,7 @@ export function purgeAddedTotalsByIds(
 // 주문 내역 localStorage 관리
 export const orderStorage = {
   // 주문 내역 저장
-  saveOrders: (sessionId, orders) => {
+  saveOrders: function (sessionId, orders) {
     if (!sessionId || !orders) return;
     const key = `orders_${sessionId}`;
     localStorage.setItem(key, JSON.stringify(orders));
@@ -61,7 +63,7 @@ export const orderStorage = {
   },
 
   // 주문 내역 불러오기
-  getOrders: (sessionId) => {
+  getOrders: function (sessionId) {
     if (!sessionId) return null;
     const key = `orders_${sessionId}`;
     try {
@@ -74,40 +76,42 @@ export const orderStorage = {
   },
 
   // 특정 상품 수량 업데이트
-  updateQuantity: (sessionId, productId, newQuantity) => {
+  updateQuantity: function (sessionId, productId, newQuantity) {
     const orders = orderStorage.getOrders(sessionId);
     if (!orders) return null;
 
     const updated = orders
-      .map((order) => {
+      .map(function (order) {
         if (order.id === productId || order.menu_item === productId) {
           return { ...order, quantity: newQuantity };
         }
         return order;
       })
-      .filter((order) => order.quantity > 0); // 수량이 0인 항목 제거
+      .filter(function (order) {
+        return order.quantity > 0;
+      }); // 수량이 0인 항목 제거
 
     orderStorage.saveOrders(sessionId, updated);
     return updated;
   },
 
   // 변경사항이 있는지 확인
-  hasChanges: (sessionId, currentOrders) => {
+  hasChanges: function (sessionId, currentOrders) {
     const storedOrders = orderStorage.getOrders(sessionId);
     if (!storedOrders || !currentOrders) return false;
 
     if (storedOrders.length !== currentOrders.length) return true;
 
-    return storedOrders.some((stored) => {
-      const current = currentOrders.find(
-        (c) => c.id === stored.id || c.menu_item === stored.menu_item
-      );
+    return storedOrders.some(function (stored) {
+      const current = currentOrders.find(function (c) {
+        return c.id === stored.id || c.menu_item === stored.menu_item;
+      });
       return !current || current.quantity !== stored.quantity;
     });
   },
 
   // localStorage 정리
-  clearOrders: (sessionId) => {
+  clearOrders: function (sessionId) {
     if (!sessionId) return;
     const key = `orders_${sessionId}`;
     localStorage.removeItem(key);

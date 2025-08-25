@@ -255,7 +255,7 @@ export class AudioRecorder {
 
     // 스트림 정리 (중요!)
     if (this.stream) {
-      this.stream.getTracks().forEach((track) => {
+      this.stream.getTracks().forEach(function (track) {
         track.stop();
         console.log(`📻 트랙 중지됨: ${track.kind}`);
       });
@@ -273,7 +273,9 @@ export class AudioRecorder {
   // 스트림 정리
   cleanup() {
     if (this.stream) {
-      this.stream.getTracks().forEach((track) => track.stop());
+      this.stream.getTracks().forEach(function (track) {
+        return track.stop();
+      });
       this.stream = null;
     }
     this.mediaRecorder = null;
@@ -298,7 +300,7 @@ export class AudioRecorder {
     ];
 
     console.log("브라우저 MIME 타입 지원 상태:");
-    types.forEach((type) => {
+    types.forEach(function (type) {
       const supported = MediaRecorder.isTypeSupported(type);
       console.log(`${type}: ${supported ? "✅ 지원" : "❌ 미지원"}`);
     });

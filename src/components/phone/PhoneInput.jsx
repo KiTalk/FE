@@ -77,12 +77,16 @@ export default function PhoneInput({
 
           {errorMessage ? (
             <Instruction $isError>
-              {errorMessage.split(/\n|<br\s*\/?>/i).map((part, idx, arr) => (
-                <React.Fragment key={idx}>
-                  {part}
-                  {idx < arr.length - 1 && <br />}
-                </React.Fragment>
-              ))}
+              {errorMessage
+                .split(/\n|<br\s*\/?>/i)
+                .map(function (part, idx, arr) {
+                  return (
+                    <React.Fragment key={idx}>
+                      {part}
+                      {idx < arr.length - 1 && <br />}
+                    </React.Fragment>
+                  );
+                })}
             </Instruction>
           ) : (
             <Instruction>{instruction}</Instruction>
@@ -90,11 +94,13 @@ export default function PhoneInput({
         </InputArea>
 
         <Keypad>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-            <KeyButton key={n} data-num={n} onClick={handleKeypadClick}>
-              {n}
-            </KeyButton>
-          ))}
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (n) {
+            return (
+              <KeyButton key={n} data-num={n} onClick={handleKeypadClick}>
+                {n}
+              </KeyButton>
+            );
+          })}
           <KeyButton
             $variant="action"
             data-action="backspace"

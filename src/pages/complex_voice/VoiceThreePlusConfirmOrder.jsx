@@ -79,7 +79,9 @@ export default function VoiceThreePlusConfirmOrder() {
   const isRecordingRef = useRef(false);
   const transitionTimerRef = useRef(null);
 
-  const language = useMemo(() => getSettings().defaultLanguage || "ko", []);
+  const language = useMemo(function () {
+    return getSettings().defaultLanguage || "ko";
+  }, []);
 
   const { syncNow } = useOrderSync(sessionId);
 
@@ -108,16 +110,19 @@ export default function VoiceThreePlusConfirmOrder() {
   }
 
   function calculateTotals(items) {
-    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
+    const totalQuantity = items.reduce(function (sum, item) {
+      return sum + item.quantity;
+    }, 0);
+    const totalPrice = items.reduce(function (sum, item) {
+      return sum + item.price * item.quantity;
+    }, 0);
     return { totalQuantity, totalPrice };
   }
 
   async function handleRemoveItem(itemId) {
-    const itemToRemove = orderItems.find((item) => item.id === itemId);
+    const itemToRemove = orderItems.find(function (item) {
+      return item.id === itemId;
+    });
 
     if (itemToRemove && sessionId && itemToRemove.menu_id) {
       try {
@@ -128,8 +133,10 @@ export default function VoiceThreePlusConfirmOrder() {
       }
     }
 
-    setOrderItems((prev) => {
-      const newItems = prev.filter((item) => item.id !== itemId);
+    setOrderItems(function (prev) {
+      const newItems = prev.filter(function (item) {
+        return item.id !== itemId;
+      });
       const totals = calculateTotals(newItems);
       setOrderSummary(totals);
 
@@ -147,15 +154,19 @@ export default function VoiceThreePlusConfirmOrder() {
       return;
     }
 
-    setOrderItems((prev) => {
-      const exists = prev.some((item) => item.id === itemId);
+    setOrderItems(function (prev) {
+      const exists = prev.some(function (item) {
+        return item.id === itemId;
+      });
       let newItems;
       if (exists) {
-        newItems = prev.map((item) =>
-          item.id === itemId ? { ...item, quantity: newQuantity } : item
-        );
+        newItems = prev.map(function (item) {
+          return item.id === itemId ? { ...item, quantity: newQuantity } : item;
+        });
       } else {
-        const base = additionalProducts.find((p) => p.id === itemId);
+        const base = additionalProducts.find(function (p) {
+          return p.id === itemId;
+        });
         newItems = [
           ...prev,
           base
@@ -204,167 +215,194 @@ export default function VoiceThreePlusConfirmOrder() {
   }
 
   // 페이지 진입 시마다 최신 주문 내역을 불러오는 함수
-  const fetchLatestOrders = useCallback(async () => {
-    if (!sessionId) return;
+  const fetchLatestOrders = useCallback(
+    async function () {
+      if (!sessionId) return;
 
-    try {
-      console.log(
-        "🔄 VoiceThreePlusConfirmOrder - 최신 주문 내역 조회 시작:",
-        sessionId
-      );
+      try {
+        console.log(
+          "🔄 VoiceThreePlusConfirmOrder - 최신 주문 내역 조회 시작:",
+          sessionId
+        );
 
-      // 즉시 한 번 시도
-      const sessionData = await orderService.getSession(sessionId);
-      console.log("📋 최신 세션 데이터:", sessionData);
+        // 즉시 한 번 시도
+        const sessionData = await orderService.getSession(sessionId);
+        console.log("📋 최신 세션 데이터:", sessionData);
 
-      if (sessionData?.orders && sessionData.orders.length > 0) {
-        const mapped = Array.isArray(sessionData.orders)
-          ? sessionData.orders.map((o) => ({
-              id: o.menu_id,
-              name: o.menu_item,
-              original: o.original,
-              price: Number(o.price || 0),
-              quantity: Number(o.quantity || 0),
-              popular: Boolean(o.popular),
-              temp: o.temp,
-              profileImage: o.profile,
-              menu_id: o.menu_id,
-            }))
-          : [];
+        if (sessionData?.orders && sessionData.orders.length > 0) {
+          const mapped = Array.isArray(sessionData.orders)
+            ? sessionData.orders.map(function (o) {
+                return {
+                  id: o.menu_id,
+                  name: o.menu_item,
+                  original: o.original,
+                  price: Number(o.price || 0),
+                  quantity: Number(o.quantity || 0),
+                  popular: Boolean(o.popular),
+                  temp: o.temp,
+                  profileImage: o.profile,
+                  menu_id: o.menu_id,
+                };
+              })
+            : [];
 
-        console.log("✅ 매핑된 주문 내역:", mapped);
-        setOrderItems(mapped);
-        orderStorage.saveOrders(sessionId, mapped);
+          console.log("✅ 매핑된 주문 내역:", mapped);
+          setOrderItems(mapped);
+          orderStorage.saveOrders(sessionId, mapped);
 
-        const totalQuantity = Number(sessionData.total_items ?? 0);
-        const totalPrice = Number(sessionData.total_price ?? 0);
-        setOrderSummary({ totalQuantity, totalPrice });
-        console.log("💰 주문 요약 업데이트:", { totalQuantity, totalPrice });
-      } else {
-        console.warn("⚠️ 주문 내역이 비어있음");
+          const totalQuantity = Number(sessionData.total_items ?? 0);
+          const totalPrice = Number(sessionData.total_price ?? 0);
+          setOrderSummary({ totalQuantity, totalPrice });
+          console.log("💰 주문 요약 업데이트:", { totalQuantity, totalPrice });
+        } else {
+          console.warn("⚠️ 주문 내역이 비어있음");
+        }
+      } catch (error) {
+        console.error("❌ 최신 주문 내역 불러오기 실패:", error);
       }
-    } catch (error) {
-      console.error("❌ 최신 주문 내역 불러오기 실패:", error);
-    }
-  }, [sessionId]);
+    },
+    [sessionId]
+  );
 
   // 컴포넌트 마운트 시와 sessionId 변경 시 최신 주문 내역 불러오기
-  useEffect(() => {
-    fetchLatestOrders();
-  }, [sessionId, fetchLatestOrders]); // sessionId와 fetchLatestOrders가 변경될 때마다 다시 불러오기
+  useEffect(
+    function () {
+      fetchLatestOrders();
+    },
+    [sessionId, fetchLatestOrders]
+  ); // sessionId와 fetchLatestOrders가 변경될 때마다 다시 불러오기
 
   // 수량이 업데이트된 경우 즉시 주문 내역 새로고침
-  useEffect(() => {
-    if (quantityUpdated) {
-      console.log("🔄 수량 업데이트 감지 - 주문 내역 즉시 새로고침");
-      // 약간의 지연을 주어 이전 페이지의 변경사항이 서버에 반영될 시간 확보
-      setTimeout(() => {
-        fetchLatestOrders();
-      }, 300);
-    }
-  }, [quantityUpdated, fetchLatestOrders]);
+  useEffect(
+    function () {
+      if (quantityUpdated) {
+        console.log("🔄 수량 업데이트 감지 - 주문 내역 즉시 새로고침");
+        // 약간의 지연을 주어 이전 페이지의 변경사항이 서버에 반영될 시간 확보
+        setTimeout(function () {
+          fetchLatestOrders();
+        }, 300);
+      }
+    },
+    [quantityUpdated, fetchLatestOrders]
+  );
 
   // 페이지가 focus 될 때마다 최신 주문 내역 불러오기 (브라우저 뒤로가기 등)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        console.log("🔄 페이지가 다시 활성화됨 - 주문 내역 새로고침");
+  useEffect(
+    function () {
+      function handleVisibilityChange() {
+        if (!document.hidden) {
+          console.log("🔄 페이지가 다시 활성화됨 - 주문 내역 새로고침");
+          fetchLatestOrders();
+        }
+      }
+
+      function handleFocus() {
+        console.log("🔄 페이지가 포커스됨 - 주문 내역 새로고침");
         fetchLatestOrders();
       }
-    };
 
-    const handleFocus = () => {
-      console.log("🔄 페이지가 포커스됨 - 주문 내역 새로고침");
-      fetchLatestOrders();
-    };
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+      window.addEventListener("focus", handleFocus);
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("focus", handleFocus);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, [sessionId, fetchLatestOrders]);
+      return function () {
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange
+        );
+        window.removeEventListener("focus", handleFocus);
+      };
+    },
+    [sessionId, fetchLatestOrders]
+  );
 
   // 3초 타이머 관리
-  useEffect(() => {
-    if (timeLeft > 0) {
-      timerRef.current = setTimeout(() => {
-        setTimeLeft((prev) => {
-          const newTime = prev - 1;
-          if (
-            newTime === 0 &&
-            toggleRecordingRef.current &&
-            !autoStopTriggered
-          ) {
-            // 실제 '녹음 중'일 때만 자동 중지 수행
-            if (!isRecordingRef.current) {
-              return 0;
-            }
-            setAutoStopTriggered(true);
-            setTimeout(() => {
-              if (toggleRecordingRef.current && isRecordingRef.current) {
-                toggleRecordingRef.current();
+  useEffect(
+    function () {
+      if (timeLeft > 0) {
+        timerRef.current = setTimeout(function () {
+          setTimeLeft(function (prev) {
+            const newTime = prev - 1;
+            if (
+              newTime === 0 &&
+              toggleRecordingRef.current &&
+              !autoStopTriggered
+            ) {
+              // 실제 '녹음 중'일 때만 자동 중지 수행
+              if (!isRecordingRef.current) {
+                return 0;
               }
-            }, 100);
-          }
-          return newTime;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
+              setAutoStopTriggered(true);
+              setTimeout(function () {
+                if (toggleRecordingRef.current && isRecordingRef.current) {
+                  toggleRecordingRef.current();
+                }
+              }, 100);
+            }
+            return newTime;
+          });
+        }, 1000);
       }
-    };
-  }, [timeLeft, autoStopTriggered]);
 
-  useEffect(() => {
+      return function () {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+        }
+      };
+    },
+    [timeLeft, autoStopTriggered]
+  );
+
+  useEffect(function () {
     setTimeLeft(3);
     setAutoStopTriggered(false);
   }, []);
 
-  useEffect(() => {
-    return () => {
+  useEffect(function () {
+    return function () {
       if (transitionTimerRef.current) {
         clearTimeout(transitionTimerRef.current);
       }
     };
   }, []);
 
-  useEffect(() => {
-    if (voiceRecognizedText && !isTransitioning) {
-      setIsTransitioning(true);
-      transitionTimerRef.current = setTimeout(async () => {
-        try {
-          await syncNow(); // 동기화
+  useEffect(
+    function () {
+      if (voiceRecognizedText && !isTransitioning) {
+        setIsTransitioning(true);
+        transitionTimerRef.current = setTimeout(async function () {
+          try {
+            await syncNow(); // 동기화
 
-          const confirmResult = await orderService.confirmResponse(
-            voiceRecognizedText
-          );
+            const confirmResult = await orderService.confirmResponse(
+              voiceRecognizedText
+            );
 
-          if (confirmResult.confirmed) {
-            // 긍정 응답 시 주문 완료 페이지로 이동
-            navigate("/order/package");
-          } else {
-            // 부정 응답 시 추가 주문 페이지로 이동
-            navigate("/order/voice/details/plus", {
-              state: { sessionId: sessionId },
-            });
+            if (confirmResult.confirmed) {
+              // 긍정 응답 시 주문 완료 페이지로 이동
+              navigate("/order/package");
+            } else {
+              // 부정 응답 시 추가 주문 페이지로 이동
+              navigate("/order/voice/details/plus", {
+                state: { sessionId: sessionId },
+              });
+            }
+          } catch (error) {
+            console.error("❌ 확인 응답 처리 실패:", error);
+            goToVoiceError(navigate, { cause: error });
           }
-        } catch (error) {
-          console.error("❌ 확인 응답 처리 실패:", error);
-          goToVoiceError(navigate, { cause: error });
-        }
-      }, 1000);
-    }
-  }, [voiceRecognizedText, isTransitioning, navigate, sessionId, syncNow]);
-  useEffect(() => {
-    const t1 = setTimeout(() => setShowTopSection(true), 100);
-    const t2 = setTimeout(() => setAnimateProducts(true), 900);
-    return () => {
+        }, 1000);
+      }
+    },
+    [voiceRecognizedText, isTransitioning, navigate, sessionId, syncNow]
+  );
+  useEffect(function () {
+    const t1 = setTimeout(function () {
+      setShowTopSection(true);
+    }, 100);
+    const t2 = setTimeout(function () {
+      setAnimateProducts(true);
+    }, 900);
+    return function () {
       clearTimeout(t1);
       clearTimeout(t2);
     };

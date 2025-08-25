@@ -14,7 +14,7 @@ export default function OrderCompletePage() {
   const [countdown, setCountdown] = useState(3);
   const [shouldNavigate, setShouldNavigate] = useState(false);
 
-  useEffect(() => {
+  useEffect(function () {
     // localStorage 스냅샷 수집
     function collectLocalStorageSnapshot() {
       const snapshot = {};
@@ -48,8 +48,8 @@ export default function OrderCompletePage() {
     clearLocalStorageSafe();
 
     // 카운트다운 타이머 시작
-    const countdownInterval = setInterval(() => {
-      setCountdown((prev) => {
+    const countdownInterval = setInterval(function () {
+      setCountdown(function (prev) {
         if (prev <= 1) {
           clearInterval(countdownInterval);
           setShouldNavigate(true);
@@ -59,15 +59,20 @@ export default function OrderCompletePage() {
       });
     }, 1000);
 
-    return () => clearInterval(countdownInterval);
+    return function () {
+      clearInterval(countdownInterval);
+    };
   }, []);
 
   // 네비게이션을 별도의 useEffect로 분리
-  useEffect(() => {
-    if (shouldNavigate) {
-      navigate("/", { replace: true });
-    }
-  }, [shouldNavigate, navigate]);
+  useEffect(
+    function () {
+      if (shouldNavigate) {
+        navigate("/", { replace: true });
+      }
+    },
+    [shouldNavigate, navigate]
+  );
 
   return (
     <Page>
