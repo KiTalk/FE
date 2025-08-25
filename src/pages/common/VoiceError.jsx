@@ -23,9 +23,9 @@ export default function VoiceError() {
     navigate("/order-method");
   }
 
-  const handleRetry = () => {
+  function handleRetry() {
     navigate(-1);
-  };
+  }
 
   return (
     <Page>

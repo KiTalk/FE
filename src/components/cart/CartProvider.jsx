@@ -106,13 +106,17 @@ export default function CartProvider(props) {
   );
   const totalQty = useMemo(
     function () {
-      return items.reduce((a, c) => a + c.qty, 0);
+      return items.reduce(function (a, c) {
+        return a + c.qty;
+      }, 0);
     },
     [items]
   );
   const totalPrice = useMemo(
     function () {
-      return items.reduce((a, c) => a + c.price * c.qty, 0);
+      return items.reduce(function (a, c) {
+        return a + c.price * c.qty;
+      }, 0);
     },
     [items]
   );

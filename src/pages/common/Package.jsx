@@ -19,7 +19,7 @@ export default function PackagePage() {
   const navigate = useNavigate();
 
   // 이전 페이지가 Cart.jsx인지 확인하는 함수
-  const isFromTouchCart = () => {
+  function isFromTouchCart() {
     // 현재 sessionStorage에 터치주문 세션이 있고, Cart에서 온 경우
     const sessionId = sessionStorage.getItem("currentSessionId");
     const orderSpec = localStorage.getItem("order_spec");
@@ -39,7 +39,7 @@ export default function PackagePage() {
       }
     }
     return false;
-  };
+  }
 
   function handleBack() {
     navigate(-1);
@@ -115,13 +115,23 @@ export default function PackagePage() {
       <BackButton onClick={handleBack} />
       <Title>어디에서 드시나요?</Title>
       <CardGrid>
-        <Card type="button" onClick={() => persistAndNext("takeout")}>
+        <Card
+          type="button"
+          onClick={function () {
+            persistAndNext("takeout");
+          }}
+        >
           <IconWrap>
             <IconImage src={packageIcon} alt="포장하기" />
           </IconWrap>
           <CardLabel>포장하기</CardLabel>
         </Card>
-        <Card type="button" onClick={() => persistAndNext("dinein")}>
+        <Card
+          type="button"
+          onClick={function () {
+            persistAndNext("dinein");
+          }}
+        >
           <IconWrap>
             <IconImage src={dineinIcon} alt="먹고가기" />
           </IconWrap>

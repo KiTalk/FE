@@ -12,7 +12,7 @@ export default function PointPhone() {
   const [showToast, setShowToast] = useState(false);
 
   // 터치주문에서 온 경우인지 확인하는 함수
-  const isFromTouchOrder = () => {
+  function isFromTouchOrder() {
     const sessionId = sessionStorage.getItem("currentSessionId");
     const orderSpec = localStorage.getItem("order_spec");
 
@@ -31,7 +31,7 @@ export default function PointPhone() {
       }
     }
     return false;
-  };
+  }
 
   async function handleSave(phoneDigits) {
     if (isSaving) return;
@@ -58,9 +58,9 @@ export default function PointPhone() {
 
         // 토스트 표시
         setShowToast(true);
-        setTimeout(() => {
+        setTimeout(function () {
           setShowToast(false);
-          setTimeout(() => {
+          setTimeout(function () {
             navigate("/order/complete", { replace: true });
           }, 300); // 애니메이션 완료 후 이동
         }, 2000);
@@ -76,9 +76,9 @@ export default function PointPhone() {
 
       // 토스트 표시
       setShowToast(true);
-      setTimeout(() => {
+      setTimeout(function () {
         setShowToast(false);
-        setTimeout(() => {
+        setTimeout(function () {
           navigate("/order/complete", { replace: true });
         }, 300); // 애니메이션 완료 후 이동
       }, 2000);
@@ -116,7 +116,7 @@ export default function PointPhone() {
         setErrorMessage("세션이 만료되었습니다.\n처음부터 다시 시작해 주세요!");
 
         // 3초 후 자동으로 홈으로 이동
-        setTimeout(() => {
+        setTimeout(function () {
           navigate("/", { replace: true });
         }, 3000);
       } else if (error.response?.status === 404) {

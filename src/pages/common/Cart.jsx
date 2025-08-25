@@ -83,7 +83,7 @@ function CartContent(props) {
 
       // 서버 데이터를 localStorage에도 동기화
       const cart = {};
-      data.orders?.forEach((order) => {
+      data.orders?.forEach(function (order) {
         cart[order.menu_id] = order.quantity;
       });
       setLocalCart(cart);
@@ -98,9 +98,12 @@ function CartContent(props) {
     }
   }, []);
 
-  useEffect(() => {
-    loadServerCartData();
-  }, [loadServerCartData]);
+  useEffect(
+    function () {
+      loadServerCartData();
+    },
+    [loadServerCartData]
+  );
 
   function formatCurrency(value) {
     const n = Number(value ?? 0);
@@ -174,7 +177,9 @@ function CartContent(props) {
   // 주문하기: localStorage를 서버에 동기화 후 이동
   async function handleCheckout() {
     // localStorage 기반으로 빈 장바구니 체크
-    const hasItems = Object.values(localCart).some((quantity) => quantity > 0);
+    const hasItems = Object.values(localCart).some(function (quantity) {
+      return quantity > 0;
+    });
     if (!hasItems) {
       alert("장바구니가 비어있습니다.");
       return;
@@ -407,8 +412,9 @@ function CartContent(props) {
 
   // localStorage 기반으로 화면 데이터 구성 (0개 상품 제외)
   const orders =
-    cartData?.orders?.filter((order) => (localCart[order.menu_id] || 0) > 0) ||
-    [];
+    cartData?.orders?.filter(function (order) {
+      return (localCart[order.menu_id] || 0) > 0;
+    }) || [];
 
   // localStorage 기반으로 총 수량과 가격 계산
   let totalQty = 0;

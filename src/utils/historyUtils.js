@@ -58,7 +58,9 @@ export function addToHistory(result, fileName = null, fileSize = null) {
 export function removeFromHistory(itemId) {
   try {
     const history = getHistory();
-    const updatedHistory = history.filter((item) => item.id !== itemId);
+    const updatedHistory = history.filter(function (item) {
+      return item.id !== itemId;
+    });
     localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
     return true;
   } catch {
@@ -83,7 +85,7 @@ export function searchHistory(query) {
     if (!query || query.trim() === "") return history;
 
     const searchTerm = query.toLowerCase().trim();
-    return history.filter((item) => {
+    return history.filter(function (item) {
       const text = (item.text || "").toLowerCase();
       return text.includes(searchTerm);
     });
@@ -98,7 +100,7 @@ export function groupHistoryByDate(history = null) {
     const items = history || getHistory();
     const groups = {};
 
-    items.forEach((item) => {
+    items.forEach(function (item) {
       const date = new Date(item.timestamp);
       const dateKey = date.toDateString();
       const timeKey = date.toLocaleTimeString("ko-KR", {
@@ -121,7 +123,9 @@ export function groupHistoryByDate(history = null) {
     });
 
     // 날짜별로 정렬 (최신순)
-    return Object.values(groups).sort((a, b) => b.timestamp - a.timestamp);
+    return Object.values(groups).sort(function (a, b) {
+      return b.timestamp - a.timestamp;
+    });
   } catch {
     return [];
   }
@@ -143,32 +147,41 @@ export function getHistoryStats() {
       };
     }
 
-    const totalText = history.reduce(
-      (sum, item) => sum + (item.text?.length || 0),
-      0
-    );
+    const totalText = history.reduce(function (sum, item) {
+      return sum + (item.text?.length || 0);
+    }, 0);
     const confidenceValues = history
-      .map((item) => item.confidence)
-      .filter((c) => c !== null && !isNaN(c));
+      .map(function (item) {
+        return item.confidence;
+      })
+      .filter(function (c) {
+        return c !== null && !isNaN(c);
+      });
     const averageConfidence =
       confidenceValues.length > 0
-        ? confidenceValues.reduce((sum, c) => sum + c, 0) /
-          confidenceValues.length
+        ? confidenceValues.reduce(function (sum, c) {
+            return sum + c;
+          }, 0) / confidenceValues.length
         : 0;
 
-    const languageDistribution = history.reduce((acc, item) => {
+    const languageDistribution = history.reduce(function (acc, item) {
       const lang = item.language || "unknown";
       acc[lang] = (acc[lang] || 0) + 1;
       return acc;
     }, {});
 
     const processingTimes = history
-      .map((item) => item.processingTime)
-      .filter((t) => t !== null && !isNaN(t));
+      .map(function (item) {
+        return item.processingTime;
+      })
+      .filter(function (t) {
+        return t !== null && !isNaN(t);
+      });
     const averageProcessingTime =
       processingTimes.length > 0
-        ? processingTimes.reduce((sum, t) => sum + t, 0) /
-          processingTimes.length
+        ? processingTimes.reduce(function (sum, t) {
+            return sum + t;
+          }, 0) / processingTimes.length
         : 0;
 
     return {

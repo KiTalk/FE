@@ -44,9 +44,9 @@ export default function OrderHistory({
 
     // 과거 수량으로 초기화(수량>0 → 자동 체크)
     const initSel = {};
-    list.forEach((d) => {
+    list.forEach(function (d) {
       initSel[d.date] = {};
-      d.items.forEach((it) => {
+      d.items.forEach(function (it) {
         initSel[d.date][it.id] = {
           checked: (it.qty ?? 0) > 0,
           qty: it.qty ?? 0,
@@ -69,7 +69,7 @@ export default function OrderHistory({
       Object.keys(selected[date] || {}).length > 0;
     const next = { ...selected };
     const bucket = { ...(next[date] || {}) };
-    Object.keys(bucket).forEach((id) => {
+    Object.keys(bucket).forEach(function (id) {
       bucket[id] = { checked: !allOn, qty: !allOn ? 1 : 0 };
     });
     next[date] = bucket;
@@ -107,8 +107,8 @@ export default function OrderHistory({
 
   function getSelectedList() {
     const out = [];
-    orders.forEach((d) => {
-      d.items.forEach((it) => {
+    orders.forEach(function (d) {
+      d.items.forEach(function (it) {
         const st = selected[d.date]?.[it.id];
         if (st?.checked && st.qty > 0)
           out.push({ product: it, quantity: st.qty });
@@ -152,7 +152,9 @@ export default function OrderHistory({
       });
       return Array.from(counter.values())
         .sort((a, b) => b.count - a.count)
-        .map((x) => ({ ...x.item, _count: x.count }));
+        .map(function (x) {
+          return { ...x.item, _count: x.count };
+        });
     },
     [orders, customFavorites]
   );

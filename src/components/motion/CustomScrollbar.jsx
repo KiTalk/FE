@@ -37,7 +37,7 @@ export default function CustomScrollbar({
   } = positioning;
 
   // 현재 transform에서 translateY(px) 안전 추출
-  const getCurrentTranslateY = useCallback((elem) => {
+  const getCurrentTranslateY = useCallback(function (elem) {
     if (!elem) return 0;
 
     // 1) 인라인 transform 우선, 없으면 computedStyle로
@@ -67,51 +67,57 @@ export default function CustomScrollbar({
   }, []);
 
   // 썸 위치 및 크기 업데이트
-  const updateThumb = useCallback(() => {
-    const viewport = document.querySelector(viewportSelector);
-    const thumb = thumbRef.current;
-    if (!viewport || !thumb) return;
+  const updateThumb = useCallback(
+    function () {
+      const viewport = document.querySelector(viewportSelector);
+      const thumb = thumbRef.current;
+      if (!viewport || !thumb) return;
 
-    const { scrollHeight, clientHeight, scrollTop } = viewport;
-    const track = thumb.parentElement;
-    const trackHeight = track ? track.offsetHeight : clientHeight || 420;
-    const visibleRatio = clientHeight / (scrollHeight || 1);
-    const thumbHeight = Math.max(
-      minThumbHeight,
-      Math.round(trackHeight * Math.min(1, visibleRatio))
-    );
-    const maxThumbOffset = Math.max(0, trackHeight - thumbHeight);
-    const maxScrollTop = Math.max(0, scrollHeight - clientHeight);
-    const top =
-      maxScrollTop > 0
-        ? Math.round((scrollTop / maxScrollTop) * maxThumbOffset)
-        : 0;
+      const { scrollHeight, clientHeight, scrollTop } = viewport;
+      const track = thumb.parentElement;
+      const trackHeight = track ? track.offsetHeight : clientHeight || 420;
+      const visibleRatio = clientHeight / (scrollHeight || 1);
+      const thumbHeight = Math.max(
+        minThumbHeight,
+        Math.round(trackHeight * Math.min(1, visibleRatio))
+      );
+      const maxThumbOffset = Math.max(0, trackHeight - thumbHeight);
+      const maxScrollTop = Math.max(0, scrollHeight - clientHeight);
+      const top =
+        maxScrollTop > 0
+          ? Math.round((scrollTop / maxScrollTop) * maxThumbOffset)
+          : 0;
 
-    thumb.style.height = `${thumbHeight}px`;
-    thumb.style.transform = `translateY(${top}px)`;
-  }, [viewportSelector, minThumbHeight]);
+      thumb.style.height = `${thumbHeight}px`;
+      thumb.style.transform = `translateY(${top}px)`;
+    },
+    [viewportSelector, minThumbHeight]
+  );
 
   // 스크롤바 위치 및 높이 업데이트
-  const updateScrollbarGeometry = useCallback(() => {
-    const scrollbar = scrollbarRef.current;
-    if (!scrollbar) return;
+  const updateScrollbarGeometry = useCallback(
+    function () {
+      const scrollbar = scrollbarRef.current;
+      if (!scrollbar) return;
 
-    const fixedElements = getFixedElements ? getFixedElements() : {};
-    const { hero, tabs } = fixedElements;
+      const fixedElements = getFixedElements ? getFixedElements() : {};
+      const { hero, tabs } = fixedElements;
 
-    const heroH = hero ? hero.offsetHeight : 0;
-    const tabsH = tabs ? tabs.offsetHeight : 0;
-    const topOffset = heroH + tabsH + 16 + topExtraOffset; // 상단 여백
-    const height = Math.max(0, window.innerHeight - topOffset - bottomOffset);
+      const heroH = hero ? hero.offsetHeight : 0;
+      const tabsH = tabs ? tabs.offsetHeight : 0;
+      const topOffset = heroH + tabsH + 16 + topExtraOffset; // 상단 여백
+      const height = Math.max(0, window.innerHeight - topOffset - bottomOffset);
 
-    scrollbar.style.top = `${topOffset}px`;
-    scrollbar.style.height = `${height}px`;
-    scrollbar.style.right = `${rightOffset}px`;
-  }, [getFixedElements, topExtraOffset, bottomOffset, rightOffset]);
+      scrollbar.style.top = `${topOffset}px`;
+      scrollbar.style.height = `${height}px`;
+      scrollbar.style.right = `${rightOffset}px`;
+    },
+    [getFixedElements, topExtraOffset, bottomOffset, rightOffset]
+  );
 
   // 포인터 이벤트 핸들러들
   const onPointerDown = useCallback(
-    (e) => {
+    function (e) {
       isDraggingRef.current = true;
       e.preventDefault();
       startYRef.current =
@@ -122,7 +128,7 @@ export default function CustomScrollbar({
   );
 
   const onPointerMove = useCallback(
-    (e) => {
+    function (e) {
       if (!isDraggingRef.current) return;
 
       const viewport = document.querySelector(viewportSelector);
@@ -155,73 +161,76 @@ export default function CustomScrollbar({
     [viewportSelector, minThumbHeight]
   );
 
-  const onPointerUp = useCallback(() => {
+  const onPointerUp = useCallback(function () {
     isDraggingRef.current = false;
   }, []);
 
-  useEffect(() => {
-    const viewport = document.querySelector(viewportSelector);
-    const content = contentSelector
-      ? document.querySelector(contentSelector)
-      : null;
-    const thumb = thumbRef.current;
-    const scrollbar = scrollbarRef.current;
+  useEffect(
+    function () {
+      const viewport = document.querySelector(viewportSelector);
+      const content = contentSelector
+        ? document.querySelector(contentSelector)
+        : null;
+      const thumb = thumbRef.current;
+      const scrollbar = scrollbarRef.current;
 
-    if (!viewport || !thumb || !scrollbar) return;
+      if (!viewport || !thumb || !scrollbar) return;
 
-    let resizeObserver = null;
+      let resizeObserver = null;
 
-    // 초기 설정 - 약간의 지연으로 DOM 완전 렌더 후 계산
-    const initTimeout = setTimeout(() => {
-      updateScrollbarGeometry();
-      updateThumb();
-    }, 50);
-
-    // 초기 설정
-    updateScrollbarGeometry();
-    updateThumb();
-
-    // 이벤트 리스너 등록
-    viewport.addEventListener("scroll", updateThumb, { passive: true });
-    thumb.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("pointermove", onPointerMove);
-    document.addEventListener("pointerup", onPointerUp);
-    window.addEventListener("resize", updateThumb);
-    window.addEventListener("resize", updateScrollbarGeometry);
-    window.addEventListener("load", updateThumb);
-
-    // ResizeObserver로 콘텐츠 높이 변화 감지
-    try {
-      resizeObserver = new ResizeObserver(() => {
+      // 초기 설정 - 약간의 지연으로 DOM 완전 렌더 후 계산
+      const initTimeout = setTimeout(function () {
         updateScrollbarGeometry();
         updateThumb();
-      });
-      if (content) resizeObserver.observe(content);
-    } catch (e) {
-      console.warn("ResizeObserver not supported:", e);
-    }
+      }, 50);
 
-    // 정리 함수
-    return () => {
-      clearTimeout(initTimeout);
-      viewport.removeEventListener("scroll", updateThumb);
-      thumb.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("pointermove", onPointerMove);
-      document.removeEventListener("pointerup", onPointerUp);
-      window.removeEventListener("resize", updateThumb);
-      window.removeEventListener("resize", updateScrollbarGeometry);
-      window.removeEventListener("load", updateThumb);
-      if (resizeObserver) resizeObserver.disconnect();
-    };
-  }, [
-    viewportSelector,
-    contentSelector,
-    updateThumb,
-    updateScrollbarGeometry,
-    onPointerDown,
-    onPointerMove,
-    onPointerUp,
-  ]);
+      // 초기 설정
+      updateScrollbarGeometry();
+      updateThumb();
+
+      // 이벤트 리스너 등록
+      viewport.addEventListener("scroll", updateThumb, { passive: true });
+      thumb.addEventListener("pointerdown", onPointerDown);
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("resize", updateThumb);
+      window.addEventListener("resize", updateScrollbarGeometry);
+      window.addEventListener("load", updateThumb);
+
+      // ResizeObserver로 콘텐츠 높이 변화 감지
+      try {
+        resizeObserver = new ResizeObserver(function () {
+          updateScrollbarGeometry();
+          updateThumb();
+        });
+        if (content) resizeObserver.observe(content);
+      } catch (e) {
+        console.warn("ResizeObserver not supported:", e);
+      }
+
+      // 정리 함수
+      return function () {
+        clearTimeout(initTimeout);
+        viewport.removeEventListener("scroll", updateThumb);
+        thumb.removeEventListener("pointerdown", onPointerDown);
+        document.removeEventListener("pointermove", onPointerMove);
+        document.removeEventListener("pointerup", onPointerUp);
+        window.removeEventListener("resize", updateThumb);
+        window.removeEventListener("resize", updateScrollbarGeometry);
+        window.removeEventListener("load", updateThumb);
+        if (resizeObserver) resizeObserver.disconnect();
+      };
+    },
+    [
+      viewportSelector,
+      contentSelector,
+      updateThumb,
+      updateScrollbarGeometry,
+      onPointerDown,
+      onPointerMove,
+      onPointerUp,
+    ]
+  );
 
   return (
     <ScrollbarContainer

@@ -78,7 +78,9 @@ export default function VoiceThreePlusDetailsPlus() {
   const isRecordingRef = useRef(false);
   const transitionTimerRef = useRef(null);
 
-  const language = useMemo(() => getSettings().defaultLanguage || "ko", []);
+  const language = useMemo(function () {
+    return getSettings().defaultLanguage || "ko";
+  }, []);
 
   const { syncNow } = useOrderSync(sessionId);
 
@@ -108,17 +110,20 @@ export default function VoiceThreePlusDetailsPlus() {
   }
 
   function calculateTotals(items) {
-    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalPrice = items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
+    const totalQuantity = items.reduce(function (sum, item) {
+      return sum + item.quantity;
+    }, 0);
+    const totalPrice = items.reduce(function (sum, item) {
+      return sum + item.price * item.quantity;
+    }, 0);
     return { totalQuantity, totalPrice };
   }
 
   const handleRemoveItem = useCallback(
-    async (itemId) => {
-      const itemToRemove = orderItems.find((item) => item.id === itemId);
+    async function (itemId) {
+      const itemToRemove = orderItems.find(function (item) {
+        return item.id === itemId;
+      });
 
       if (itemToRemove && sessionId && itemToRemove.menu_id) {
         try {
@@ -129,8 +134,10 @@ export default function VoiceThreePlusDetailsPlus() {
         }
       }
 
-      setOrderItems((prev) => {
-        const newItems = prev.filter((item) => item.id !== itemId);
+      setOrderItems(function (prev) {
+        const newItems = prev.filter(function (item) {
+          return item.id !== itemId;
+        });
         const totals = calculateTotals(newItems);
         setOrderSummary(totals);
 
@@ -145,21 +152,27 @@ export default function VoiceThreePlusDetailsPlus() {
   );
 
   const handleQuantityChange = useCallback(
-    (itemId, newQuantity) => {
+    function (itemId, newQuantity) {
       if (newQuantity < 1) {
         handleRemoveItem(itemId);
         return;
       }
 
-      setOrderItems((prev) => {
-        const exists = prev.some((item) => item.id === itemId);
+      setOrderItems(function (prev) {
+        const exists = prev.some(function (item) {
+          return item.id === itemId;
+        });
         let newItems;
         if (exists) {
-          newItems = prev.map((item) =>
-            item.id === itemId ? { ...item, quantity: newQuantity } : item
-          );
+          newItems = prev.map(function (item) {
+            return item.id === itemId
+              ? { ...item, quantity: newQuantity }
+              : item;
+          });
         } else {
-          const base = additionalProducts.find((p) => p.id === itemId);
+          const base = additionalProducts.find(function (p) {
+            return p.id === itemId;
+          });
           newItems = [
             ...prev,
             base
@@ -209,136 +222,153 @@ export default function VoiceThreePlusDetailsPlus() {
     return 0;
   }
 
-  useEffect(() => {
-    let aborted = false;
-    async function fetchExistingOrders() {
-      if (!sessionId) return;
-      try {
-        console.log("📋 기존 세션 주문 내역 조회:", sessionId);
-        const sessionData = await orderService.getSession(sessionId);
-        console.log("🧾 세션 주문 내역:", sessionData);
-        if (aborted) return;
+  useEffect(
+    function () {
+      let aborted = false;
+      async function fetchExistingOrders() {
+        if (!sessionId) return;
+        try {
+          console.log("📋 기존 세션 주문 내역 조회:", sessionId);
+          const sessionData = await orderService.getSession(sessionId);
+          console.log("🧾 세션 주문 내역:", sessionData);
+          if (aborted) return;
 
-        const mapped = Array.isArray(sessionData?.orders)
-          ? sessionData.orders.map((o) => ({
-              id: o.menu_id,
-              name: o.menu_item,
-              original: o.original,
-              price: Number(o.price || 0),
-              quantity: Number(o.quantity || 0),
-              popular: Boolean(o.popular),
-              temp: o.temp,
-              profileImage: o.profile,
-              menu_id: o.menu_id,
-            }))
-          : [];
-        setOrderItems(mapped);
+          const mapped = Array.isArray(sessionData?.orders)
+            ? sessionData.orders.map(function (o) {
+                return {
+                  id: o.menu_id,
+                  name: o.menu_item,
+                  original: o.original,
+                  price: Number(o.price || 0),
+                  quantity: Number(o.quantity || 0),
+                  popular: Boolean(o.popular),
+                  temp: o.temp,
+                  profileImage: o.profile,
+                  menu_id: o.menu_id,
+                };
+              })
+            : [];
+          setOrderItems(mapped);
 
-        orderStorage.saveOrders(sessionId, mapped);
+          orderStorage.saveOrders(sessionId, mapped);
 
-        const totalQuantity = Number(sessionData?.total_items ?? 0);
-        const totalPrice = Number(sessionData?.total_price ?? 0);
-        setOrderSummary({ totalQuantity, totalPrice });
-      } catch (e) {
-        if (!aborted) {
-          console.error("기존 주문 불러오기 실패:", e?.message || e);
+          const totalQuantity = Number(sessionData?.total_items ?? 0);
+          const totalPrice = Number(sessionData?.total_price ?? 0);
+          setOrderSummary({ totalQuantity, totalPrice });
+        } catch (e) {
+          if (!aborted) {
+            console.error("기존 주문 불러오기 실패:", e?.message || e);
+          }
         }
       }
-    }
-    fetchExistingOrders();
-    return () => {
-      aborted = true;
-    };
-  }, [sessionId]);
+      fetchExistingOrders();
+      return function () {
+        aborted = true;
+      };
+    },
+    [sessionId]
+  );
 
-  useEffect(() => {
-    if (timeLeft > 0) {
-      timerRef.current = setTimeout(() => {
-        setTimeLeft((prev) => {
-          const newTime = prev - 1;
-          if (
-            newTime === 0 &&
-            toggleRecordingRef.current &&
-            !autoStopTriggered
-          ) {
-            if (!isRecordingRef.current) {
-              return 0;
-            }
-            setAutoStopTriggered(true);
-            setTimeout(() => {
-              if (toggleRecordingRef.current && isRecordingRef.current) {
-                toggleRecordingRef.current();
+  useEffect(
+    function () {
+      if (timeLeft > 0) {
+        timerRef.current = setTimeout(function () {
+          setTimeLeft(function (prev) {
+            const newTime = prev - 1;
+            if (
+              newTime === 0 &&
+              toggleRecordingRef.current &&
+              !autoStopTriggered
+            ) {
+              if (!isRecordingRef.current) {
+                return 0;
               }
-            }, 100);
-          }
-          return newTime;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
+              setAutoStopTriggered(true);
+              setTimeout(function () {
+                if (toggleRecordingRef.current && isRecordingRef.current) {
+                  toggleRecordingRef.current();
+                }
+              }, 100);
+            }
+            return newTime;
+          });
+        }, 1000);
       }
-    };
-  }, [timeLeft, autoStopTriggered]);
 
-  useEffect(() => {
+      return function () {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+        }
+      };
+    },
+    [timeLeft, autoStopTriggered]
+  );
+
+  useEffect(function () {
     setTimeLeft(5);
     setAutoStopTriggered(false);
   }, []);
 
-  useEffect(() => {
-    return () => {
+  useEffect(function () {
+    return function () {
       if (transitionTimerRef.current) {
         clearTimeout(transitionTimerRef.current);
       }
     };
   }, []);
 
-  useEffect(() => {
-    if (voiceRecognizedText && !isTransitioning && sessionId) {
-      setIsTransitioning(true);
-      transitionTimerRef.current = setTimeout(async () => {
-        try {
-          await syncNow();
+  useEffect(
+    function () {
+      if (voiceRecognizedText && !isTransitioning && sessionId) {
+        setIsTransitioning(true);
+        transitionTimerRef.current = setTimeout(async function () {
+          try {
+            await syncNow();
 
-          // 항상 새로운 상품으로 추가
-          console.log("➕ 새로운 상품 추가:", voiceRecognizedText);
-          orderService
-            .addOrder(sessionId, voiceRecognizedText)
-            .then(() => console.log("📤 추가 주문 요청 전송됨"))
-            .catch((e) =>
-              console.warn("⚠️ 추가 주문 요청 전송 실패(무시):", e)
-            );
+            // 항상 새로운 상품으로 추가
+            console.log("➕ 새로운 상품 추가:", voiceRecognizedText);
+            orderService
+              .addOrder(sessionId, voiceRecognizedText)
+              .then(function () {
+                console.log("📤 추가 주문 요청 전송됨");
+              })
+              .catch(function (e) {
+                console.warn("⚠️ 추가 주문 요청 전송 실패(무시):", e);
+              });
 
-          navigate("/order/voice/details/plus/confirm", {
-            state: {
-              sessionId: sessionId,
-              recognizedText: voiceRecognizedText,
-            },
-          });
-        } catch (error) {
-          console.error("❌ 추가 주문 요청 실패:", error);
-          goToVoiceError(navigate, { cause: error });
-          setIsTransitioning(false);
-        }
-      }, 1000);
-    }
-  }, [
-    voiceRecognizedText,
-    isTransitioning,
-    sessionId,
-    navigate,
-    syncNow,
-    orderItems,
-    handleQuantityChange,
-  ]);
+            navigate("/order/voice/details/plus/confirm", {
+              state: {
+                sessionId: sessionId,
+                recognizedText: voiceRecognizedText,
+              },
+            });
+          } catch (error) {
+            console.error("❌ 추가 주문 요청 실패:", error);
+            goToVoiceError(navigate, { cause: error });
+            setIsTransitioning(false);
+          }
+        }, 1000);
+      }
+    },
+    [
+      voiceRecognizedText,
+      isTransitioning,
+      sessionId,
+      navigate,
+      syncNow,
+      orderItems,
+      handleQuantityChange,
+    ]
+  );
 
-  useEffect(() => {
-    const t1 = setTimeout(() => setShowTopSection(true), 100);
-    const t2 = setTimeout(() => setAnimateProducts(true), 900);
-    return () => {
+  useEffect(function () {
+    const t1 = setTimeout(function () {
+      setShowTopSection(true);
+    }, 100);
+    const t2 = setTimeout(function () {
+      setAnimateProducts(true);
+    }, 900);
+    return function () {
       clearTimeout(t1);
       clearTimeout(t2);
     };

@@ -21,29 +21,41 @@ export function usePhoneInput(options = {}) {
   const [digits, setDigits] = useState(initialValue);
 
   // 포맷된 전화번호 (010-1234-5678 형태로 분리)
-  const formatted = useMemo(() => {
-    return formatKoreanPhone(digits);
-  }, [digits]);
+  const formatted = useMemo(
+    function () {
+      return formatKoreanPhone(digits);
+    },
+    [digits]
+  );
 
   // 원본 숫자 문자열 (하이픈 등 제거)
-  const cleanDigits = useMemo(() => {
-    return extractDigits(digits);
-  }, [digits]);
+  const cleanDigits = useMemo(
+    function () {
+      return extractDigits(digits);
+    },
+    [digits]
+  );
 
   // 유효성 검사
-  const isValid = useMemo(() => {
-    return isValidKoreanPhone(digits);
-  }, [digits]);
+  const isValid = useMemo(
+    function () {
+      return isValidKoreanPhone(digits);
+    },
+    [digits]
+  );
 
   // 저장 가능 여부 (11자리 완성 여부)
-  const canSave = useMemo(() => {
-    return cleanDigits.length === maxLength;
-  }, [cleanDigits.length, maxLength]);
+  const canSave = useMemo(
+    function () {
+      return cleanDigits.length === maxLength;
+    },
+    [cleanDigits.length, maxLength]
+  );
 
   // 숫자 추가
   const addDigit = useCallback(
     function (digit) {
-      setDigits((prev) => {
+      setDigits(function (prev) {
         const cleaned = extractDigits(prev);
         if (!canAddDigit(cleaned, maxLength)) return prev;
         return cleaned + String(digit);
@@ -55,7 +67,7 @@ export function usePhoneInput(options = {}) {
   // 마지막 숫자 제거 (백스페이스)
   const backspace = useCallback(
     function () {
-      setDigits((prev) => {
+      setDigits(function (prev) {
         return removeLastDigit(prev, minLength);
       });
     },

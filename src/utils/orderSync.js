@@ -9,7 +9,7 @@ import { orderService } from "../services/api";
  */
 export function useOrderSync(sessionId) {
   // 수동 동기화 함수
-  const syncNow = useCallback(async () => {
+  const syncNow = useCallback(async function() {
     if (!sessionId) {
       console.log("❌ 세션 ID가 없습니다");
       return false;
@@ -24,12 +24,14 @@ export function useOrderSync(sessionId) {
     try {
       // localStorage의 데이터를 백엔드 API 형식으로 변환
       const apiOrders = storedOrders
-        .filter((order) => order.quantity > 0) // 수량이 0인 항목 제거
-        .map((order) => ({
-          menu_item: order.menu_item || order.name,
-          quantity: Number(order.quantity || 0),
-          temp: order.temp || "ice", // 기본값은 ice로 설정
-        }));
+        .filter(function(order) { return order.quantity > 0; }) // 수량이 0인 항목 제거
+        .map(function(order) {
+          return {
+            menu_item: order.menu_item || order.name,
+            quantity: Number(order.quantity || 0),
+            temp: order.temp || "ice", // 기본값은 ice로 설정
+          };
+        });
 
       if (apiOrders.length === 0) {
         console.log("📋 동기화할 유효한 주문이 없습니다");
@@ -69,12 +71,12 @@ export function useOrderSync(sessionId) {
  */
 export const syncUtils = {
   // 주문 변경사항 확인
-  hasChanges: (sessionId, currentOrders) => {
+  hasChanges: function(sessionId, currentOrders) {
     return orderStorage.hasChanges(sessionId, currentOrders);
   },
 
   // 주문 내역 강제 동기화
-  forceSync: async (sessionId) => {
+  forceSync: async function(sessionId) {
     if (!sessionId) return false;
 
     const storedOrders = orderStorage.getOrders(sessionId);
@@ -82,12 +84,14 @@ export const syncUtils = {
 
     try {
       const apiOrders = storedOrders
-        .filter((order) => order.quantity > 0)
-        .map((order) => ({
-          menu_item: order.menu_item || order.name,
-          quantity: Number(order.quantity || 0),
-          temp: order.temp || "ice", // 기본값은 ice로 설정
-        }));
+        .filter(function(order) { return order.quantity > 0; })
+        .map(function(order) {
+          return {
+            menu_item: order.menu_item || order.name,
+            quantity: Number(order.quantity || 0),
+            temp: order.temp || "ice", // 기본값은 ice로 설정
+          };
+        });
 
       // 새로운 API 형식에 맞게 orders 키로 래핑
       const requestBody = { orders: apiOrders };
@@ -115,7 +119,7 @@ export const syncUtils = {
   },
 
   // 특정 상품 수량 즉시 동기화
-  syncItem: async (sessionId, productId, newQuantity) => {
+  syncItem: async function(sessionId, productId, newQuantity) {
     if (!sessionId) return false;
 
     try {
@@ -128,11 +132,13 @@ export const syncUtils = {
       if (!updatedOrders) return false;
 
       // 백엔드 동기화
-      const apiOrders = updatedOrders.map((order) => ({
-        menu_item: order.menu_item || order.name,
-        quantity: Number(order.quantity || 0),
-        temp: order.temp || "ice", // 기본값은 ice로 설정
-      }));
+      const apiOrders = updatedOrders.map(function(order) {
+        return {
+          menu_item: order.menu_item || order.name,
+          quantity: Number(order.quantity || 0),
+          temp: order.temp || "ice", // 기본값은 ice로 설정
+        };
+      });
 
       // 새로운 API 형식에 맞게 orders 키로 래핑
       const requestBody = { orders: apiOrders };

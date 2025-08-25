@@ -5,15 +5,19 @@ export default function CategoryTabs({ tabs, activeId, onChange }) {
   return (
     <CategoryBar>
       <CategoryInner>
-        {tabs.map((tab) => (
-          <CategoryTab
-            key={tab.id}
-            $active={tab.id === activeId}
-            onClick={() => onChange(tab.id)}
-          >
-            {tab.label}
-          </CategoryTab>
-        ))}
+        {tabs.map(function (tab) {
+          return (
+            <CategoryTab
+              key={tab.id}
+              $active={tab.id === activeId}
+              onClick={function () {
+                return onChange(tab.id);
+              }}
+            >
+              {tab.label}
+            </CategoryTab>
+          );
+        })}
       </CategoryInner>
     </CategoryBar>
   );

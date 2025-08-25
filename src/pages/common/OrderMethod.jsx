@@ -54,7 +54,7 @@ export default function OrderMethod() {
       <ButtonGroup>
         <Button
           type="button"
-          onClick={() => {
+          onClick={function () {
             setMode("voice");
             handleSelect("/order/voice");
           }}
@@ -68,7 +68,7 @@ export default function OrderMethod() {
 
         <Button
           type="button"
-          onClick={() => {
+          onClick={function () {
             setMode("color");
             handleTouchOrder("/order/color/intro");
           }}
@@ -84,7 +84,7 @@ export default function OrderMethod() {
       <ButtonGroup>
         <Button
           type="button"
-          onClick={() => {
+          onClick={function () {
             setMode("touch");
             handleTouchOrder("/order/touch");
           }}
@@ -98,7 +98,7 @@ export default function OrderMethod() {
 
         <Button
           type="button"
-          onClick={() => {
+          onClick={function () {
             setMode("phone");
             handleTouchOrder("/order/phone/number");
           }}

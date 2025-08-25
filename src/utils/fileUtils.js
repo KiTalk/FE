@@ -19,7 +19,9 @@ export function validateFileFormat(file) {
     "audio/mp4",
     "audio/flac",
   ];
-  return allowedTypes.some((type) => file.type.startsWith(type));
+  return allowedTypes.some(function (type) {
+    return file.type.startsWith(type);
+  });
 }
 
 // 파일 크기 검증

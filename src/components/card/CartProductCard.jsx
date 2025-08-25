@@ -32,7 +32,7 @@ export default function CartProductCard({
   tagLabel,
 }) {
   // ✅ 현재 모드 읽기 (order_spec.mode)
-  const currentMode = useMemo(() => {
+  const currentMode = useMemo(function () {
     try {
       if (typeof window === "undefined") return null;
       const raw = window.localStorage.getItem("order_spec");
@@ -45,7 +45,7 @@ export default function CartProductCard({
   }, []);
 
   // ✅ ColorIntro에서 선택한 메뉴 타입 읽기
-  const selectedMenuType = useMemo(() => {
+  const selectedMenuType = useMemo(function () {
     try {
       if (typeof window === "undefined") return null;
       return window.localStorage.getItem("selectedMenuType");
