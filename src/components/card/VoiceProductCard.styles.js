@@ -17,7 +17,7 @@ export const OrderTypeTag = styled.div`
   position: absolute;
   left: 0;
   top: 0;
-  width: 5.8125rem;
+  width: 7.8125rem;
   height: 3.8125rem;
   border-radius: 0 0 1.25rem 0;
   background: #223770;
