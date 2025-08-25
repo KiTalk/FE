@@ -1,11 +1,11 @@
 // API 설정
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://python.hyunseoko.store/";
+  import.meta.env.VITE_API_BASE_URL || "https://python.hyunseoko.store";
 
 // 터치주문용 API 설정
 export const TOUCH_ORDER_API_BASE_URL =
   import.meta.env.VITE_TOUCH_ORDER_API_BASE_URL ||
-  "https://api.hyunseoko.store/";
+  "https://api.hyunseoko.store";
 
 export const API_ENDPOINTS = {
   // API_BASE_URL 사용
