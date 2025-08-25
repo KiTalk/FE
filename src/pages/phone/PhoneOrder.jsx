@@ -957,10 +957,13 @@ function TouchOrderContent() {
                             phoneFavoritesData.map(function (item, idx) {
                               const rankLabel =
                                 idx < 3 ? `${idx + 1}위` : undefined;
+                              const cartQuantity =
+                                localCart[item.originalId] || 0;
                               return (
                                 <ProductCard
                                   key={`fav-${item.id}`}
                                   product={item}
+                                  cartQty={cartQuantity}
                                   onAdd={makeOnAddHandler(item)}
                                   tagLabel={rankLabel}
                                   currentMode="phone"
@@ -1234,10 +1237,12 @@ function TouchOrderContent() {
                   <ProductRow>
                     {Array.isArray(section?.products)
                       ? section.products.map(function (item) {
+                          const cartQuantity = localCart[item.originalId] || 0;
                           return (
                             <ProductCard
                               key={item.id}
                               product={item}
+                              cartQty={cartQuantity}
                               onAdd={makeOnAddHandler(item)}
                               currentMode="phone"
                               selectedMenuType={activeTabId}

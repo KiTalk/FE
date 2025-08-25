@@ -34,7 +34,7 @@ export default function VoiceOneTwo() {
         위 버튼을 누른 후 <br />
         주문할 메뉴를 말씀해주세요
       </Title>
-      <Example>""아이스 아메리카노 1잔 포장""</Example>
+      <Example>"아이스 아메리카노 1잔 포장"</Example>
 
       <BackButton onClick={handleBack} />
     </Page>

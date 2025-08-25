@@ -226,7 +226,7 @@ export default function VoiceRecognize() {
 
               <ExampleBox>
                 <ExampleHeading>예시 문장</ExampleHeading>
-                <ExampleGray>""아이스 아메리카노 1잔 포장""</ExampleGray>
+                <ExampleGray>"아이스 아메리카노 1잔 포장"</ExampleGray>
               </ExampleBox>
 
               <BackButton
