@@ -79,7 +79,7 @@ export default function PhoneNumber() {
       inputHeading="전화번호 입력"
       instruction="오른쪽 숫자 패드에서 전화번호 입력 후 저장을 눌러주세요"
       errorMessage={errorMessage}
-      saveButtonText={isSaving ? "저장 중..." : "저장"}
+      saveButtonText={isSaving ? "조회 중..." : "조회"}
       onSave={handleSave}
       onBack={handleGoBack}
     >
